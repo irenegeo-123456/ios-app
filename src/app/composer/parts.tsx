@@ -4,7 +4,8 @@ import { LONG_PRESS_MS } from '../gestures'
 import { SKButton } from '../../slackkit/SKButton'
 import { SKAvatarPile } from '../../slackkit/SKAvatarPile'
 import type { Conversation, FileAttachment, User } from '../../data/types'
-import { asset } from '../../lib/asset'
+import { SKThumbnailAttachment } from '../../slackkit/SKThumbnailAttachment'
+import type { ContextBarState } from './contextBar'
 
 // The composer's small pieces (spec composer.md §5, §6, §9, §10, §14).
 
@@ -136,24 +137,65 @@ export function SendToChannel({ conv, checked, onToggle }: { conv: Conversation 
   )
 }
 
-/**
- * The typing indicator (copy from ContextBarTypingConfiguration.swift:34-38): 16 pt avatars overlapping by 4, then
- * "Jane is **typing…**". `standalone`: Sept's SKContextBar, its own interactive glass capsule above the composer (min 36 tall,
- * 6 / 12 padding, caption 13 contentPrimary; SKContextBar.swift:38-41, :66-77, :136-152, :682-689); otherwise June's
- * ContextBarView inside the glass card (spec §14).
- */
-export function TypingBanner({ users, standalone }: { users: User[]; standalone?: boolean }) {
-  const names = users.map((u) => u.name || 'User')
-  // user_is_typing (yaml:22968), two_users_are_typing (20930), several_people_are_typing (16751)
+/** "Jane is **typing…**" / "Jane and Sam are **typing…**" / "Several people are **typing…**" (user_is_typing yaml:22968,
+ *  two_users_are_typing :22438, several_people_are_typing :17733; ContextBarTypingConfiguration.swift:31-42). Names are
+ *  `user.name`, display or real (TypingUsersService.swift:56-70). */
+function typingLabel(users: User[]): ReactNode {
+  const names = users.map((u) => u.name || u.realName)
   const lead = names.length === 1 ? `${names[0]} is ` : names.length === 2 ? `${names[0]} and ${names[1]} are ` : 'Several people are '
   return (
-    <div className={standalone ? 'cmp-banner cmp-banner--bar glass' : 'cmp-banner'} role="status">
+    <>
+      {lead}
+      <b>typing…</b>
+    </>
+  )
+}
+
+/**
+ * Sept's SKContextBar above the composer (Modules/UIInfra/ContextBarUI/Implementation/SKContextBar.swift): its own
+ * interactive glass capsule, at least 36 tall, 6 / 12 padding (:38-41, :66-77, :136-152); a header row `[left] [label]`
+ * 8 apart (Views/ContextBarRowView.swift:18-23, :61-68): a 16 pt overlapping avatar pile or nothing (SKContextBar.swift:
+ * 331-335), then the label, Lato 13 contentPrimary on up to 2 lines, <bold> spans Lato Bold (:339-341, :618-629, :682-689).
+ * Its states are worked out in contextBar.ts; each draws as SKContextBarAdapter.swift does.
+ */
+export function ContextBar({ state }: { state: ContextBarState }) {
+  let avatars: string[] = []
+  let label: ReactNode
+  if (state.kind === 'typing') {
+    avatars = state.users.map((u) => u.avatar)
+    label = typingLabel(state.users)
+  } else if (state.kind === 'aiAppProcessing') {
+    // Text(data.name + " " + data.status), no left component (ContextBarAiAppProcessingConfiguration.swift:22; SKContextBarAdapter.swift:282-289)
+    label = state.text
+  } else {
+    // Slackbot's avatar + slackbot_is_typing "Slackbot is <bold>typing...</bold>", three periods (yaml:20148;
+    // ContextBarSlackbotAIProcessingConfiguration.swift:31, :39-40; SKContextBarAdapter.swift:410-418)
+    avatars = state.avatar ? [state.avatar] : []
+    label = (
+      <>
+        Slackbot is <b>typing...</b>
+      </>
+    )
+  }
+  return (
+    <div className="cmp-banner cmp-banner--bar glass" role="status">
+      {/* SKAvatarPile .extraSmall, overlapping (SKContextBar.swift:37, :331-335); none when there's no avatar */}
+      {avatars.length > 0 && <SKAvatarPile avatars={avatars} size="extraSmall" shouldOverlap maxAvatarCount={5} className="cmp-banner__pile" />}
+      <span className="cmp-banner__text">{label}</span>
+    </div>
+  )
+}
+
+/**
+ * June's typing banner, ContextBarView inside the glass card (flag composerContextBar off; spec §14): 16 pt avatars
+ * overlapping by 4, then "Jane is **typing…**".
+ */
+export function TypingBanner({ users }: { users: User[] }) {
+  return (
+    <div className="cmp-banner" role="status">
       {/* SKAvatarPile .extraSmall, overlapping, at most 5 (ContextBarView.swift:541; SKAvatarPile.swift:207-220, :236) */}
       <SKAvatarPile avatars={users.map((u) => u.avatar)} size="extraSmall" shouldOverlap maxAvatarCount={5} className="cmp-banner__pile" />
-      <span className="cmp-banner__text">
-        {lead}
-        <b>typing…</b>
-      </span>
+      <span className="cmp-banner__text">{typingLabel(users)}</span>
     </div>
   )
 }
@@ -179,6 +221,11 @@ function fileTile(f: FileAttachment): { bg: string; icon: string } {
 /**
  * The attachments tray (ComposerAttachmentsView.swift:71-91): 76 pt, a horizontal strip of 64 pt cards with a remove
  * button on each card's top-right corner. Images are 64 × 64 thumbnails; files are compact cards up to 220 wide.
+ * An image's ALT badge (Sept): SKThumbnailAttachment with altTextBadgeVisibility `.visibleAlways` ("ALT", or the
+ * "+ ALT" reminder) when the user's or team's alt-text-reminder pref is on, else `.visibleIfPresent` ("ALT" only when the
+ * image has alt text) (ComposerAttachmentsPresenter.swift:253-261; prefs `altTextReminders` / `teamAltTextReminders`,
+ * default false, ComposerFeature+Dependencies.swift:225-226, :243). The clone has neither pref nor alt text on files, so
+ * it's `.visibleIfPresent` and no badge shows. (The image-markup edit icon would replace it; flag off, §9.)
  */
 export function AttachmentsTray({ files, onRemove }: { files: FileAttachment[]; onRemove: (id: string) => void }) {
   return (
@@ -189,7 +236,7 @@ export function AttachmentsTray({ files, onRemove }: { files: FileAttachment[]; 
           <div key={f.id} className={`cmp-tray__item${isImage(f) ? ' is-thumb' : ' is-file'}`}>
             <div className="cmp-tray__card" data-tap>
               {isImage(f) ? (
-                <img src={asset(f.url)} alt="" draggable={false} />
+                <SKThumbnailAttachment state={{ image: { src: f.url } }} altTextBadgeVisibility="visibleIfPresent" isInteractionEnabled={false} className="cmp-tray__thumb" />
               ) : (
                 <>
                   <span className="cmp-tray__tile" style={{ background: tile.bg }}>

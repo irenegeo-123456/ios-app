@@ -7,6 +7,7 @@ import { textOf } from '../format'
 import { BKButton, BKChoices, BKImageElement, BKOverflow, BKSelectButton } from '../elements/Elements'
 import type { PickableElement } from '../elements/open'
 import type { ActionsBlock, AlertBlock, BlockElement, ContextBlock, DividerBlock, FileBlock, HeaderBlock, ImageBlock, ImageElement, KitBlock, SectionBlock, TextObject, VideoBlock } from '../types'
+import { asset } from '../../lib/asset'
 
 // section, header, divider, context, image, actions, video, file, alert, the unknown-block banner and the internal
 // loading block (spec blockkit.md §3.1–3.7, 3.10, 3.11, 3.16, 3.20). Sizes are in the CSS (blocks.css), with sources.
@@ -125,7 +126,7 @@ function ImageView({ block }: Props<ImageBlock>) {
   const [failed, setFailed] = useState(false)
   const known = block.image_width && block.image_height ? { w: block.image_width, h: block.image_height } : null
   const size = known ?? natural
-  const src = block.image_url ?? block.slack_file?.url
+  const src = asset(block.image_url ?? block.slack_file?.url)
   const title = block.title ? textOf(block.title) : ''
   return (
     <div className="bk-image">
@@ -172,7 +173,7 @@ function VideoView({ block }: Props<VideoBlock>) {
     <div className="bk-video">
       {by && (
         <div className="bk-video__provider">
-          {block.provider_icon_url && <img className="bk-video__provider-icon" src={block.provider_icon_url} alt="" />}
+          {block.provider_icon_url && <img className="bk-video__provider-icon" src={asset(block.provider_icon_url)} alt="" />}
           <span>{by}</span>
         </div>
       )}
@@ -180,7 +181,7 @@ function VideoView({ block }: Props<VideoBlock>) {
         <BKInline text={block.title} />
       </div>
       <div className="bk-video__thumb" data-tap onClick={() => window.open(block.video_url, '_blank', 'noopener')}>
-        <img src={block.thumbnail_url} alt={block.alt_text} draggable={false} />
+        <img src={asset(block.thumbnail_url)} alt={block.alt_text} draggable={false} />
         {/* the badge: play_filled + "Video", Lato Bold 13 white on #1D1C1D @70 % (BKVideoBlockView.swift:22,116,126-158) */}
         <span className="bk-video__badge">
           <Icon name="play_filled" size={16} />
@@ -219,7 +220,7 @@ function FileView({ block }: Props<FileBlock>) {
   const subtitle = [prettyBytes(f.size), type].filter(Boolean).join(' ')
   return (
     <div className="bk-file" data-tap onClick={() => f.url && window.open(f.url, '_blank', 'noopener')}>
-      <span className="bk-file__ornament">{f.icon ? <img src={f.icon} alt="" /> : <Icon name="file" size={20} />}</span>
+      <span className="bk-file__ornament">{f.icon ? <img src={asset(f.icon)} alt="" /> : <Icon name="file" size={20} />}</span>
       <span className="bk-file__text">
         <span className="bk-file__title">{f.title}</span>
         {subtitle && <span className="bk-file__subtitle">{subtitle}</span>}

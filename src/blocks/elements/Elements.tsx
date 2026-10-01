@@ -10,6 +10,7 @@ import { BKInline } from '../text'
 import type { ButtonElement, CheckboxesElement, ImageElement, KitAction, OptionObject, OverflowElement, RadioButtonsElement, WorkflowButtonElement } from '../types'
 import type { StateValue } from '../views'
 import { pickFor, type PickableElement } from './open'
+import { asset } from '../../lib/asset'
 
 // Block Kit elements (spec blockkit.md §4): buttons are SKButton medium (§2), overflow is the "More" text button, selects
 // and pickers are an outline button with a caret (actions, section accessories) or the input block's select row, and
@@ -229,7 +230,7 @@ export function BKChoices({ el, placement }: { el: CheckboxesElement | RadioButt
 
 /** An image element: 20 × 20, radius 2 in context blocks (ContextBlockImageCell), 68 × 68 thumbnails in sections. */
 export function BKImageElement({ el, className }: { el: ImageElement; className?: string }) {
-  const src = el.image_url ?? el.slack_file?.url
+  const src = asset(el.image_url ?? el.slack_file?.url)
   if (!src) return <span className={className} />
   return <img className={className} src={src} alt={el.alt_text} draggable={false} />
 }

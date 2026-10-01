@@ -39,7 +39,9 @@ import {
 } from './editor'
 import { COMMANDS, findOpportunity, search, type AcRow, type Opportunity } from './suggestions'
 import { AutocompleteCard } from './Autocomplete'
-import { AttachmentChip, AttachmentsTray, SendToChannel, ToolButton, TypingBanner, keepFocus } from './parts'
+import { AttachmentChip, AttachmentsTray, ContextBar, SendToChannel, ToolButton, TypingBanner, keepFocus } from './parts'
+import { contextBarState, type ContextBarState } from './contextBar'
+import { useAgentStore } from '../../apps/agent-state'
 import { SLACKBOT_DM, SLACKBOT_USER_ID } from '../screens/slackbot/constants'
 import './PlusSheet'
 import './LinkAlert'
@@ -182,16 +184,21 @@ export function Composer({ conversationId, threadTs, onHeight, placeholder, onSe
 
   const editingRoot = !!editTarget && !!threadTs && editTarget.ts === threadTs
   const ph = placeholder ?? placeholderFor(fx, conv, threadTs, editingRoot)
-  const typers = (typingIds ?? []).filter((id) => id !== fx.me).map((id) => fx.users[id]).filter((u) => !!u)
-  const hasBanner = typers.length > 0 && !threadTs
-  // Sept: the context bar stands apart above the card (ContextBarContentPlugin.swift:78-95; MessageTranscriptPluginsBuilder
-  // .swift:157-163), the card's insets never change for it (ComposerView.swift:193-207). June flag off: inside the card.
-  const contextBarLayout = useFlag('composerContextBar')
-  const canSend = !!editTarget || !blank || files.length > 0
   // Slackbot's DM (Slackbot AI on, as in the demo): no microphone when collapsed, and the focused row is just "+"
   // (ComposerToolbarLayoutManager.swift:188-197, :205-217 [Sept])
   // the DM with Slackbot's user, or the Slackbot screens' own DM, which isn't in the workspace's conversations
   const isSlackbot = conv?.userId === SLACKBOT_USER_ID || conversationId === SLACKBOT_DM
+  // what the context bar shows: people typing, an AI app's status in a thread of its DM, or Slackbot answering
+  // (contextBar.ts; spec §14)
+  const agentStatuses = useAgentStore((s) => s.status)
+  const bar = contextBarState({ me: fx.me, users: fx.users, conversationId, conv, threadTs, typingIds, statuses: agentStatuses, slackbot: isSlackbot, slackbotUserId: SLACKBOT_USER_ID })
+  const hasBanner = !!bar
+  // Sept: the context bar stands apart above the card (ContextBarContentPlugin.swift:78-95; MessageTranscriptPluginsBuilder
+  // .swift:157-163), the card's insets never change for it (ComposerView.swift:193-207). June flag off: inside the card,
+  // typing only.
+  const contextBarLayout = useFlag('composerContextBar')
+  const legacyTypers = !contextBarLayout && bar?.kind === 'typing' ? bar.users : null
+  const canSend = !!editTarget || !blank || files.length > 0
 
   // ---------------------------------------------------------------------------------------- editor sync
 
@@ -317,11 +324,11 @@ export function Composer({ conversationId, threadTs, onHeight, placeholder, onSe
     ro.observe(el)
     return () => ro.disconnect()
   }, [showContextBar])
-  // the bar stays while it leaves with a fade and a slide (ListDrawerAppearanceAnimation.swift:22-25 [Sept]), showing its
-  // last typers
+  // the bar stays while it leaves with a fade and a slide (ListDrawerAppearanceAnimation.swift:22-25 [Sept]), showing what
+  // it showed last
   const barPhase = useLeavingPhase(showContextBar, 430)
-  const lastTypers = useRef(typers)
-  if (showContextBar) lastTypers.current = typers
+  const lastBar = useRef<ContextBarState | null>(bar)
+  if (showContextBar) lastBar.current = bar
   const drawerH = cardH + (showContextBar ? ctxH + 12 : 0)
   useEffect(() => {
     onHeight?.(drawerH)
@@ -794,7 +801,7 @@ export function Composer({ conversationId, threadTs, onHeight, placeholder, onSe
   return (
     <div
       ref={rootRef}
-      className={['cmp', `cmp--${style}`, !contextBarLayout && 'cmp--legacy', focused && 'is-focused', focused && mode === 'format' && 'is-formatting', longform && 'is-longform', hasBanner && !contextBarLayout && 'has-banner', editTarget && 'is-editing']
+      className={['cmp', `cmp--${style}`, !contextBarLayout && 'cmp--legacy', focused && 'is-focused', focused && mode === 'format' && 'is-formatting', longform && 'is-longform', !!legacyTypers && 'has-banner', editTarget && 'is-editing']
         .filter(Boolean)
         .join(' ')}
       data-qa="composer"
@@ -802,14 +809,14 @@ export function Composer({ conversationId, threadTs, onHeight, placeholder, onSe
       {ac && ac.rows.length > 0 && ac.place.maxHeight > 40 && (
         <AutocompleteCard rows={ac.rows} highlighted={ac.hi} onPick={pick} style={acStyle} maxHeight={ac.place.maxHeight} query={`${ac.opp.type}${ac.opp.query}`} />
       )}
-      {barPhase !== 'out' && (
+      {barPhase !== 'out' && (showContextBar ? bar : lastBar.current) && (
         <div className={`cmp-context${barPhase === 'leaving' ? ' is-leaving' : ''}`} ref={ctxRef}>
-          <TypingBanner users={showContextBar ? typers : lastTypers.current} standalone />
+          <ContextBar state={(showContextBar ? bar : lastBar.current)!} />
         </div>
       )}
       <div ref={cardRef} className="cmp-card glass" style={{ height: longform ? longH : cardH }} onPointerDown={onCardPointerDown} onPointerMove={onCardPointerMove} onPointerUp={onCardPointerUp} onPointerCancel={onCardPointerUp}>
         <div className="cmp-stack" ref={stackRef}>
-          {hasBanner && !contextBarLayout && <TypingBanner users={typers} />}
+          {legacyTypers && <TypingBanner users={legacyTypers} />}
           <div className="cmp-contents">
             {/* 20 pt handlebar area, its pill invisible on iOS 26; tapping it toggles the full-screen composer (§2.3) */}
             <button
