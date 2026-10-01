@@ -1,0 +1,97 @@
+/* ModalStack / ModalScreen / ModalPage (ModalStack.tsx). A modal's navigation controller: pages slide in from the
+   right over 0.35 s while the page below moves 30 % to the left (UIKit's push, as StackView's deeper pushes and the
+   Block Kit modal's views). */
+
+.modal-stack {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  /* the settings view controllers' backgrounds moved from sk_primary_background to basePrimary in September (same
+     #ffffff / #1a1d21): CustomStatusViewController.swift:49, NotificationSettingsViewController.swift:21,
+     AppearanceViewController.swift:27, EditProfileViewController.swift:49 */
+  background: var(--dt_color_base_primary);
+}
+.modal-stack__page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.modal-stack__page.is-covered {
+  transform: translateX(-30%);
+  pointer-events: none;
+}
+.modal-stack__page.is-entering {
+  animation: modal-push-in 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.08);
+}
+.modal-stack__page.is-leaving {
+  animation: modal-push-out 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+}
+@keyframes modal-push-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes modal-push-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.modal-page {
+  /* Slack's settings lists sit on basePrimary (#ffffff / #1a1d21) */
+  background: var(--dt_color_base_primary);
+}
+.modal-page.is-sheet {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.modal-page__list {
+  /* under the sheet's bar: 16 pt above a 44 pt row (SheetNavBar) */
+  padding-top: 60px;
+}
+.modal-page__list.is-screen {
+  /* under a tab's bar: the status bar + the 44 pt bar */
+  padding-top: calc(var(--navbar-bottom));
+}
+.modal-page__end {
+  /* in a sheet: clear of the home indicator, and of the keyboard while it's up */
+  height: calc(var(--safe-bottom) + 16px + var(--kb-height, 0px));
+}
+.modal-page__list.is-screen .modal-page__end {
+  /* on a tab: clear of the floating tab bar (21 + 62 pt, measurements.md) */
+  height: calc(21px + 62px + 16px + var(--kb-height, 0px));
+}
+.modal-page__item.is-disabled {
+  opacity: 0.5;
+}
+.modal-page__text-button {
+  /* a title bar button item on a tab's bar: UIKit's system font at 17 pt in a glass capsule, the title 12 pt in from
+     its ends (measurements.md: SKBarButtonItemTests testTitleButtons 12.3, system Edit / Save / Cancel 11–12.3; nav.css) */
+  width: auto;
+  padding: 0 12px;
+  font: 400 17px/1 var(--sf);
+  color: var(--dt_color_content_primary);
+}
+.modal-page__text-button:disabled {
+  color: var(--dt_color_content_tertiary);
+}
+/* Slack's title items: Lato Bold 17 (SheetNavBar's weight; SKBarButtonItem .title(.default)), contentSecondary disabled */
+.modal-page__text-button.is-bold {
+  font: 700 17px/1 Lato;
+}
+.modal-page__text-button.is-bold:disabled {
+  color: var(--dt_color_content_secondary);
+}
+.modal-page__text-button.is-regular {
+  font: 400 17px/1 Lato;
+}

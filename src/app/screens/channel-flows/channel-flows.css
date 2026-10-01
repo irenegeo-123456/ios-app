@@ -1,0 +1,59 @@
+/* Shared by the channel and people flows (spec reference/ios/specs/channels-people.md). */
+
+/* A plain title bar button item on iOS 26: UIKit's 17 pt system font in the bar tint, highlight1.content
+   (SLAppearance.swift:37), in a glass capsule (nav.css .glass-group). */
+.chf-bar__text {
+  padding: 0 6px;
+  font: 400 17px/1 var(--sf);
+  color: var(--dt_color_content_highlight_1);
+  white-space: nowrap;
+}
+.chf-bar.is-disabled .chf-bar__text {
+  color: var(--dt_color_content_tertiary);
+}
+.chf-bar.is-disabled .glass-group__item {
+  pointer-events: none;
+}
+/* `.prominent` (ChannelVisibilityPickerViewController.swift:62-66): UIKit fills the capsule with the tint and draws a
+   white, semibold title */
+.chf-bar.is-prominent {
+  background: var(--dt_color_content_highlight_1);
+  box-shadow: none;
+}
+.chf-bar.is-prominent .chf-bar__text {
+  font: 600 17px/1 var(--sf);
+  color: var(--dt_color_constants_white);
+}
+.chf-bar.is-prominent.is-disabled {
+  background: var(--glass-fill);
+}
+.chf-bar.is-prominent.is-disabled .chf-bar__text {
+  color: var(--dt_color_content_tertiary);
+}
+
+/* The system done item with glass styling on iOS 26: a .prominent circle filled with the bar's tint, the checkmark white
+   (SKBarButtonItem.swift:375-394, 419-421; SLAppearance.swift:37) */
+.glass-button.chf-done {
+  background: var(--dt_color_content_highlight_1);
+  box-shadow: var(--glass-shadow);
+  color: var(--dt_color_constants_white);
+}
+
+/* a plain navigation title: Lato Bold 17, contentPrimary (UINavigationBar+SlackStyles.swift:83-84) */
+.chf-plain-title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+
+/* The title pill when it isn't a button (find mode) */
+.chf-pill {
+  cursor: default;
+}
+.chf-pill__prefix {
+  vertical-align: -2px;
+}
+
+/* UILabel breaks lines at "\n": "Channel\ncreated" (`channel_created`, yaml:3720) is two lines in SKToast */
+.sk-toast__message {
+  white-space: pre-line;
+}

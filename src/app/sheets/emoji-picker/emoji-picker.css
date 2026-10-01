@@ -1,0 +1,345 @@
+/* The emoji picker (spec sheets-menus.md §2). Background basePrimary (EP/ModalPicker/EmojiPickerViewController.swift:242). */
+.ep {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--dt_color_base_primary);
+}
+
+/* ---- header: a UISearchBar (.prominent, no background image) 6 pt from the top, 8 from the sides, 6 above the
+   rule; its field 36 tall on baseSecondary; the add button, 36 × 36, 16 from the right and 8 after the bar
+   (EmojiPickerViewController.swift:48-51, 86-151, 304-322). The header is 64 pt. */
+.ep-header {
+  position: relative;
+  flex: none;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+.ep-searchbar {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 8px;
+  right: 60px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: right 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ep.is-searching .ep-searchbar {
+  right: 8px;
+}
+/* UISearchTextField on iOS 26: a 36 pt capsule, the magnifier and placeholder in placeholderText gray */
+.ep-field {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  border-radius: 18px;
+  padding: 0 8px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--dt_color_base_secondary);
+  color: rgba(60, 60, 67, 0.6);
+}
+[data-appearance='dark'] .ep-field {
+  color: rgba(235, 235, 245, 0.6);
+}
+.ep-field__glass {
+  flex: none;
+}
+.ep-field__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: none;
+  font: 400 17px/22px var(--sf);
+  color: var(--dt_color_content_primary);
+  /* the cursor in the bar's tint, highlight1.content (EmojiPickerViewController.swift:90, September 2026; June
+     sk_highlight) */
+  caret-color: var(--dt_color_content_highlight_1);
+}
+.ep-field__input::placeholder {
+  color: rgba(60, 60, 67, 0.6);
+}
+[data-appearance='dark'] .ep-field__input::placeholder {
+  color: rgba(235, 235, 245, 0.6);
+}
+.ios-app .ep-field__clear {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: rgba(60, 60, 67, 0.3);
+}
+/* the system Cancel button in the bar's tint, highlight1.content #1264a3 / #2ba5ce (EmojiPickerViewController.swift:90) */
+.ios-app .ep-cancel {
+  flex: none;
+  border: 0;
+  padding: 0 0 0 4px;
+  background: none;
+  font: 400 17px/22px var(--sf);
+  color: var(--dt_color_content_highlight_1);
+}
+/* the add-emoji SKIconButton (glass circle, 36 × 36): 16 from the right edge, vertically centered on the search bar
+   (EmojiPickerViewController.swift:113-152, 313, 317-318) */
+.ep-add {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  transition:
+    transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.25s;
+}
+/* hidden while searching: alpha 0 and scale 0.6 (EmojiPickerViewController.swift:435-462) */
+.ep.is-searching .ep-add {
+  opacity: 0;
+  transform: scale(0.6);
+  pointer-events: none;
+}
+/* 1 px, full width, outlineTertiary (EmojiPickerViewController.swift:102-108) */
+.ep-rule {
+  /* one device pixel (src/styles/hairline.css) */
+  flex: none;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+
+/* ---- the grid: 36 pt cells, 7 columns justified between 16 pt insets, 16 pt between rows, sections inset 6 top and
+   bottom, 40 pt of extra room at the end for the category bar (EP/EmojiGrid/EmojiGridViewController.swift:29-37,
+   80-84, 323-346; EmojiGridViewVerticalFlowLayout.swift:127-142) */
+.ep-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.ep-grid {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  overflow-y: auto;
+  padding-bottom: calc(40px + var(--sheet-safe-bottom, var(--safe-bottom)));
+  transition: opacity 0.1s ease-out;
+}
+.ep.is-searching .ep-grid {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Section headers: 32 tall, basePrimary, caption 13 contentSecondary 32 pt from the left; sticky
+   (EmojiGridSectionHeader.swift:34,55,62-64; EmojiGridViewVerticalFlowLayout.swift:88-116) */
+.ep-section__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 32px;
+  padding: 0 4px 0 32px;
+  display: flex;
+  align-items: center;
+  background: var(--dt_color_base_primary);
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.ep-section__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 36px);
+  justify-content: space-between;
+  row-gap: 16px;
+  padding: 6px 16px;
+}
+.ios-app .ep-cell {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+}
+/* pressed: a 48 × 48 baseTertiary circle behind the emoji (EmojiGridCell.swift:52-60,80-98) */
+.ep-cell__press {
+  position: absolute;
+  inset: -6px;
+  border-radius: 25px;
+  background: var(--dt_color_base_tertiary);
+  opacity: 0;
+}
+.ep-cell.is-pressed .ep-cell__press {
+  opacity: 1;
+}
+.ep-cell__emoji {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+
+/* ---- the category bar: a segmented control 24 pt from the left, 22 from the right, 4 above the bottom safe area
+   (at least 14 above the view's bottom); icons 20 pt, contentPrimary, the selected one sk_black / sk_true_white on a
+   basePrimary segment (EP/EmojiGrid/Views/EmojiPickerAccessoryBar.swift:74-90,124-134,174-206). Behind it, since
+   September 2026, a capsule (radius = height / 2) of baseTertiary with a 1 pt outlineTertiary border, pinned 1 pt below
+   the control and 2 pt short of its right edge, so 24 pt in from both sides (:98-109,168-172,191; June: an
+   ultra-thin blur with 8 pt corners). The control's own chrome (height, the selected segment's capsule) is UIKit's. */
+.ep-bar {
+  position: absolute;
+  z-index: 2;
+  left: 24px;
+  right: 22px;
+  bottom: max(14px, calc(var(--sheet-safe-bottom, var(--safe-bottom)) + 4px));
+}
+.ep-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 2px;
+  bottom: -1px;
+  border-radius: 999px;
+  background: var(--dt_color_base_tertiary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+}
+.ep-bar__control {
+  position: relative;
+  height: 32px;
+  display: flex;
+}
+.ep-bar__thumb {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: calc(2px + (100% - 4px) / var(--count) * var(--sel));
+  width: calc((100% - 4px) / var(--count));
+  border-radius: 999px;
+  background: var(--dt_color_base_primary);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 0 0 var(--hairline) rgba(0, 0, 0, 0.04);
+  transition: left 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ios-app .ep-bar__segment {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+.ios-app .ep-bar__segment.is-selected {
+  color: #1d1c1d;
+}
+[data-appearance='dark'] .ios-app .ep-bar__segment.is-selected {
+  color: #fff;
+}
+
+/* ---- search results: S rows, the emoji in the 24 pt box, its name as the label (Presentables/EmojiListPresentable.swift:334-365) */
+.ep-results {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding-bottom: calc(var(--kb-height) + 8px);
+  animation: ep-fade 0.1s ease-out;
+}
+@keyframes ep-fade {
+  from {
+    opacity: 0;
+  }
+}
+.ios-app .ep-result {
+  position: relative;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.ep-result__bg {
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+}
+.ep-result.is-pressed .ep-result__bg {
+  background: var(--dt_color_base_tertiary);
+}
+.ep-result__emoji {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+.ep-result__name {
+  position: relative;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* no results: 100 pt below the top, Lato 15 contentTertiary, centered, up to 3 lines (EmojiListViewController.swift:49-58) */
+.ep-empty {
+  margin: 100px 24px 0;
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_tertiary);
+  text-align: center;
+  white-space: pre-line;
+}
+
+/* ---- skin tones: a popover, basePrimary, tones 36 pt with 4 pt corners, pressed sky blue at 20 %
+   (ST/SkinToneSelection/EmojiButton.swift:16-19,57-60,106-108) */
+.ep-tones-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+}
+.ep-tones {
+  position: absolute;
+  width: 270px;
+  height: 50px;
+  box-sizing: border-box;
+  border-radius: 14px;
+  background: var(--dt_color_base_primary);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2), 0 0 0 var(--hairline) var(--dt_color_outline_tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ep-tones__rule {
+  width: 1px;
+  height: 32px;
+  margin: 0 10px;
+  background: var(--dt_color_outline_tertiary);
+}
+.ios-app .ep-tone {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 4px;
+  padding: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+}
+.ios-app .ep-tone.is-pressed {
+  background: rgba(29, 155, 209, 0.2);
+}
+.ep-tone img {
+  width: 28px;
+  height: 28px;
+}

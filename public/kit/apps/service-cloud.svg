@@ -1,0 +1,18 @@
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Service Cloud">
+  <defs>
+    <linearGradient id="scg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff9a3c"/>
+      <stop offset="1" stop-color="#f2801f"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="11" fill="url(#scg)"/>
+  <!-- headset (support) mark -->
+  <g fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round">
+    <path d="M14 27v-4a10 10 0 0 1 20 0v4"/>
+  </g>
+  <g fill="#ffffff">
+    <rect x="11.5" y="25.5" width="6" height="10" rx="3"/>
+    <rect x="30.5" y="25.5" width="6" height="10" rx="3"/>
+  </g>
+  <path d="M33.5 33.5v1.5a4 4 0 0 1-4 4h-4" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round"/>
+</svg>

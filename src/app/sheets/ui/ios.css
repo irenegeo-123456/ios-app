@@ -1,0 +1,351 @@
+/* iOS 26 system chrome that UIKit draws for Slack: menus (UIMenu), alerts and action sheets (UIAlertController) and
+   the context-menu preview. None of it is in Slack's source; values are measured on Apple's iOS 26 HIG renders of a
+   402 × 874 iPhone at 536 px = 402 pt (menu-secondary-actions-expanded, alert-ios, action-sheet-iphone-mail-*,
+   menus-toggled-item @2x.png) and use UIKit's semantic colors: label #000 / #fff, secondaryLabel rgba(60,60,67,.6) /
+   rgba(235,235,245,.6), tertiaryLabel rgba(60,60,67,.3) / rgba(235,235,245,.3), iOS 26 systemRed #ff383c / #ff4245,
+   systemBlue #0088ff / #0091ff, fill rgba(120,120,128,.16) / rgba(120,120,128,.3) (both measured on the alert).
+   Buttons are prefixed with .glass-platter to win over `.ios-app button { font: inherit }` (app.css). */
+
+.ios-screen {
+  --ios-label: #000;
+  --ios-secondary-label: rgba(60, 60, 67, 0.6);
+  --ios-tertiary-label: rgba(60, 60, 67, 0.3);
+  --ios-red: #ff383c;
+  --ios-blue: #0088ff;
+  --ios-fill: rgba(120, 120, 128, 0.16);
+  --ios-highlight: rgba(120, 120, 128, 0.16);
+  /* the platters' glass: the renders read #f8f8f8 (menu) and #ebebec over the dim (alert) */
+  --ios-platter: rgba(250, 250, 250, 0.84);
+  --ios-platter-rim: rgba(255, 255, 255, 0.9);
+  --ios-platter-shadow: 0 10px 44px rgba(0, 0, 0, 0.13), 0 0 0 var(--hairline) rgba(0, 0, 0, 0.05);
+}
+.ios-screen[data-appearance='dark'] {
+  --ios-label: #fff;
+  --ios-secondary-label: rgba(235, 235, 245, 0.6);
+  --ios-tertiary-label: rgba(235, 235, 245, 0.3);
+  --ios-red: #ff4245;
+  --ios-blue: #0091ff;
+  --ios-fill: rgba(120, 120, 128, 0.3);
+  --ios-highlight: rgba(120, 120, 128, 0.32);
+  /* the dark renders read #1a1a1a with a lighter rim */
+  --ios-platter: rgba(30, 30, 31, 0.86);
+  --ios-platter-rim: rgba(255, 255, 255, 0.16);
+  --ios-platter-shadow: 0 10px 44px rgba(0, 0, 0, 0.45);
+}
+
+.glass-platter {
+  background: var(--ios-platter);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  backdrop-filter: blur(30px) saturate(1.8);
+  box-shadow:
+    inset 0 0 0 1px var(--ios-platter-rim),
+    var(--ios-platter-shadow);
+  font-family: var(--sf);
+  color: var(--ios-label);
+}
+
+/* ------------------------------------------------------------------------------------------------------- menus */
+.ios-menu-overlay {
+  position: absolute;
+  inset: 0;
+}
+.ios-menu {
+  position: absolute;
+  min-width: 254px;
+  max-width: 300px;
+  width: max-content;
+  border-radius: 34px;
+  overflow: hidden auto;
+  scrollbar-width: none;
+  transition: height 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ios-menu__inner {
+  padding: 10px 0;
+}
+/* It grows out of its button with a little bounce, and fades as it goes. */
+.ios-menu--pulldown {
+  opacity: 0;
+  transform: scale(0.35);
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.18s ease-in,
+    height 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ios-overlay.is-open .ios-menu--pulldown {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform 0.42s cubic-bezier(0.26, 1.3, 0.44, 1),
+    opacity 0.16s ease-out,
+    height 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ios-menu__title,
+.ios-menu__section-title {
+  /* UIMenu titles: footnote 13, secondaryLabel */
+  padding: 6px 20px;
+  font: 400 13px/16px var(--sf);
+  color: var(--ios-secondary-label);
+}
+.ios-menu__section + .ios-menu__section {
+  /* inline sections are 10 pt apart, with no rule (54.75 pt between row centers across sections vs 45 within) */
+  margin-top: 10px;
+}
+.glass-platter .ios-menu__item,
+.glass-platter .ios-menu__back {
+  position: relative;
+  width: 100%;
+  min-height: 45px;
+  border: 0;
+  background: none;
+  padding: 11px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font: 400 17px/22px var(--sf);
+  color: var(--ios-label);
+}
+.glass-platter .ios-menu__item::before,
+.glass-platter .ios-menu__back::before {
+  /* the pressed row: a rounded fill inset from the platter's sides */
+  content: '';
+  position: absolute;
+  inset: 0 8px;
+  border-radius: 16px;
+  background: var(--ios-highlight);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.glass-platter .ios-menu__item.is-pressed::before,
+.glass-platter .ios-menu__back.is-pressed::before {
+  opacity: 1;
+  transition: none;
+}
+/* with checkable items the titles start at 35; with icons at 66 (icons centered at 38.5) */
+.glass-platter.ios-menu.has-checks .ios-menu__item,
+.glass-platter.ios-menu.has-checks .ios-menu__back {
+  padding-left: 35px;
+}
+.glass-platter.ios-menu.has-icons .ios-menu__item,
+.glass-platter.ios-menu.has-icons .ios-menu__back {
+  padding-left: 66px;
+}
+.ios-menu__icon {
+  position: absolute;
+  left: 26.5px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  display: grid;
+  place-items: center;
+}
+.ios-menu__check {
+  /* the on state: a checkmark in the leading column (16–26 pt) */
+  position: absolute;
+  left: 13.5px;
+  top: 50%;
+  margin-top: -7.5px;
+}
+.ios-menu__text {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ios-menu__item-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ios-menu__item-subtitle {
+  /* subtitles: footnote 13, secondaryLabel (the render's "Suggest Results" has 12 pt of ink) */
+  font: 400 13px/16px var(--sf);
+  color: var(--ios-secondary-label);
+}
+.ios-menu__chevron {
+  position: relative;
+  flex: none;
+  margin-right: 4px;
+  color: var(--ios-tertiary-label);
+}
+.glass-platter .ios-menu__item.is-destructive {
+  color: var(--ios-red);
+}
+.glass-platter .ios-menu__item.is-disabled {
+  color: var(--ios-tertiary-label);
+}
+/* an expanded submenu: its title in semibold with a chevron pointing down */
+.glass-platter .ios-menu__back {
+  justify-content: space-between;
+  font-weight: 600;
+}
+.ios-menu__back-title,
+.ios-menu__back-chevron {
+  position: relative;
+}
+.ios-menu__back-chevron {
+  flex: none;
+  margin-right: 1px;
+  color: var(--ios-secondary-label);
+}
+
+/* ---------------------------------------------------------------------------------------- alerts and sheets */
+.ios-alert-overlay {
+  position: absolute;
+  inset: 0;
+}
+.ios-alert-dim {
+  /* UIKit's dimming view: black 20 % (the render's white app reads 205) */
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.ios-alert-overlay[data-kind='popover'] .ios-alert-dim {
+  background: rgba(0, 0, 0, 0.1);
+}
+.ios-overlay.is-open .ios-alert-dim {
+  opacity: 1;
+}
+.ios-alert {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 300px;
+  margin-left: -150px;
+  border-radius: 34px;
+  transform: translateY(-50%) scale(1.12);
+  opacity: 0;
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s ease-in;
+}
+.ios-overlay.is-open .ios-alert {
+  transform: translateY(-50%);
+  opacity: 1;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 1.2, 0.45, 1),
+    opacity 0.18s ease-out;
+}
+.ios-alert__text {
+  padding: 22px 22px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ios-alert__title {
+  font: 600 17px/22px var(--sf);
+  color: var(--ios-label);
+  white-space: pre-line;
+}
+.ios-alert__message {
+  font: 400 17px/22px var(--sf);
+  /* label at 75 % (the render's message reads #3e3e3f on #ebebec, #c7c7c7 on #1a1a1a in dark) */
+  color: color-mix(in srgb, var(--ios-label) 75%, transparent);
+  white-space: pre-line;
+}
+.ios-alert__buttons {
+  padding: 24px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ios-alert__buttons.is-row {
+  flex-direction: row;
+}
+.ios-alert__buttons.is-row > * {
+  flex: 1;
+  min-width: 0;
+}
+.glass-platter .ios-alert__button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 24px;
+  padding: 0 16px;
+  background: var(--ios-fill);
+  font: 600 17px/22px var(--sf);
+  color: var(--ios-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    transform 0.2s,
+    filter 0.2s;
+}
+.glass-platter .ios-alert__button.is-pressed {
+  transform: scale(0.97);
+  filter: brightness(0.92);
+}
+[data-appearance='dark'] .glass-platter .ios-alert__button.is-pressed {
+  filter: brightness(1.25);
+}
+.glass-platter .ios-alert__button.is-destructive {
+  color: var(--ios-red);
+}
+.glass-platter .ios-alert__button.is-preferred {
+  background: var(--ios-blue);
+  color: #fff;
+}
+.glass-platter .ios-alert__button.is-preferred.is-destructive {
+  background: var(--ios-red);
+  color: #fff;
+}
+
+/* An action sheet: next to its source (a popover on iOS 26), or floating at the bottom like a partial sheet. */
+.ios-action-sheet {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  border-radius: 34px 34px max(34px, calc(var(--display-radius, 62px) - 6px)) max(34px, calc(var(--display-radius, 62px) - 6px));
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    transform 0.25s ease-in,
+    opacity 0.2s ease-in;
+}
+.ios-action-sheet.is-anchored {
+  right: auto;
+  bottom: auto;
+  border-radius: 34px;
+  transform: scale(0.6);
+}
+.ios-overlay.is-open .ios-action-sheet {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform 0.42s cubic-bezier(0.26, 1.2, 0.44, 1),
+    opacity 0.16s ease-out;
+}
+.ios-action-sheet .ios-alert__text {
+  padding: 20px 22px 0;
+  gap: 8px;
+}
+.ios-action-sheet .ios-alert__title {
+  font: 600 15px/20px var(--sf);
+}
+.ios-action-sheet .ios-alert__message {
+  font: 400 15px/20px var(--sf);
+}
+.ios-action-sheet .ios-alert__buttons {
+  /* 14 pt in, 13 top and bottom, 8 between (measured 13.5 / 12.75 / 9.75) */
+  padding: 13px 14px;
+}
+.ios-action-sheet .ios-alert__text + .ios-alert__buttons {
+  padding-top: 16px;
+}
+.ios-action-sheet:not(.is-anchored) .ios-alert__buttons {
+  padding-bottom: max(14px, calc(var(--safe-bottom) - 6px));
+}
+.glass-platter.ios-action-sheet .ios-alert__button {
+  /* 46 pt capsules in the popover (measured 45.4), regular weight ("Save Draft") */
+  min-height: 46px;
+  border-radius: 23px;
+  font-weight: 400;
+}
+.glass-platter.ios-action-sheet .ios-alert__button.is-cancel {
+  font-weight: 600;
+}

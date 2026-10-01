@@ -1,0 +1,54 @@
+[
+ {
+  "name": "bowtie",
+  "file": "bowtie.png"
+ },
+ {
+  "name": "squirrel",
+  "file": "squirrel.png"
+ },
+ {
+  "name": "glitch_crab",
+  "file": "glitch_crab.png"
+ },
+ {
+  "name": "piggy",
+  "file": "piggy.png"
+ },
+ {
+  "name": "cubimal_chick",
+  "file": "cubimal_chick.png"
+ },
+ {
+  "name": "dusty_stick",
+  "file": "dusty_stick.png"
+ },
+ {
+  "name": "slack",
+  "file": "slack.png"
+ },
+ {
+  "name": "pride",
+  "file": "pride.png"
+ },
+ {
+  "name": "thumbsup_all",
+  "file": "thumbsup_all.gif"
+ },
+ {
+  "name": "slack_call",
+  "file": "slack_call.png"
+ },
+ {
+  "name": "shipit",
+  "aliasOf": "squirrel"
+ },
+ {
+  "name": "white_square",
+  "aliasOf": "white_large_square"
+ },
+ {
+  "name": "black_square",
+  "aliasOf": "black_large_square"
+ }
+]

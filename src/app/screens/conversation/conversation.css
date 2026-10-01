@@ -1,0 +1,427 @@
+/* The conversation screen (spec messages.md §9-§10, shell-navigation.md §3, composer.md §15). The glass look comes from
+   .glass (src/app/nav/nav.css); sizes and fonts are Slack's, cited per rule. */
+
+.convo {
+  /* root background base_primary (AnyConversationViewController.swift:161); the list too, Sept (ListThemeOptions.swift:65-69
+     [Sept]; June sk_primary_background, the same hex) (§1.4) */
+  background: var(--dt_color_base_primary);
+}
+
+/* ----------------------------------------------------------------------------------------------- nav bar */
+.convo-navbar.is-solid .ios-navbar__edge {
+  opacity: 1;
+  background: var(--dt_color_base_primary);
+}
+/* bar buttons: 20 pt icons in content_primary (SKBarButtonItem.swift:277-288) */
+.convo-bar-button {
+  color: var(--dt_color_content_primary);
+}
+[data-appearance='dark'] .convo-bar-button {
+  color: var(--glass-ink);
+}
+
+/* The title pill (ConversationNavigationTitleView.swift:128-140, 254-258, 451-541): interactive glass, 44 tall, as wide
+   as the bar allows, left-aligned; [ornament][name / subtitle] with 6 pt (2 + 4) to the trailing edge. */
+.convo-title {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  padding: 0 6px 0 0;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  color: var(--dt_color_content_primary);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.convo-title.is-pressed {
+  transform: scale(0.98);
+}
+/* channel/group icon: 20 pt, content_primary, in a 36 pt slot, no gap after (:900-905) */
+.convo-title__icon {
+  flex: none;
+  width: 36px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+/* DM avatar: 36 pt, round on iOS 26 (concentric), in a 44 pt slot, 8 − 4 = 4 pt after (:907-911; ConversationUtility.swift:26-30) */
+.convo-title__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin-right: 4px;
+  display: grid;
+  place-items: center;
+}
+.convo-title__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* name: Lato Black 15 (.smallBodyBlack, no Dynamic Type), content_primary, 1 line (ConversationHeaderPresentationObject.swift:301-306) */
+.convo-title__name {
+  font: var(--sk-small-body-black);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* subtitle: Lato 13, content_secondary, 1 line; a status emoji is 12 pt with 5 pt before the text (:402; title view :418-422) */
+.convo-title__subtitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.convo-title__subtitle-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.convo-title__status {
+  flex: none;
+  display: block;
+}
+/* App DMs: the legacy title, centered: 32 pt round avatar, 16 pt, Lato Black 17; pressed alpha 0.5
+   (HeaderTitleView.swift:223-227, 425-481) */
+.convo-center-title {
+  position: absolute;
+  left: 76px;
+  right: 76px;
+  top: 0;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.convo-center-title .convo-app-title {
+  pointer-events: auto;
+  min-width: 0;
+  max-width: 100%;
+  height: 44px;
+  border: 0;
+  background: none;
+  padding: 0 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--dt_color_content_primary); /* HeaderTitleView.swift:430 [Sept]; June sk_primary_foreground */
+}
+.convo-app-title.is-pressed {
+  opacity: 0.5;
+}
+.convo-app-title__name {
+  min-width: 0;
+  font: var(--sk-body-black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------------------------- the list */
+.convo-list {
+  position: absolute;
+  inset: 0;
+  background: var(--dt_color_base_primary); /* ListThemeOptions.swift:65-69 [Sept] */
+}
+/* bottom-anchored: short histories sit right above the composer (alignShortContentToBottom,
+   MessageTranscriptPluginInput+SKList.swift:13-26) */
+.convo-list__content {
+  box-sizing: border-box;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  will-change: transform;
+}
+.convo-page {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(var(--navbar-bottom) + 48px + 0.333px);
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------------------- channel intro (§9.7) */
+.convo-intro {
+  padding-bottom: 0;
+}
+/* text rows: SKGenericEntity .small, 10/16 padding, unlimited lines (SKEntityBaseView.swift:61-67) */
+.convo-intro__row {
+  padding: 10px 16px;
+}
+/* the channel name with its "#" or lock: Lato Black 28 (.headline), content_primary; #general: "Welcome!" Lato Black 22 */
+.convo-intro__title {
+  font: var(--sk-headline);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: break-word;
+}
+.convo-intro__title.is-welcome {
+  font: var(--sk-title);
+}
+.convo-intro__lock {
+  display: inline-block !important;
+  width: 0.987em !important;
+  height: 0.987em !important;
+  vertical-align: -0.106em;
+}
+/* description: Lato 17, content_secondary (ChannelHeaderTransformer.swift:200-205, 283-318) */
+.convo-intro__text {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}
+/* DM / group DM: name(s) + status emoji in Lato Black 22 (.title), content_primary */
+.convo-intro__name {
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: break-word;
+}
+/* the person's title (content_secondary) and pronouns (content_tertiary), Lato 13 (ImHeaderTransformer.swift:87-140) */
+.convo-intro__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.convo-intro__pronouns {
+  color: var(--dt_color_content_tertiary);
+}
+/* 56 pt avatars (radius 14), 16 pt from the left and top, 10 pt apart (MKConversationMemberCollectionView.swift:32-37, 313-328) */
+.convo-intro__avatars {
+  display: flex;
+  gap: 10px;
+  padding: 16px 16px 0;
+}
+/* Add description / Add people: SKButtonEntity (10/16 padding, 8 apart, equal widths) of large SKButtons with the icon on
+   top: base_primary, content_primary, 1 pt outline_tertiary, Lato Bold 17, padding 14/16, radius 14, 20 pt icon, 6 pt gap
+   (ChannelHeaderTransformer.swift:399-435; SKButtonEntity.swift:26, 151-161; SKButton+Types.swift:249-374) */
+.convo-intro__buttons {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+}
+.convo-intro__buttons .convo-intro__button {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  color: var(--dt_color_content_primary);
+  font: var(--sk-body-bold);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  /* custom style bounce: 0.96, down 0.2 s / up 0.4 s (SKButton.swift:47, 429-448) */
+  transition: transform 0.4s var(--sk-spring-smooth), background-color 0.2s;
+}
+.convo-intro__buttons .convo-intro__button.is-pressed {
+  transform: scale(0.96);
+  transition-duration: 0.2s;
+  background: rgb(from var(--dt_color_base_primary) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8));
+}
+
+/* --------------------------------------------------------------------------------- unread / latest pills (§9.4) */
+/* PillBannerView: 36 pt capsule, radius 18, UIGlassEffect(.clear) tinted highlight1.baseInverse #1264a3 / #0a77a7 (June
+   sk_sapphire_blue #1264a3 in both), shadow black r 0.5 @ 0.2; arrow button 32 wide, label Lato Bold 13 white, close 32
+   wide, white icons at 0.8 × 20 (PillBannerView.swift:56-77, 97-112, 130-148 [Sept]) */
+.convo-pill {
+  position: absolute;
+  z-index: 25;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 36px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  background: color-mix(in srgb, var(--dt_color_base_inverse_highlight_1) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
+  backdrop-filter: blur(8px) saturate(1.4);
+  box-shadow:
+    0 0 0.5px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  color: var(--sk_true_white);
+  white-space: nowrap;
+}
+/* the unread pill slides down from above: bouncy spring, medium 0.431 s (DefaultListDrawerAppearanceAnimation.swift:10-21) */
+.convo-pill--unread {
+  animation: convo-pill-down 0.431s var(--sk-spring-bouncy);
+}
+@keyframes convo-pill-down {
+  from {
+    transform: translate(-50%, calc(-100% - 60px));
+  }
+}
+/* Sept: it leaves sliding back up and fading (ListDrawerAppearanceAnimation.swift:20-25; DefaultListDrawerAppearanceAnimation.swift:10-21) */
+.convo-pill--unread.is-leaving {
+  animation: convo-pill-up 0.431s var(--sk-spring-bouncy) both;
+  pointer-events: none;
+}
+@keyframes convo-pill-up {
+  to {
+    transform: translate(-50%, calc(-100% - 60px));
+    opacity: 0;
+  }
+}
+.convo-pill__main {
+  height: 36px;
+  border: 0;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+.convo-pill__icon,
+.convo-pill__close {
+  width: 32px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+.convo-pill__label {
+  font: var(--sk-caption-bold);
+}
+.convo-pill__main.is-pressed,
+.convo-pill__close.is-pressed {
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------------------- app DM pages */
+.convo-apptabs {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  top: var(--navbar-bottom);
+  height: 48px;
+  display: flex;
+  background: var(--dt_color_base_primary);
+  box-sizing: content-box;
+}
+/* the 1 px outline_tertiary hairline under the bar (SKPageController.swift:115-121) */
+.convo-apptabs::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  /* one device pixel at any DPR (src/styles/hairline.css) */
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.convo-apptabs .convo-apptabs__tab {
+  position: relative;
+  flex: 1;
+  border: 0;
+  background: none;
+  padding: 0 10px;
+  display: grid;
+  place-items: center;
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_secondary);
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.convo-apptabs .convo-apptabs__tab.is-selected {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+/* the pressed "selection view": base_secondary, inset 6/4, radius 10; bounce 0.96 (TabBarCollectionViewCell.swift:36-49, 504-524) */
+.convo-apptabs__press {
+  position: absolute;
+  inset: 6px 4px;
+  border-radius: 10px;
+}
+.convo-apptabs .convo-apptabs__tab.is-pressed {
+  transform: scale(0.96);
+  transition-duration: 0.2s;
+}
+.convo-apptabs__tab.is-pressed .convo-apptabs__press {
+  background: var(--dt_color_base_secondary);
+}
+.convo-apptabs__title {
+  position: relative;
+}
+.convo-apptabs__underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--dt_color_base_inverse_highlight_2); /* SKTabBar.swift:86-89 [Sept]; June sk_lilypad_green */
+}
+.convo-apphome {
+  position: absolute;
+  inset: 0;
+  padding: 8px 16px calc(21px + 62px + 16px);
+}
+.convo-appabout {
+  position: absolute;
+  inset: 0;
+  padding-bottom: calc(21px + 62px + 16px);
+}
+.convo-appcard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 16px;
+  background: #616061; /* the app's card color, #616061 when unset (AppProfilePresenter.swift:57-64) */
+  color: var(--sk_true_white);
+}
+.convo-appcard .sk-avatar__image {
+  border-radius: 14px !important;
+}
+.convo-appcard__text {
+  min-width: 0;
+}
+.convo-appcard__name {
+  font: var(--sk-body-bold);
+}
+.convo-appcard__summary {
+  font: var(--sk-body);
+}
+.convo-appabout__section {
+  padding: 16px;
+}
+.convo-appabout__header {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  padding-bottom: 8px;
+}
+.convo-appabout__body {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+
+/* ---------------------------------------------------------------------------------------------- missing */
+.convo-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 0 32px;
+  text-align: center;
+}
+.convo-empty__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.convo-empty__body {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}

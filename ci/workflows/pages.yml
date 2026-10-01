@@ -1,0 +1,66 @@
+# INTERNAL ONLY. Deploys the production build to the repository's GitHub Pages, so a prototype can be shared as a
+# link: https://<pages host>/<owner>/<repo>/?proto=<slug>. The build carries Slack's fonts, icons and design tokens:
+# deploy only where Pages is access-controlled (Slack's internal GitHub, pages.slack-github.com; or a github.com
+# enterprise organization with Pages visibility set to Private, and the repository variable PAGES_PRIVATE=true).
+#
+# One-time setup: Settings › Pages › Build and deployment › Source: "GitHub Actions". After that, every push to
+# main (or a manual run) builds with BASE_PATH set to the site's sub-path (vite.config.ts) and deploys dist/.
+#
+# The Pages actions are the majors GitHub Enterprise Server documents ("Using custom workflows with GitHub Pages");
+# later majors need the v4 artifact backend, which GHES doesn't support, so keep these on GHES.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write # to deploy to Pages
+  id-token: write # to verify the deployment comes from this workflow
+
+# One deployment at a time; a newer push queues behind the running one instead of cancelling it mid-deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # On github.com only when Pages there is private (see above).
+    if: github.server_url != 'https://github.com' || vars.PAGES_PRIVATE == 'true'
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      # base_path is "/<owner>/<repo>" (no trailing slash), or "" for a site at the host's root; Vite's base must
+      # end with '/'.
+      - name: Build for the site's base path
+        env:
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          export BASE_PATH="${PAGES_BASE_PATH%/}/"
+          echo "Building with BASE_PATH=$BASE_PATH"
+          npm run build
+          touch dist/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v2
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v3

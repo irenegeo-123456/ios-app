@@ -1,0 +1,549 @@
+/* SlackKit components (Modules/UIInfra/SlackKit). Every value is from reference/ios/specs/slackkit-components.md or
+   home.md, which cite the Swift source; colors are iOS tokens (--dt_color_*), legacy sk_* colors (below) and theme
+   roles (--theme_*). */
+
+.ios-screen {
+  /* SKLegacyColors.swift (spec theme-colors.md §4, line numbers there), light / dark */
+  --sk_primary_foreground: #1d1c1d;
+  --sk_primary_background: var(--dt_color_base_primary); /* :34-39, = base_primary in all four variants */
+  --sk_foreground_max: #1d1c1db3; /* :65, primary_foreground @ 0.7 */
+  --sk_foreground_high: #1d1c1d80; /* :75, @ 0.5 */
+  --sk_foreground_mid: #1d1c1d4d; /* :85, @ 0.3 */
+  --sk_foreground_low: #1d1c1d21; /* :90, @ 0.13 */
+  --sk_foreground_soft: #1d1c1d0f; /* :100, @ 0.06 */
+  --sk_foreground_min: #1d1c1d0a; /* :112, @ 0.04 */
+  --sk_foreground_max_solid: #616061;
+  --sk_foreground_high_solid: #868686;
+  --sk_foreground_low_solid: #dddddd;
+  --sk_foreground_soft_solid: #f3f3f3;
+  --sk_foreground_min_solid: #f8f8f8;
+  --sk_highlight: #1264a3; /* :125 */
+  --sk_highlight_hover: #0b4c8c; /* :130 */
+  --sk_pale_yellow_solid: #fcf4da; /* :247, sunshine.lighten(0.8) */
+  --sk_frosty_blue_solid: #e8f5fa;
+  --sk_pale_yellow: #f2c74433;
+  --sk_toast_background: #141414b3;
+  --sk_code: #e01e5a;
+  --sk_code_block_fill: #1d1c1d0a;
+  --sk_code_block_stroke: #1d1c1d21;
+  --sk_mention_text: #0b4c8c; /* developer colors :337-388, message_rendering_mention_text */
+  --sk_mention_fill: #1d9bd11a;
+  --sk_coachmark_background: #1264a3;
+  --sk_coachmark_text: #ffffff;
+  --sk_coachmark_button_background: #ffffff;
+  --sk_coachmark_button_text: #1d1c1d;
+  --sk_coachmark_ornament_background: #e8f5fa;
+  --sk_trials_banner_text: #4a154b;
+  --list_icon_foreground: #ffffff; /* :378, sk_true_white / sk_primary_foreground_dark */
+  --file_type_bolt_icon_background_color: #d9454d; /* :388 */
+  /* secondaryColor(for: .sfdcRecord) = UIColor(light: basePrimary, dark: baseInversePrimary)
+     (UIColor+FileTypeExtensions.swift:32-37) */
+  --sk-file-sfdc-glyph: var(--dt_color_base_primary);
+  /* Static legacy colors, the same in both appearances (:140-267) */
+  --sk_highlight_accent: #1d9bd1;
+  --sk_secondary_highlight: #f2c744;
+  --sk_true_black: #000000;
+  --sk_true_white: #ffffff;
+  --sk_black: #1d1c1d;
+  --sk_black_high_contrast: #1d1c1d80;
+  --sk_dark_gray: #616061;
+  --sk_light_gray: #868686;
+  --sk_soft_gray: #dddddd;
+  --sk_subtle_gray: #f3f3f3;
+  --sk_off_white: #f8f8f8;
+  --sk_lilypad_green: #007a5a;
+  --sk_aubergine: #4a154b;
+  --sk_raspberry_red: #e01e5a;
+  --sk_reddish_orange: #de4e2b;
+  --sk_just_orange: #e8912d;
+  --sk_sunshine_yellow: #f2c744;
+  --sk_indigo: #0b4c8c;
+  --sk_sapphire_blue: #1264a3;
+  --sk_sky_blue: #1d9bd1;
+  --sk_teal_blue: #96daea;
+  --sk_frosty_blue: #1d9bd11a;
+  --sk_dark_blue: #1c405f;
+  --sk_dropbox_blue: #007ee5; /* :295 */
+  /* StandardPaletteColor.gray._0 resolved in the light trait, used in both (SKSpinner.swift:198-221) */
+  --sk-gray-0-light: #f8f8f8;
+  /* ColorSet.defaultAubergine.theme.contentSecondary: aubergine_100 @80% / aubergine_90 @90%
+     (DefaultThemeColorSet.swift:154-156), used by SKBanner's business_trial and pro tones */
+  --sk-aubergine-content-secondary: rgb(from var(--dt_color_palettes_aubergine_100) r g b / 0.8);
+  /* Home's divider (ListThemeOptions.ia4Phone dividerColor = primary.outlineTertiary since September 2026,
+     ListThemeOptions.swift:65-87; June's was sk_foreground_low_solid) */
+  --sk-divider-home: var(--dt_color_outline_tertiary);
+
+  /* Motion (spec "Shared behavior"): the spring presets as CSS easings, sampled from the damped spring each preset
+     describes (SKF/Extensions/UIView+SpringAnimation.swift:64-130). Durations: smooth 0.2 / 0.4 / 0.6 s, snappy
+     0.177 / 0.368 / 0.552 s, bouncy 0.207 / 0.431 / 0.647 s (fast / medium / long). */
+  --sk-spring-smooth: linear(0, 0.131, 0.358, 0.562, 0.715, 0.821, 0.89, 0.934, 0.96, 0.977, 0.986, 0.992, 0.995, 0.997, 0.999, 0.999, 1);
+  --sk-spring-snappy: linear(0, 0.082, 0.253, 0.44, 0.606, 0.739, 0.838, 0.906, 0.951, 0.979, 0.994, 1.002, 1.006, 1.006, 1.006, 1.005, 1.003, 1.002, 1.002, 1.001, 1);
+  --sk-spring-bouncy: linear(0, 0.082, 0.262, 0.467, 0.655, 0.807, 0.916, 0.986, 1.026, 1.043, 1.046, 1.04, 1.032, 1.022, 1.014, 1.007, 1.003, 1, 0.999, 0.998, 0.998, 0.998, 0.999, 0.999, 1);
+}
+.ios-screen[data-appearance='dark'] {
+  --sk_primary_foreground: #d1d2d3;
+  --sk_foreground_max: #d1d2d3b3;
+  --sk_foreground_high: #d1d2d380;
+  --sk_foreground_mid: #d1d2d34d;
+  --sk_foreground_low: #d1d2d321;
+  --sk_foreground_soft: #d1d2d30f;
+  --sk_foreground_min: #d1d2d30a;
+  --sk_foreground_max_solid: #9a9c9e;
+  --sk_foreground_high_solid: #75777a;
+  --sk_foreground_low_solid: #323538;
+  --sk_foreground_soft_solid: #24272a;
+  --sk_foreground_min_solid: #212428;
+  --sk_highlight: #1d9bd1;
+  --sk_highlight_hover: #1d9bd1;
+  --sk_pale_yellow_solid: #61501b; /* sunshine.darken(0.6) */
+  --sk_frosty_blue_solid: #092f3f;
+  --sk_toast_background: #141414e6;
+  --sk_code: #e8912d;
+  --sk_code_block_fill: #d1d2d321;
+  --sk_code_block_stroke: #d1d2d380;
+  --sk_mention_text: #1d9bd1;
+  --sk_coachmark_background: #17344c;
+  --sk_coachmark_text: #d1d2d3;
+  --sk_coachmark_button_background: #4f6375;
+  --sk_coachmark_button_text: #ffffff;
+  --sk_coachmark_ornament_background: #4f6375;
+  --sk_trials_banner_text: #d1d2d3b3;
+  --list_icon_foreground: #d1d2d3;
+  --file_type_bolt_icon_background_color: #d97e85;
+  --sk-file-sfdc-glyph: var(--dt_color_base_inverse_primary);
+  --sk-aubergine-content-secondary: rgb(from var(--dt_color_palettes_aubergine_90) r g b / 0.9);
+}
+
+/* The pressed bounce most SlackKit controls share (UIView+BounceMode.swift:14-35): scale down over 0.2 s
+   (smooth/fast), back up over 0.4 s (smooth/medium), no overshoot. Components set --sk-bounce-scale. */
+.sk-bounce {
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.sk-bounce.is-pressed {
+  transform: scale(var(--sk-bounce-scale, 0.96));
+  transition-duration: 0.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* with Reduce Motion the bounce is off (isBounceModeEnabled is false) */
+  .sk-bounce,
+  .sk-bounce.is-pressed {
+    transition: none;
+    transform: none;
+  }
+}
+.ios-screen[data-appearance='dark'][data-dark-variant='true-dark'] {
+  --dt_color_base_primary: #000000;
+}
+
+/* ------------------------------------------------------------------------------------------ SKMemberAvatar */
+.sk-avatar,
+.sk-ws-avatar {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+.sk-avatar__image,
+.sk-ws-avatar__image {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* SKImageView placeholder: primary.baseTertiary */
+  background: var(--dt_color_base_tertiary);
+  display: grid;
+  place-items: center;
+}
+.sk-avatar__image img,
+.sk-ws-avatar__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.sk-avatar__initials {
+  /* the fallback SKLabel: SKFont.body in primary.contentPrimary, centered, pinned to the image (:549-563) */
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sk-avatar.is-interactive {
+  cursor: pointer;
+}
+.sk-avatar__presence {
+  /* the status icon overhangs the avatar's corner (it isn't clipped: SKMemberAvatar doesn't clip to bounds) */
+  position: absolute;
+  pointer-events: none;
+}
+.sk-avatar__guest {
+  /* the SCG triangle / MCG square: guestAnnotationLayer filled primary.contentTertiary, re-resolved on appearance
+     changes since September 2026 (SKMemberAvatar.swift:186, :190-193) */
+  position: absolute;
+  inset: 0;
+  fill: var(--dt_color_content_tertiary);
+  pointer-events: none;
+}
+.sk-avatar__workspace,
+.sk-avatar__icon-annotation {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+.sk-avatar__workspace img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sk-avatar__workspace::after {
+  /* a 1 px primary.surfacePrimary layer border (:279-282) */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--hairline) var(--dt_color_surface_primary);
+}
+/* SKWorkspaceAvatar (SKWorkspaceAvatar.swift). The hairline is a 1 px (1/3 pt) outlineTertiary stroke on the image's
+   path, in a layer below the image, so only its outer half shows (and all of it inside a cut-out) (:40-46, :282). */
+.sk-ws-avatar__hairline {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  fill: none;
+  stroke: var(--dt_color_outline_tertiary);
+  stroke-width: var(--hairline);
+  pointer-events: none;
+}
+.sk-ws-avatar__initials {
+  /* the fallback SKLabel: SKFont.title (Lato Black 22) in primary.contentPrimary, centered (:313-314) */
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sk-ws-avatar__dot {
+  /* CircleView (:461-466) */
+  position: absolute;
+  border-radius: 50%;
+}
+.sk-ws-avatar__badge {
+  position: absolute;
+  display: inline-flex;
+}
+.sk-ws-avatar__lock {
+  position: absolute;
+}
+.sk-ws-avatar__ring {
+  /* active: the stroke view, a contentPrimary layer border (:84-89, :276-280) */
+  position: absolute;
+  border-style: solid;
+  border-color: var(--dt_color_content_primary);
+  pointer-events: none;
+}
+.sk-ws-avatar__variant {
+  /* govSlack: a lagoon_90 tile with a 2 pt basePrimary border and the gov_slack_variant template image tinted
+     basePrimary (:56-70, :244-253) */
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid var(--dt_color_base_primary);
+  background: var(--dt_color_palettes_lagoon_90);
+}
+.sk-ws-avatar__variant i {
+  position: absolute;
+  background: var(--dt_color_base_primary);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* ----------------------------------------------------------------------------------------------- SKBadge */
+/* SKBadge.swift:21-29, :186-237, :357-444. Height = max(font, 12) + 2 × vertical margin; width ≥ 24 and ≥ height. */
+.sk-badge {
+  --badge-bg: var(--dt_color_base_inverse_important);
+  --badge-fg: var(--dt_color_content_inverse_primary);
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: none;
+  box-sizing: border-box;
+  height: 18px;
+  min-width: 24px;
+  padding: 0 9px;
+  border-radius: 9px;
+  font: var(--sk-micro-bold);
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.sk-badge__label {
+  line-height: 1.2;
+}
+.sk-badge__icon {
+  color: currentColor;
+}
+.sk-badge--deemphasized {
+  --badge-bg: transparent;
+  --badge-fg: var(--dt_color_content_secondary);
+  font: var(--sk-micro);
+}
+.sk-badge--text {
+  --badge-bg: var(--dt_color_surface_primary);
+  --badge-fg: var(--dt_color_content_secondary);
+}
+.sk-badge--tag {
+  /* the tag uses the label's own height plus 3 pt margins (:24, :200-209) */
+  --badge-bg: var(--dt_color_palettes_grass_5);
+  --badge-fg: var(--dt_color_palettes_grass_70);
+  height: auto;
+  min-height: 18px;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.sk-badge--rounded {
+  /* roundedRectangle: margins 4 / 4, radius min(20, 0.25 × 20) = 5 */
+  height: 20px;
+  min-width: 24px;
+  padding: 0 4px;
+  border-radius: 5px;
+}
+.sk-badge.is-interactive {
+  cursor: default;
+}
+/* withPulse: the halo is a layer behind the badge (:273-283); the fill moves to ::before so the halo can sit under it */
+.sk-badge.has-pulse {
+  background: transparent;
+}
+.sk-badge.has-pulse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--badge-bg);
+}
+.sk-badge__pulse {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  border-radius: inherit;
+  animation: sk-badge-pulse 1s ease-in alternate;
+}
+@keyframes sk-badge-pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.5);
+  }
+}
+
+/* ---------------------------------------------------------------------------- SKEntityRow (.small, 44 pt) */
+.sk-row {
+  position: relative;
+  min-height: 44px;
+  --row-color: var(--dt_color_content_primary);
+  /* the whole cell (highlight and content) shrinks by 8 pt, (L − 8) / L, with the bounce timing: 0.2 s smooth down,
+     0.4 s smooth up (SKListCollectionViewCell.swift:214-240, UIView+BounceMode.swift:14-35) */
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.sk-row.is-pressed {
+  transform: scale(calc((var(--screen-w, 393px) - 8px) / var(--screen-w, 393px)));
+  transition-duration: 0.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-row,
+  .sk-row.is-pressed {
+    transition: none;
+    transform: none;
+  }
+}
+.sk-row__bg {
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+  background: transparent;
+  transition: background-color 0.4s var(--sk-spring-smooth);
+}
+.sk-row.is-pressed .sk-row__bg {
+  /* the SKList highlight, primary.baseTertiary (SKList.swift:140-142) */
+  background: var(--dt_color_base_tertiary);
+  transition-duration: 0.2s;
+}
+.sk-row__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 16px;
+}
+.sk-row__ornament {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--row-color);
+}
+.sk-row.is-disabled .sk-row__ornament {
+  opacity: 0.6;
+}
+.sk-row__primary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sk-row__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-body);
+  color: var(--row-color);
+}
+.sk-row__inline {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.sk-row__accessories {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Name states (SKListCellPresentationObject+Channel.swift:112-172) in ListThemeOptions.ia4Phone's item colors: since
+   September 2026 primary.contentPrimary / contentSecondary / contentTertiary (ListThemeOptions.swift:65-87; June's were
+   sk_primary_foreground / sk_foreground_max_solid / sk_foreground_high_solid) */
+.sk-row--unread {
+  --row-color: var(--dt_color_content_primary);
+}
+.sk-row--unread .sk-row__title {
+  font: var(--sk-body-black);
+}
+.sk-row--read,
+.sk-row--action {
+  --row-color: var(--dt_color_content_secondary);
+}
+.sk-row--muted {
+  --row-color: var(--dt_color_content_tertiary);
+}
+
+/* --------------------------------------------------------------------- SKListHeader (.medium, 52 pt) */
+.sk-list-header {
+  padding-top: 8px;
+}
+.sk-list-header__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 12px 16px;
+}
+.sk-list-header__ornament {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+}
+.sk-list-header__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.sk-list-header.is-unread .sk-list-header__title {
+  /* the list theme's item primary color: primary.contentPrimary since September 2026 (ListThemeOptions.swift:65-87) */
+  font: var(--sk-small-body-black);
+  color: var(--dt_color_content_primary);
+}
+.sk-list-header__spacer {
+  flex: 1;
+}
+.sk-list-header__caret {
+  color: var(--dt_color_content_tertiary);
+  transition: transform 0.25s;
+}
+.sk-list-header__caret.is-collapsed {
+  transform: rotate(-90deg);
+}
+.sk-list-header__icon-button {
+  border: 0;
+  background: none;
+  padding: 0 4px;
+  /* the list theme's item tertiary color: primary.contentTertiary since September 2026 (ListThemeOptions.swift:65-87) */
+  color: var(--dt_color_content_tertiary);
+  display: grid;
+  place-items: center;
+}
+.sk-list-header__text-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_highlight_1);
+  max-width: 50%;
+  white-space: nowrap;
+}
+.sk-list-header__content:active > :not(.sk-list-header__spacer) {
+  opacity: 0.4;
+}
+
+/* The 8 pt section footer with its 1 px hairline (SKListFooterView .hairlineDivider): one device pixel at the bottom
+   (src/styles/hairline.css) */
+.sk-list-footer {
+  position: relative;
+  height: 8px;
+  --hairline-color: var(--dt_color_outline_tertiary);
+}
+.sk-list-footer i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--hairline-color);
+}
+
+/* SKGroupAvatar .small: the group-DM count box */
+.sk-group-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--dt_color_base_tertiary);
+  color: var(--dt_color_content_primary);
+  font: var(--sk-caption-bold);
+}
+.sk-row.is-pressed .sk-group-avatar {
+  background: color-mix(in srgb, var(--dt_color_base_primary) 13%, transparent);
+}
+
+/* The "APP" adjacent label (primaryAdjacentLabelColors: primary.contentSecondary on primary.baseTertiary since
+   September 2026, ListThemeOptions.swift:65-87; June's sk_foreground_max_solid on sk_foreground_low_solid) */
+.sk-adjacent-label {
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font: var(--sk-micro-bold);
+  color: var(--dt_color_content_secondary);
+  background: var(--dt_color_base_tertiary);
+}
+.sk-adjacent-label.is-prominent {
+  color: var(--dt_color_content_highlight_1);
+  background: var(--dt_color_base_highlight_1);
+}

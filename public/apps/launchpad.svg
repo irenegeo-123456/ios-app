@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <defs>
+    <linearGradient id="lp-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4B2FD1"/>
+      <stop offset="1" stop-color="#8E4DF0"/>
+    </linearGradient>
+    <linearGradient id="lp-flame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD166"/>
+      <stop offset="1" stop-color="#FF7A45"/>
+    </linearGradient>
+  </defs>
+  <rect width="72" height="72" fill="url(#lp-bg)"/>
+  <circle cx="17" cy="18" r="1.6" fill="#fff" opacity=".55"/>
+  <circle cx="56" cy="14" r="1.2" fill="#fff" opacity=".45"/>
+  <circle cx="58" cy="30" r="1.6" fill="#fff" opacity=".35"/>
+  <path d="M36 50.5c-3.2-2.6-4.6-5.4-4.1-8.6h8.2c.5 3.2-.9 6-4.1 8.6z" fill="url(#lp-flame)"/>
+  <path d="M29.6 34.2l-5.1 5.4c-.6.6-.2 1.7.7 1.7h5.1zM42.4 34.2l5.1 5.4c.6.6.2 1.7-.7 1.7h-5.1z" fill="#E7DDFF"/>
+  <path d="M36 11.5c5.6 4.8 8.2 11.4 7.7 19.7l-.8 11.1H29.1l-.8-11.1c-.5-8.3 2.1-14.9 7.7-19.7z" fill="#fff"/>
+  <circle cx="36" cy="26.5" r="3.9" fill="#6A3DE3"/>
+  <circle cx="36" cy="26.5" r="1.9" fill="#B9A4FF"/>
+  <rect x="17" y="54" width="38" height="4.2" rx="2.1" fill="#fff"/>
+  <rect x="22" y="58" width="3" height="5" rx="1.2" fill="#fff" opacity=".7"/>
+  <rect x="47" y="58" width="3" height="5" rx="1.2" fill="#fff" opacity=".7"/>
+</svg>

@@ -1,0 +1,197 @@
+/* SKSwitch, SKCheckbox, SKRadioButton. Spec: slackkit-components.md › Selection controls; Swift cited inline. The
+   checkbox and radio animate with UIView.animate(withDuration: 0.25, usingSpringWithDamping: 1, initialSpringVelocity:
+   0.5); the switch is UIKit's own. */
+
+.sk-switch,
+.sk-checkbox,
+.sk-radio {
+  position: relative;
+  flex: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  vertical-align: middle;
+}
+
+/* ------------------------------------------------------------------------------------------------ SKSwitch */
+.sk-switch {
+  /* September 2026: a native UISwitch (SKSwitch.swift:26-41), drawn as iOS 26 draws it. Measured from
+     SNAP/SKSwitchSnapshotTests/*@3x.png: the view is UISwitch's intrinsic 61 × 28 (:53-74), the capsule track 63 × 28
+     from its left edge, the capsule thumb 37 × 24, 2 pt from the track's ends (x 2 off, 24 on), no shadow. */
+  --sw-track: var(--sk-switch-off-track);
+  --sw-thumb-x: 2px;
+  width: 61px;
+  height: 28px;
+  background: none;
+  transition: opacity 0.2s;
+}
+.sk-switch.is-on {
+  /* onTintColor = highlight2.content #007A5A / #3DAA7C (:22, :37) */
+  --sw-track: var(--dt_color_content_highlight_2);
+  --sw-thumb-x: 24px;
+}
+.sk-switch.is-disabled {
+  /* the on/off colors stay; the whole switch dims to Modifiers.disabledOpacity (:85-91, Modifiers.swift:19) */
+  opacity: 0.35;
+}
+.sk-switch__track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 63px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--sw-track);
+  transition: background-color 0.4s var(--sk-spring-smooth);
+}
+.sk-switch__thumb {
+  /* thumbTintColor is contentInversePrimary (:23, :38), but iOS 26 draws the thumb white in both appearances
+     (#FFFFFF in the dark snapshot rows) */
+  position: absolute;
+  top: 2px;
+  left: var(--sw-thumb-x);
+  width: 37px;
+  height: 24px;
+  border-radius: 12px;
+  background: #ffffff;
+  transition: left 0.4s var(--sk-spring-smooth);
+}
+/* UIKit's off track (not a Slack color), measured from the snapshots: #3C3C43 @30% / #EBEBF5 @30%, and with Increase
+   Contrast #3C3C43 @70% / #EBEBF5 @55%. Also UIKit's secondaryLabel (#3C3C43 @60% / #EBEBF5 @60%), which some of Slack's
+   snapshot fixtures use (SKSearchBarSnapshotTests.testSearchBarWithCustomLeadingOrnament). */
+.ios-screen {
+  --sk-switch-off-track: rgb(60 60 67 / 0.3);
+  --sk-ui-secondary-label: rgb(60 60 67 / 0.6);
+}
+.ios-screen[data-appearance='dark'] {
+  --sk-switch-off-track: rgb(235 235 245 / 0.3);
+  --sk-ui-secondary-label: rgb(235 235 245 / 0.6);
+}
+.ios-screen[data-appearance='light'][data-contrast='high'] {
+  --sk-switch-off-track: rgb(60 60 67 / 0.7);
+}
+.ios-screen[data-appearance='dark'][data-contrast='high'] {
+  --sk-switch-off-track: rgb(235 235 245 / 0.55);
+}
+
+/* ---------------------------------------------------------------------------------------------- SKCheckbox */
+.sk-checkbox {
+  /* SKCheckbox.swift:23-53, :133-154, :259-276 */
+  --cb-ring: var(--dt_color_outline_primary);
+  --cb-ring-width: 1.5px;
+  --cb-fill: var(--dt_color_content_highlight_1);
+  --cb-check: var(--dt_color_content_inverse_primary);
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: none;
+}
+.sk-checkbox.is-pressed {
+  --cb-ring-width: 2.5px;
+  --cb-fill: rgb(from var(--dt_color_base_inverse_highlight_1) r g b / 0.5);
+}
+.sk-checkbox.is-disabled {
+  --cb-ring: rgb(from var(--dt_color_outline_tertiary) r g b / 0.13);
+  --cb-fill: var(--dt_color_base_tertiary);
+  --cb-check: var(--dt_color_content_inverse_secondary);
+}
+.sk-checkbox__ring {
+  /* the border-only ring; the inner background is clear since September 2026 (SKCheckbox.swift:100; June basePrimary) */
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 var(--cb-ring-width) var(--cb-ring);
+  transition: box-shadow 0.25s var(--sk-spring-smooth);
+}
+.sk-checkbox__fill {
+  /* grows from the center to the full bounds; its radius scales with it (:142-149) */
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--cb-fill);
+  transform: scale(0);
+  transition:
+    transform 0.25s var(--sk-spring-smooth),
+    background-color 0.25s var(--sk-spring-smooth);
+}
+.sk-checkbox.is-on .sk-checkbox__fill {
+  transform: scale(1);
+}
+.sk-checkbox__check {
+  /* 14 × 14 at the center + (−0.16, +0.24), rotated −4° (:27-35, :136-139); hidden when off */
+  position: absolute;
+  left: calc(50% - 7px - 0.16px);
+  top: calc(50% - 7px + 0.24px);
+  transform: rotate(-4deg);
+  color: var(--cb-check);
+  visibility: hidden;
+}
+.sk-checkbox.is-on .sk-checkbox__check {
+  visibility: visible;
+}
+
+/* ------------------------------------------------------------------------------------------- SKRadioButton */
+.sk-radio {
+  /* SKRadioButton.swift:20-43, :117-138, :256-271 */
+  --rb-bg: var(--dt_color_base_primary);
+  --rb-ring: var(--dt_color_outline_primary);
+  --rb-ring-width: 2px;
+  --rb-dot: var(--dt_color_content_highlight_1);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--rb-bg);
+  box-shadow: inset 0 0 0 var(--rb-ring-width) var(--rb-ring);
+  transition: box-shadow 0.25s var(--sk-spring-smooth);
+}
+.sk-radio.is-on {
+  --rb-ring: var(--dt_color_outline_highlight_1);
+}
+.sk-radio.is-pressed {
+  --rb-ring-width: 2.5px;
+}
+.sk-radio.is-on.is-pressed {
+  --rb-ring: var(--sk_highlight_hover);
+  --rb-dot: var(--sk_highlight_hover);
+}
+.sk-radio.is-disabled {
+  --rb-bg: var(--dt_color_base_tertiary);
+  --rb-ring: var(--dt_color_outline_tertiary);
+  --rb-dot: var(--dt_color_outline_tertiary);
+}
+.sk-radio__dot {
+  /* inset 5 (a 10 pt dot), 5.25 while pressed (9.5 pt); collapses to the center when off */
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--rb-dot);
+  transform: scale(0);
+  transition:
+    transform 0.25s var(--sk-spring-smooth),
+    background-color 0.25s var(--sk-spring-smooth);
+}
+.sk-radio.is-on .sk-radio__dot {
+  transform: scale(1);
+}
+.sk-radio.is-on.is-pressed .sk-radio__dot {
+  transform: scale(0.95);
+}
+
+/* ------------------------------------------------------------------------------------------------------- SKDot */
+/* SKDot (DesignerComponents/Dot/SKDot.swift:23-65, September 2026): a 12 pt circle with 2 pt of padding, 16 pt */
+.sk-dot {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.sk-dot__circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--sk-dot-color, var(--dt_color_base_inverse_important));
+}

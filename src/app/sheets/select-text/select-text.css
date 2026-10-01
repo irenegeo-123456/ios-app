@@ -1,0 +1,69 @@
+/* Select Text (SelectTextSheet.tsx; spec canvas-lists-creation.md §5): the bar, then an MKMessagesAndEntitiesList — an
+   8 pt blank divider, the message, an 8 pt footer with a hairline, an 8 pt blank divider, "Copy all text", 8 pt
+   (TextCopyingPresenter.swift:158-230; SKListFooterView.swift:18-20, 106-112). */
+.st {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.st__list {
+  flex: 1;
+  min-height: 0;
+  padding-top: 60px;
+  /* scrolling is on only at the large detent (TextCopyingViewController.swift:37-40) */
+  overflow: hidden;
+  padding-bottom: var(--sheet-safe-bottom, var(--safe-bottom, 0px));
+}
+.st__list.ios-scroll {
+  overflow-y: auto;
+}
+.st__gap {
+  height: 8px;
+}
+.st__footer {
+  /* hairlineDivider: 8 pt with a 1 px outline_tertiary line at its bottom */
+  height: 8px;
+  box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--dt_color_outline_tertiary);
+}
+.st__message {
+  cursor: text;
+}
+/* the text view takes selections (legacyTextView.isSelectable, SKLabel.swift:567-586) */
+.st__text,
+.st__text * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+.st__text {
+  cursor: text;
+}
+
+/* the edit menu over the selection: UIKit's (not in Slack's source), drawn as the app's glass platters */
+.st-menu {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 6px;
+  border-radius: 22px;
+  white-space: nowrap;
+}
+.glass-platter .st-menu__item {
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: none;
+  color: var(--ios-label);
+  font: 400 17px/22px var(--sf);
+}
+.glass-platter .st-menu__item.is-pressed {
+  opacity: 0.5;
+}
+.st-menu__divider {
+  width: 1px;
+  height: 20px;
+  background: var(--ios-tertiary-label);
+}

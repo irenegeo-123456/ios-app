@@ -1,0 +1,81 @@
+/* SKTextToolbar and SKTextInput. Spec: slackkit-components.md › SKTextToolbar, SKTextInput (core). */
+
+/* ------------------------------------------------------------------------------------------- SKTextToolbar */
+.sk-text-toolbar {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none; /* showsHorizontalScrollIndicator = false */
+}
+.sk-text-toolbar::-webkit-scrollbar {
+  display: none;
+}
+.sk-text-toolbar__content {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: 36px;
+}
+.sk-text-toolbar__item {
+  /* itemSize 36 × 36 */
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sk-text-toolbar__item > * {
+  grid-area: 1 / 1;
+}
+.sk-text-toolbar__item.is-disabled {
+  opacity: 0.35; /* disabledAlpha, on the content view */
+  cursor: default;
+}
+.sk-text-toolbar__circle {
+  /* circleInsets 2: a 32 pt circle, highlight1.surface (SKTextToolbarItemCell.swift:21, :46-47) */
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--dt_color_surface_highlight_1);
+}
+.sk-text-toolbar__divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  background: var(--dt_color_outline_tertiary);
+}
+
+/* --------------------------------------------------------------------------------------------- SKTextInput */
+.sk-text-input {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.sk-text-input__field {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  /* Lato Regular 17, contentPrimary; usesFontLeading = false: ascender + descender = 1.2 em */
+  font: 400 17px/1.2 Lato;
+  color: var(--dt_color_content_primary);
+}
+.sk-text-input__placeholder {
+  position: absolute;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  pointer-events: none;
+}

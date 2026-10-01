@@ -1,0 +1,424 @@
+/* Files (DocsViewController, spec search-slackbot-huddles.md §4.2). Values cite DocsPresenter.swift unless noted. */
+
+.files {
+  /* the view is basePrimary; so is the full-bleed list since September 2026 (June sk_primary_background, the same values)
+     (DocsViewController.swift:112-116; DocsPresenter.swift:443) */
+  background: var(--dt_color_base_primary);
+}
+.files__list {
+  background: var(--dt_color_base_primary);
+}
+.files__content {
+  /* under the navigation bar (status bar + 54 pt, nav.css --navbar-bottom); clear of the floating tab bar (21 + 62,
+     measurements.md) */
+  min-height: 100%;
+  box-sizing: border-box;
+  padding-top: var(--navbar-bottom);
+  padding-bottom: calc(21px + 62px + 16px);
+  display: flex;
+  flex-direction: column;
+}
+.files__banner {
+  /* SKBannerEntity margins 12 / 16 / 12 / 16 (SKBannerEntity.swift:23) */
+  padding: 12px 16px;
+}
+.files__chips {
+  flex: none;
+}
+.files__sort {
+  /* the sort row: an SKPillButton on a clear background, flush with the row; its own insets place the text at x 15
+     and 4 pt below the chips (measured glyphs x 16–146.3, y 62.3–76 in testPaidEmptyState@3x.png) */
+  flex: none;
+  display: flex;
+}
+.files__sort-anchor {
+  display: inline-flex;
+}
+.files__rows {
+  flex: none;
+}
+.files__empty {
+  /* SKListPresentationObject.empty with the filter sections above it: the empty state fills what's left */
+  flex: 1;
+  min-height: 320px;
+  height: auto;
+}
+.files__template {
+  /* "Template" in indigo _50 (DocsPresenter.swift:384-387; Colors.swift:1048) */
+  color: var(--dt_color_palettes_indigo_50);
+}
+
+/* ------------------------------------------------------------------------------------------- File types sheet */
+.files-sheet {
+  /* containerPrimary (DocsFilterFileTypesViewController.swift:54) */
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_container_primary);
+}
+.files-sheet__bar {
+  /* iOS 26 sheet navigation bar (UIKit): 44 pt glass items 16 pt from the sheet's leading, trailing and top edges,
+     the title centered on them (SheetHost.tsx; Apple's sheets-large-detent render, 536 px = 402 pt) */
+  position: relative;
+  flex: none;
+  height: 76px;
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 16px 0;
+  box-sizing: border-box;
+}
+.files-sheet__close {
+  color: var(--dt_color_content_primary);
+}
+.files-sheet__title {
+  /* SKNavigationTitle: Lato Black 17, contentPrimary (SKNavigationTitle.swift:68-86) */
+  position: absolute;
+  left: 76px;
+  right: 76px;
+  top: 16px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.files-sheet__done {
+  margin-left: auto;
+  padding: 0 14px;
+}
+.files-sheet__done .sk-button {
+  background: none;
+}
+.files-sheet__list {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---------------------------------------------------------------------------------------------- file viewer */
+.file-viewer__content {
+  min-height: 100%;
+  box-sizing: border-box;
+  /* below the standard navigation bar (nav.css --navbar-bottom) */
+  padding: calc(var(--navbar-bottom) + 16px) 16px calc(21px + 62px + 16px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.file-viewer__media {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.file-viewer__media img {
+  max-width: 100%;
+  max-height: calc(var(--screen-h) - var(--navbar-bottom) - 21px - 62px - 80px);
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  display: block;
+}
+.file-viewer__card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 0 16px;
+}
+.file-viewer__name {
+  margin-top: 8px;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+.file-viewer__type,
+.file-viewer__meta {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.file-viewer__type {
+  margin-bottom: 8px;
+}
+.file-viewer__missing {
+  /* FileNoAccessOverlayView: a centered stack 10 pt apart, 44 pt side insets; the lock, title .bodyBold and
+     description .caption in contentPrimary (FileNoAccessOverlayView.swift:17-23, 74-121) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 28px;
+  text-align: center;
+}
+.file-viewer__missing-title {
+  margin-top: 5px;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.file-viewer__missing-body {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_primary);
+}
+
+/* ---------------------------------------------------------------------------------------------- file viewer sheet */
+/* FileViewerSheet.tsx (the file carousel). The overlay's own transition stands in for iOS 26's zoom: in over 0.3 s
+   (MediaPlayerTransitionDelegate duration 0.3), out over the overlay's exit. */
+.fv {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: fv-in 0.3s var(--sk-spring-smooth) both;
+}
+.fv.is-closing {
+  animation: fv-out 0.3s ease-in both;
+}
+@keyframes fv-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+@keyframes fv-out {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+.fv__backdrop {
+  /* ColorSet.Constants.black (FileCarouselViewController.swift:517-528) */
+  position: absolute;
+  inset: 0;
+  background: var(--dt_color_constants_black);
+}
+.fv__stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  transition: transform 0.2s ease-out, border-radius 0.2s;
+}
+.fv.is-dragging .fv__stage {
+  transition: border-radius 0.2s;
+}
+.fv__page {
+  position: absolute;
+  inset: 0;
+  background: var(--dt_color_constants_black);
+  transition: transform 0.35s var(--sk-spring-smooth);
+}
+.fv.is-dragging .fv__page {
+  transition: none;
+}
+.fv-image,
+.fv-pdf {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.fv-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  -webkit-user-drag: none;
+}
+.fv-pdf {
+  /* PDFView on sk_foreground_soft_solid (PDFViewerViewController.swift:35), the page fit to the width */
+  background: var(--sk_foreground_soft_solid);
+  padding: calc(var(--safe-top) + 44px + 8px) 8px calc(var(--safe-bottom) + 44px + 8px);
+}
+.fv-pdf img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  background: var(--dt_color_constants_white);
+}
+.fv-generic {
+  /* GenericFileViewController: a centered stack 12 pt apart, 12 pt from the sides; a 72 pt icon; the info in bodyBold
+     sk_foreground_high_solid, centered; a primary .medium button (:20-26, 67-100; GenericFilePresenter.swift:28-45) */
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 12px;
+  text-align: center;
+}
+.fv-generic__info {
+  font: var(--sk-body-bold);
+  color: var(--sk_foreground_high_solid);
+}
+.fv__chrome {
+  /* the toolbars, forced dark (FileCarouselToolbarHelper.swift: overrideUserInterfaceStyle = .dark): their glass takes
+     the dark values measured on iOS 26 (nav.css, measurements.md); 16 pt margins like the app's bars */
+  --glass-fill: rgba(33, 36, 40, 0.86);
+  --glass-rim: rgba(122, 140, 168, 0.42);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --glass-ink: #f2f4fa; /* sRGB (the device screenshots are Display P3: measurements.md) */
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  /* chrome show / hide: 0.3 s spring (damping 1), sliding 50 pt (FileCarouselViewController.swift:1060-1076, 1450-1451) */
+  transition:
+    opacity 0.3s var(--sk-spring-smooth),
+    transform 0.3s var(--sk-spring-smooth);
+}
+.fv__top {
+  top: var(--safe-top);
+}
+.fv__bottom {
+  bottom: var(--safe-bottom);
+}
+.fv__top.is-hidden {
+  opacity: 0;
+  transform: translateY(-50px);
+  pointer-events: none;
+}
+.fv__bottom.is-hidden {
+  opacity: 0;
+  transform: translateY(50px);
+  pointer-events: none;
+}
+.fv.is-dragging .fv__chrome {
+  opacity: 0;
+}
+.fv-glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  backdrop-filter: blur(14px) saturate(1.6);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-rim),
+    inset 0 1px 0 var(--glass-highlight),
+    var(--glass-shadow);
+  color: var(--glass-ink);
+  border: 0;
+}
+.fv-circle {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s;
+}
+.fv-circle.is-pressed,
+.fv-group__item.is-pressed {
+  transform: scale(0.94);
+}
+.fv-title {
+  /* FileCarouselHeaderTitleView: insets 0 / 5 / 0 / 8, a 28 pt round avatar, 6 pt to the text (:163-168) */
+  min-width: 0;
+  height: 44px;
+  border-radius: 22px;
+  padding: 0 14px 0 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.fv-title__info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.fv-title__line {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.fv-title__name {
+  /* smallBodyBold contentPrimary; the time smallBody contentSecondary; the context caption contentSecondary (:136-150) */
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fv-title__time {
+  flex: none;
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_secondary);
+}
+.fv-title__context {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.fv-title__lock {
+  display: inline-block !important;
+}
+.fv-group {
+  height: 44px;
+  border-radius: 22px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+}
+.fv-group__item {
+  height: 44px;
+  min-width: 44px;
+  border: 0;
+  background: none;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: inherit;
+  transition: transform 0.2s;
+}
+.fv-group__count {
+  /* the thread item's reply count in smallBody (FileCarouselToolbarHelper.swift:206-215) */
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_primary);
+}
+.fv__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* ------------------------------------------------------------------------------------------- file actions sheet */
+/* FileActionsSheet: below the 60 pt sheet bar, .small rows on basePrimary, 8 pt blank dividers between sections
+   (SKListHeader .blankDivider), the home indicator's inset under the last row */
+.file-actions {
+  padding: 60px 0 calc(var(--safe-bottom) + 8px);
+  background: var(--dt_color_base_primary);
+}
+.file-actions__divider {
+  height: 8px;
+}
+/* Delete: Text(delete, textColor: .sk_raspberry_red) (FileActionDataTypes.swift:196-198) */
+.file-actions__destructive {
+  color: var(--sk_raspberry_red);
+}

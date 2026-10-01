@@ -1,0 +1,930 @@
+/* Huddles (spec search-slackbot-huddles.md §3). Values cite the Swift they come from; measured values name their PNG
+   (~/slack-objc-main/Modules/Features/Huddles/Snapshots/iOS_26/…, @3x ÷ 3). */
+
+/* sk_black @ 70 %: the huddle chips, pills and default buttons (HuddlesSheetParticipantCell.swift:206, :346, :366) */
+.ios-screen {
+  --huddle-chip-bg: rgb(from var(--sk_black) r g b / 0.7);
+}
+
+/* ------------------------------------------------------------------------------------------------ the sheet */
+.huddle-call {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  /* HuddlesSheetViewController.swift:140: basePrimary behind the theme */
+  background: var(--dt_color_base_primary);
+  color: var(--dt_color_constants_white);
+  isolation: isolate;
+}
+/* The theme image is server-provided (§3.3 layer 1, §3.13): a dark brand-aubergine gradient stands in, from Slack's
+   brand constants (the same in light and dark). */
+.huddle-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 70% at 15% 10%, var(--dt_color_brand_secondary_bright_aubergine) 0%, transparent 60%),
+    radial-gradient(100% 60% at 90% 85%, var(--dt_color_brand_secondary_berry) 0%, transparent 65%),
+    linear-gradient(170deg, var(--dt_color_brand_core_aubergine), var(--dt_color_brand_core_black));
+  pointer-events: none;
+}
+/* the top fade: a 90 pt copy of the background, alpha 1 → 0 between 50 % and 100 % (HuddlesSheetViewV2.swift:131-142) */
+.huddle-bg--top-fade {
+  z-index: 2;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45px, transparent 90px);
+  mask-image: linear-gradient(to bottom, #000 45px, transparent 90px);
+}
+/* the bottom fade: a 120 pt copy, alpha 0 → 1 between 0 and 75 % (HuddlesSheetViewV2.swift:106-119) */
+.huddle-bg--bottom-fade {
+  z-index: 2;
+  -webkit-mask-image: linear-gradient(to top, #000 30px, transparent 120px);
+  mask-image: linear-gradient(to top, #000 30px, transparent 120px);
+}
+
+/* the participant grid (HuddlesCanvasGridLayout.swift:36-233): margins 80 top / 16 sides / 100 bottom, content shorter
+   than the screen centered vertically, a short last row centered horizontally */
+.huddle-call__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 16px 100px;
+  box-sizing: border-box;
+}
+.huddle-call__grid-inner {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.huddle-call__tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------------------------------ participant tile */
+.huddle-tile {
+  position: relative;
+  flex: none;
+  border-radius: 16px;
+  color: var(--dt_color_constants_white);
+}
+/* the outline is a filled view one border-width bigger, radius 16 + border, behind the avatar: 1 pt outlineTertiary, or
+   3 pt white with a black 10 % shadow (0, 2, radius 4) for the active speaker; a 0.6 s spring, damping 1
+   (HuddlesSheetParticipantCell.swift:311-321, :596-623) */
+.huddle-tile__outline {
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  background: var(--dt_color_outline_tertiary);
+  transition:
+    inset 0.6s var(--sk-spring-smooth),
+    border-radius 0.6s var(--sk-spring-smooth),
+    background-color 0.6s var(--sk-spring-smooth),
+    box-shadow 0.6s var(--sk-spring-smooth);
+}
+.huddle-tile.is-speaking .huddle-tile__outline {
+  inset: -3px;
+  border-radius: 19px;
+  background: var(--dt_color_constants_white);
+  box-shadow: 0 2px 8px rgb(from var(--dt_color_constants_black) r g b / 0.1);
+}
+.huddle-tile__image {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  /* UIImage.avatarPlaceholder(.callsAvatar) (measured #EAEAEA in testBasicMutedParticipant@3x.png) */
+  background: var(--dt_color_base_tertiary);
+}
+.huddle-tile__image .sk-avatar {
+  display: block;
+}
+.huddle-tile__image .sk-avatar__image {
+  border-radius: 0 !important;
+}
+.huddle-tile__dim {
+  /* invited / joining: black at 50 % (:162-172) */
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: rgb(from var(--dt_color_constants_black) r g b / 0.5);
+}
+.huddle-tile__spinner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+/* The name pill, 8 pt from the tile's bottom-left, fully rounded, insets 4 / 6, 4 pt gaps, captionBold white, 1 line
+   (:212-254, :436-438); measured 24 pt tall at 8 pt insets in testBasicMutedParticipant@3x.png */
+.huddle-tile__name {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  max-width: calc(100% - 16px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 12px;
+  background: var(--huddle-chip-bg);
+  font: var(--sk-caption-bold);
+  line-height: 16px;
+}
+.huddle-tile__name-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the mute icon pops in with a 0.5 s spring (damping 0.8) from scale 0.2 (:212-226) */
+.huddle-tile__muted,
+.huddle-soundwave {
+  animation: huddle-pop 0.5s var(--sk-spring-bouncy) both;
+}
+@keyframes huddle-pop {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+/* The reaction / sticker badge 8 pt from the top-left: insets 5, a 22 pt emoji, 2 pt to a sticker's label (captionBold
+   white), radius 8 (:333-356); reactions spring in over 0.8 s (damping 0.5), stickers 0.4 s (damping 1) (:97-104) */
+.huddle-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 8px;
+  background: var(--huddle-chip-bg);
+  color: var(--dt_color_constants_white);
+  font: var(--sk-caption-bold);
+  white-space: nowrap;
+}
+.huddle-tile__reaction {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  max-width: calc(100% - 16px);
+  padding: 5px;
+  box-sizing: border-box;
+}
+.huddle-tile__reaction.is-reaction {
+  animation: huddle-badge-in 0.8s var(--sk-spring-bouncy) both;
+}
+.huddle-tile__reaction.is-sticker {
+  animation: huddle-badge-in 0.4s var(--sk-spring-smooth) both;
+}
+.huddle-tile__sticker-label {
+  padding-right: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@keyframes huddle-badge-in {
+  from {
+    transform: scale(0.01);
+    opacity: 0;
+  }
+}
+/* Invited / Joining soon / Declined: the chip 8 pt from the edges, label insets 5 (25 pt tall, measured in
+   testInvitedParticipant@3x.png), radius 8 (HuddlesSheetParticipantCell.swift:180-190, :954-1000) */
+.huddle-tile__invite {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  gap: 4px;
+  padding: 5px;
+}
+/* While pinned the reaction / sticker badge keeps 8 pt clear of the pin and truncates: left 8 + gap 8 + pin 32 + inset 8
+   (pinReactionSpacing, :100, :501-504, :944-947) */
+.huddle-tile.is-pinned .huddle-tile__reaction {
+  max-width: calc(100% - 56px);
+}
+/* 📌 in a 32 pt box 8 pt from the top-right (September 2026; June 12: pinnedIconInset, :110-112, :376-385, :497-500) */
+.huddle-tile__pin {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--huddle-chip-bg);
+  display: grid;
+  place-items: center;
+}
+/* flip camera on your own video: a pill 8 pt from the bottom-right (:91, :268-276, :445-446) */
+.huddle-tile__flip {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 18px;
+  background: var(--huddle-chip-bg);
+  display: grid;
+  place-items: center;
+}
+.huddle-tile.is-camera .huddle-tile__image .sk-avatar__image img {
+  /* no real camera: the "video" is your avatar, slightly zoomed as a live feed reads */
+  transform: scale(1.12);
+}
+
+/* the 16 pt soundwave while speaking (a Lottie on iOS): four bars */
+.huddle-soundwave {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5px;
+  flex: none;
+}
+.huddle-soundwave i {
+  width: 2px;
+  height: 12px;
+  border-radius: 1px;
+  background: currentColor;
+  animation: huddle-wave 0.9s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+.huddle-soundwave i:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.huddle-soundwave i:nth-child(3) {
+  animation-delay: -0.6s;
+}
+.huddle-soundwave i:nth-child(4) {
+  animation-delay: -0.15s;
+}
+@keyframes huddle-wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .huddle-soundwave i {
+    animation: none;
+  }
+}
+
+/* a mic or camera glyph with the separate red slash (HuddleAVButton.swift:32-57, 161-228) */
+.huddle-slashed {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+.huddle-slashed > .ios-icon,
+.huddle-slashed__slash {
+  position: absolute;
+  inset: 0;
+}
+.huddle-slashed__slash {
+  /* the slash scales in from 0.01 in a 0.3 s spring (:72-83) */
+  animation: huddle-slash-in 0.3s var(--sk-spring-smooth) both;
+}
+@keyframes huddle-slash-in {
+  from {
+    transform: scale(0.01);
+  }
+}
+.huddle-lock-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ---------------------------------------------------------------------------------------------- banners */
+/* AI notes (HuddlesSheetRecordingCell.swift:16-21, 139-147): sk_black 70 %, radius 16, 16 pt icon margin, 10 pt spacing,
+   12 pt vertical margins, bodyBold white; your own screen share (HuddlesSheetLocalScreenShareCell.swift): 58 pt, 12 pt
+   side insets, the label chip then the Stop Sharing pill */
+.huddle-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 16px;
+  background: var(--huddle-chip-bg);
+  color: var(--dt_color_constants_white);
+}
+.huddle-banner--notes {
+  padding: 12px 10px 12px 16px;
+}
+.huddle-banner__text {
+  flex: 1;
+  min-width: 0;
+  font: var(--sk-body-bold);
+}
+.ios-app .huddle-banner__more {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 20px;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_constants_white);
+}
+.huddle-banner--share {
+  height: 58px;
+  padding: 0 12px;
+  justify-content: space-between;
+  gap: 8px;
+}
+.huddle-banner__share-label {
+  gap: 4px;
+  padding: 8px;
+  min-width: 0;
+  white-space: normal;
+}
+.ios-app .huddle-stop-share {
+  /* SKPillButton .small on highlight1.baseInverse (pressed darkened 20 %), captionBold white, ≥ 36 pt */
+  min-height: 36px;
+  border: 0;
+  border-radius: 18px;
+  padding: 8px 12px;
+  background: var(--dt_color_base_inverse_highlight_1);
+  color: var(--dt_color_constants_white);
+  font: var(--sk-caption-bold);
+  white-space: nowrap;
+}
+.ios-app .huddle-stop-share.is-pressed {
+  background: rgb(from var(--dt_color_base_inverse_highlight_1) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8));
+}
+
+/* ------------------------------------------------------------------------------------------------ the header */
+/* HuddlesSheetHeaderView.swift:25-27, 295-351, 367-374: the title stack 12 pt below the safe top, 16 pt above the bottom;
+   40 pt minimize circle and the Leave pill 16 pt from the edges, centered on the stack */
+.huddle-header {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px 16px;
+}
+/* black 50 % → 0, the header's height + 4 (HuddlesSheetViewV2.swift:144-151, 201) */
+.huddle-header__gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: -4px;
+  background: linear-gradient(to bottom, rgb(from var(--dt_color_constants_black) r g b / 0.5), transparent);
+  pointer-events: none;
+}
+.huddle-header > :not(.huddle-header__gradient) {
+  position: relative;
+}
+.huddle-header__labels {
+  flex: 1;
+  min-width: 0;
+}
+.huddle-header__title {
+  /* .bodyBold white, 1 line (:252-266) */
+  font: var(--sk-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huddle-header__subtitle {
+  /* .smallBody white, 1 line (:268-279) */
+  font: var(--sk-small-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* a new subtitle slides up from +20 pt: 0.4 s spring, damping 0.8, velocity 0.6 (:202-250) */
+.huddle-header__subtitle .is-new {
+  display: inline-block;
+  animation: huddle-subtitle-in 0.4s var(--sk-spring-bouncy) both;
+}
+@keyframes huddle-subtitle-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+/* Leave: SKPillButton .small (insets 8 / 12), glass, sk_raspberry_red, "Leave" captionBold white (max 16), ≥ 38 pt
+   (:62-106). The glass renders the red darker (measured #8B042E fill, a #C1588C rim in
+   testViewWithBasicConfigurationCompact@3x.png); the coded color is used. */
+.ios-app .huddle-leave {
+  flex: none;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 19px;
+  background: var(--sk_raspberry_red);
+  color: var(--dt_color_constants_white);
+  font: var(--sk-caption-bold);
+  box-shadow: inset 0 0 0 1px rgb(from var(--dt_color_constants_white) r g b / 0.28);
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.ios-app .huddle-leave.is-pressed {
+  /* pressed: sk_raspberry_red at 80 % */
+  background: rgb(from var(--sk_raspberry_red) r g b / 0.8);
+  transform: scale(0.96);
+  transition-duration: 0.2s;
+}
+
+/* (buttons are prefixed with .ios-app to outrank `.ios-app button { font: inherit; color: inherit }`, app.css)
+   the 40 pt glass circles (SKIconButton .small, useGlassEffect): white icon on sk_black 70 %, which iOS 26's glass renders
+   near black with a light rim (measured #121112 fill, #7E7D7E 1 pt rim, HuddleActionButtonContentViewTest/
+   testViewUpdatedHuddleCanvas@3x.png and the header test) */
+.ios-app .huddle-circle {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 20px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: #121112; /* measured glass render of sk_black @ 70 % */
+  box-shadow: inset 0 0 0 1px #7e7d7e; /* measured rim */
+  color: var(--dt_color_constants_white);
+  transition: transform 0.4s var(--sk-spring-smooth), background-color 0.2s;
+}
+.ios-app .huddle-circle.is-pressed {
+  transform: scale(0.9);
+  transition-duration: 0.2s;
+}
+
+/* ---------------------------------------------------------------------------------------------- the controls */
+/* HuddleActionButtonContentView.swift:95-108, 350-374: five 40 pt buttons spaced equally 16 pt in from the sides, 24 pt
+   above them, pinned to the bottom safe area (HuddleActionButtonViewController.swift:58-62). Measured centers at 36, 116,
+   197, 277, 357 on 393 pt. */
+.huddle-controls {
+  position: absolute;
+  z-index: 5;
+  left: 16px;
+  right: 16px;
+  bottom: var(--safe-bottom);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* unmuted mic / camera on: a black glyph on white (measured #F3F3F3 camera fill) (HuddleAVButton.swift:32-57, 256-264) */
+.ios-app .huddle-ctrl.is-on {
+  background: #f3f3f3; /* measured "on" fill */
+  box-shadow: none;
+  color: var(--dt_color_constants_black);
+}
+.huddle-ctrl__video {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+/* the 5 pt green dot inside the camera, offset −2.5 pt, pulsing to 0.8 and alpha 0.7 every 0.8 s (:447-464);
+   measured #489E88 */
+.huddle-ctrl__video-dot {
+  position: absolute;
+  left: calc(50% - 2.5px - 2.5px);
+  top: calc(50% - 2.5px);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sk_lilypad_green);
+  animation: huddle-video-dot 0.8s ease-in-out infinite alternate;
+}
+@keyframes huddle-video-dot {
+  to {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+}
+/* the sticker you wear replaces the reactions icon: 30 pt, popping in (0.8 s spring, damping 0.6, from 0.4) (:424-445) */
+.huddle-ctrl__sticker {
+  animation: huddle-sticker-in 0.8s var(--sk-spring-bouncy) both;
+}
+@keyframes huddle-sticker-in {
+  from {
+    transform: scale(0.4);
+  }
+}
+/* the thread badge: a 20 pt sk_raspberry_red circle in a 24 pt ring of the red darkened 40 %, microBold white, top-right
+   (HuddleBadgedButton.swift:25, 59-97; measured at x 276.7–296.7 of the 256.7–296.7 button) */
+.huddle-ctrl__badge {
+  position: absolute;
+  right: 0;
+  top: 0;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: var(--sk_raspberry_red);
+  box-shadow: 0 0 0 2px rgb(from var(--sk_raspberry_red) calc(r * 0.6) calc(g * 0.6) calc(b * 0.6));
+  color: var(--dt_color_constants_white);
+  font: var(--sk-micro-bold);
+  display: grid;
+  place-items: center;
+}
+
+/* ------------------------------------------------------------------------------------------------ the feed */
+/* from the header's bottom to 8 pt above the controls (HuddlesSheetViewV2.swift:331-334); the controls are 24 + 40 tall */
+.huddle-feed {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--safe-bottom) + 24px + 40px + 8px);
+  height: 0;
+  pointer-events: none;
+}
+.huddle-feed__pill {
+  position: absolute;
+  left: 16px;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+  height: 35.33px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 18px;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  color: var(--dt_color_content_primary);
+  font: var(--sk-body-bold);
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: huddle-feed-in 0.5s var(--sk-spring-smooth) both;
+  transition:
+    bottom 0.5s var(--sk-spring-smooth),
+    opacity 0.5s linear;
+}
+.huddle-feed__pill.is-mine {
+  background: var(--dt_color_base_inverse_highlight_1);
+  box-shadow: none;
+  color: var(--dt_color_content_inverse_primary);
+}
+.huddle-feed__emoji {
+  flex: none;
+}
+/* new pills rise from 2 pt below the feed (offscreenDistancePreFlight, HuddleNotificationFeedStack.swift:211) */
+@keyframes huddle-feed-in {
+  from {
+    transform: translateY(56px);
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------- effects */
+.huddle-effect {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+  animation: huddle-effect-fade 2.6s linear both;
+}
+@keyframes huddle-effect-fade {
+  0% {
+    opacity: 0;
+  }
+  8%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.huddle-effect__drop {
+  position: absolute;
+  bottom: -64px;
+  animation: huddle-effect-rise 2.2s cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+@keyframes huddle-effect-rise {
+  from {
+    transform: translateY(0) scale(var(--drop-scale, 1));
+  }
+  to {
+    transform: translateY(-620px) scale(var(--drop-scale, 1));
+    opacity: 0;
+  }
+}
+
+/* ----------------------------------------------------------------------------------------------- the PiP */
+.huddle-pip {
+  position: absolute;
+  /* above the tabs (their bar is 45), below sheets (200+) */
+  z-index: 150;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgb(from var(--dt_color_constants_black) r g b / 0.25);
+  opacity: 0;
+  transform: scale(0.9);
+  /* zoom out: 0.2 s ease-out to 0.9 and alpha 0; in: 0.4 s spring (damping 0.6) after 0.1 s; snaps: the default spring */
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out,
+    left 0.4s var(--sk-spring-bouncy),
+    top 0.4s var(--sk-spring-bouncy);
+  touch-action: none;
+}
+.huddle-pip.is-visible {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.4s var(--sk-spring-bouncy) 0.1s,
+    transform 0.4s var(--sk-spring-bouncy) 0.1s,
+    left 0.4s var(--sk-spring-bouncy),
+    top 0.4s var(--sk-spring-bouncy);
+}
+.huddle-pip.is-visible.is-pressed {
+  transform: scale(0.9);
+  transition:
+    transform 0.4s var(--sk-spring-bouncy),
+    left 0s,
+    top 0s;
+}
+.huddle-pip.is-dragging {
+  transition: transform 0.4s var(--sk-spring-bouncy);
+}
+.huddle-pip__content {
+  position: absolute;
+  inset: 0;
+  /* sk_foreground_min_solid_dark (SKLegacyColors.swift:187; HuddlesPIPParticipantView.swift:84) */
+  background: #212428;
+}
+.huddle-pip__content .sk-avatar__image {
+  border-radius: 0 !important;
+}
+.huddle-pip__alone {
+  /* "You’re the only one here" (youre_the_only_one), captionBold contentInverseSecondary, 24 pt from the sides, centered
+     (HuddlesPIPParticipantView.swift:21, 42-75) */
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font: var(--sk-caption-bold);
+  color: var(--dt_color_content_inverse_secondary);
+}
+/* "+N" in a 32 pt box 12 pt from the bottom-right (HuddlesPIPViewController.swift:26-27, 185-186, 254-258) */
+.huddle-pip__count {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: var(--huddle-chip-bg);
+  color: var(--dt_color_constants_white);
+  font: var(--sk-caption-bold);
+  display: grid;
+  place-items: center;
+}
+/* the notification chip, 32 pt tall, 6 pt from the top-left (:28, :177-178) */
+.huddle-pip__notice {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  max-width: calc(100% - 12px);
+  height: 32px;
+  box-sizing: border-box;
+  gap: 4px;
+  padding: 0 8px 0 6px;
+  animation: huddle-badge-in 0.4s var(--sk-spring-bouncy) both;
+}
+.huddle-pip__notice span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------------------------------- the preview */
+/* HuddlesPreviewViewController.swift:200-300, 464-521, 706-723 (see HuddlePreviewSheet.tsx); the SKBottomSheet adds its
+   16 pt drag zone above this and the bottom safe area below it */
+.huddle-preview {
+  /* topMargin 32 (no navigation bar), 16 pt sides, the buttons end at the content's bottom and UIKit adds the bottom
+     safe area (HuddlesPreviewViewController.swift:151-219, 522-535; SelfSizedDetentHeightObserver.swift:15-31) */
+  padding: 32px 16px var(--sheet-safe-bottom, var(--safe-bottom));
+  background: var(--dt_color_base_primary);
+}
+.huddle-preview__participants {
+  height: 66px;
+  display: flex;
+  justify-content: center;
+  margin: 0 -16px;
+  padding: 0 16px;
+  overflow: hidden;
+}
+.huddle-preview__participant {
+  flex: none;
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+}
+.huddle-preview__text {
+  margin-top: 16px;
+  text-align: center;
+}
+.huddle-preview__title {
+  /* .subtitle (Lato Black 20), centered */
+  font: var(--sk-subtitle);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+.huddle-preview__subtitle {
+  margin-top: 6px;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+.huddle-preview__channel {
+  font-weight: 700;
+  color: var(--dt_color_content_highlight_1);
+  white-space: nowrap;
+}
+.huddle-preview__lock {
+  display: inline-block !important;
+  vertical-align: -1px;
+  margin-right: 1px;
+}
+.huddle-preview__actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.huddle-preview__primary {
+  width: 100%;
+}
+
+/* ------------------------------------------------------------------------------------------------ More menu */
+/* HuddlesMenuViewController.swift:40-45: 20 pt of top inset, basePrimary */
+.huddle-more {
+  padding: 20px 0 calc(var(--safe-bottom) + 8px);
+  background: var(--dt_color_base_primary);
+}
+.huddle-more__header {
+  padding-top: 0;
+}
+
+/* ------------------------------------------------------------------------------------------- reactions picker */
+.huddle-reactions {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+  /* HuddlesReactionsViewController.swift:311: 12 pt above the tabs */
+  padding-top: 12px;
+  box-sizing: border-box;
+}
+.huddle-reactions > .sk-page-controller {
+  flex: 1;
+  min-height: 0;
+}
+.huddle-reactions__page {
+  height: 100%;
+  padding-bottom: calc(var(--safe-bottom) + 16px);
+  box-sizing: border-box;
+}
+/* TipLabelHeaderView.swift:40-49: smallBody contentSecondary, 16 top / 8 bottom / 4 sides (inside the section's insets) */
+.huddle-tip {
+  padding: 16px 20px 8px;
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_secondary);
+}
+.huddle-emoji-section__header {
+  /* 32 pt, caption contentSecondary, text 32 pt from the left (EmojiGridSectionHeader.swift:34, 55, 62-64) */
+  height: 32px;
+  padding-left: 32px;
+  display: flex;
+  align-items: center;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.huddle-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 36px);
+  justify-content: space-between;
+  row-gap: 16px;
+  padding: 6px 16px;
+}
+.huddle-emoji-cell {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+}
+.huddle-emoji-cell::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 25px;
+  background: transparent;
+}
+.huddle-emoji-cell.is-pressed::before {
+  background: var(--dt_color_base_tertiary);
+}
+.huddle-emoji-cell > * {
+  position: relative;
+}
+/* effects: 4 per row, 56 pt emoji 4 pt above a microBold contentPrimary title (EffectCell.swift:20-110;
+   EffectsPickerViewController.swift:199-202: 20 pt section insets, 4 pt item insets, 9 pt vertical) */
+.huddle-effects {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0 16px;
+  row-gap: 18px;
+}
+.huddle-effect-cell {
+  border: 0;
+  background: none;
+  padding: 9px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.huddle-effect-cell.is-pressed {
+  transform: scale(0.9);
+  transition-duration: 0.2s;
+}
+.huddle-effect-cell__emoji {
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: var(--dt_color_base_secondary);
+  display: grid;
+  place-items: center;
+}
+.huddle-effect-cell__label {
+  font: var(--sk-micro-bold);
+  color: var(--dt_color_content_primary);
+  text-align: center;
+}
+/* stickers: 2 per row, 8 pt insets, 60 pt tiles, radius 8, baseSecondary (selected sk_lilypad_green), the emoji 8 pt from
+   a smallBodyBold label, 16 pt side insets (StickerView.swift:20-95; StickerPickerViewController.swift:60-95) */
+.huddle-stickers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 8px 16px;
+}
+.ios-app .huddle-sticker {
+  height: 60px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--dt_color_base_secondary);
+  color: var(--dt_color_content_primary);
+  font: var(--sk-small-body-bold);
+  text-align: left;
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.ios-app .huddle-sticker.is-pressed {
+  transform: scale(0.96);
+  transition-duration: 0.2s;
+}
+.ios-app .huddle-sticker.is-selected {
+  background: var(--sk_lilypad_green);
+  color: var(--dt_color_constants_white);
+}
+.huddle-sticker__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------------------------------ face pile */
+.huddle-facepile {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+.huddle-facepile__face {
+  position: relative;
+  display: block;
+  border-radius: 50%;
+}
+.huddle-facepile__face .sk-avatar {
+  display: block;
+}

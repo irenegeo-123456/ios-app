@@ -1,0 +1,204 @@
+/* SKTabBar and SKPageController. Spec: slackkit-components.md › SKTabBar, SKPageController; SKTabBar.swift:22-28,
+   :118-142, :300-306; TabBarCollectionViewCell.swift:34-50, :252-270, :330-405, :480-500. */
+
+.sk-tab-bar {
+  position: relative;
+  width: 100%;
+  flex: none;
+  overflow: hidden; /* clipsToBounds */
+}
+.sk-tab-bar__scroller {
+  position: absolute;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.sk-tab-bar__scroller::-webkit-scrollbar {
+  display: none;
+}
+.sk-tab-bar__content {
+  position: relative;
+  height: 100%;
+}
+.sk-tab {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  /* press: bounce to 0.96 (Constants.bounceScale) with the shared timing */
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.sk-tab.is-pressed {
+  transform: scale(0.96);
+  transition-duration: 0.2s;
+}
+.sk-tab__selection {
+  /* the pressed "selection view", radius 10 (Constants.cornerRadius) */
+  position: absolute;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.4s var(--sk-spring-smooth);
+}
+.sk-tab.is-pressed .sk-tab__selection {
+  opacity: 1;
+  transition-duration: 0.2s;
+}
+/* pill buttons: the selection view is the selected fill, not a pressed state (:258-268, :462-464) */
+.sk-tab-bar--pillButton .sk-tab.is-pressed .sk-tab__selection {
+  opacity: 0;
+}
+.sk-tab-bar--pillButton .sk-tab.is-pill-selected .sk-tab__selection {
+  opacity: 1;
+}
+.sk-tab__frame {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+.sk-tab__stack {
+  /* title, count and icon 4 pt apart (Spacing.small) */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+}
+.sk-tab__title {
+  /* smallBody / smallBodyBold when selected (progress > 0.5), capped at 20 pt for Dynamic Type */
+  min-width: 0;
+  font: var(--sk-small-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sk-tab__title.is-selected {
+  font: var(--sk-small-body-bold);
+}
+.sk-tab__count {
+  flex: none;
+  font: var(--sk-small-body);
+  white-space: nowrap;
+}
+.sk-tab__dot {
+  /* Constants.dotSize 8, important.baseInverse (:49, :79-80) */
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--dt_color_base_inverse_important);
+}
+.sk-tab__ornament {
+  /* an SKOrnamentBox .small (24 pt) */
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+}
+.sk-tab__image {
+  width: 24px;
+  height: 24px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.sk-tab-bar__underline {
+  /* 4 pt tall, radius 2, as wide as the selected tab, flush with the bottom (:23-27, :118-125) */
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.sk-tab-bar__underline.is-animated {
+  /* refreshForSelectionProgress: UIView.animate 0.25 s (:313-324) */
+  transition:
+    left 0.25s ease-in-out,
+    width 0.25s ease-in-out;
+}
+.sk-tab-bar__pill {
+  position: absolute;
+  pointer-events: none;
+}
+.sk-tab-bar__pill.is-animated {
+  /* pillBackground(animateSelection: true): 0.25 s ease-in-out (:126-142) */
+  transition:
+    left 0.25s ease-in-out,
+    width 0.25s ease-in-out;
+}
+.sk-tab-bar__measure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------ SKPageController */
+.sk-page-controller {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.sk-page-controller.is-rounded {
+  /* addRoundedCornersToPageControllers: 16 pt continuous top corners (:98, :315-322) */
+  border-radius: 16px 16px 0 0;
+}
+.sk-page-controller__hairline {
+  /* 1 px outlineTertiary between the tabs and the pages (:113-118): one device pixel tall in the layout, drawn as the
+     top pixel of a 1 pt box (src/styles/hairline.css) */
+  flex: none;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.sk-page-controller__pages {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.sk-page-controller__pages::-webkit-scrollbar {
+  display: none;
+}
+.sk-page-controller__pages.is-locked {
+  overflow-x: hidden;
+}
+.sk-page-controller__page {
+  flex: none;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+}
+/* pillBackground squeezes the icon box and badge to the stack's height (see SKTabBar.tsx) */
+.sk-tab-bar--pillBackground .sk-tab__ornament {
+  height: min(24px, var(--tab-stack-h, 24px));
+}
+.sk-tab-bar--pillBackground .sk-tab__ornament > svg {
+  width: min(20px, var(--tab-stack-h, 20px));
+  height: min(20px, var(--tab-stack-h, 20px));
+}
+.sk-tab-bar--pillBackground .sk-tab__stack .sk-badge {
+  height: min(18px, var(--tab-stack-h, 18px));
+}

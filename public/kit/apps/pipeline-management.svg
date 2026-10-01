@@ -1,0 +1,15 @@
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline Management">
+  <defs>
+    <linearGradient id="pmg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b8ce9"/>
+      <stop offset="1" stop-color="#0166bf"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="11" fill="url(#pmg)"/>
+  <!-- funnel / pipeline mark -->
+  <g fill="#ffffff">
+    <rect x="11.5" y="13.5" width="25" height="5.4" rx="2.7"/>
+    <rect x="15.25" y="21.3" width="17.5" height="5.4" rx="2.7"/>
+    <rect x="19" y="29.1" width="10" height="5.4" rx="2.7"/>
+  </g>
+</svg>

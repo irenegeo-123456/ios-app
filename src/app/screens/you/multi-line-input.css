@@ -1,0 +1,54 @@
+/* SKMultiLineTextInputEntity (MultiLineInput.tsx cites each value). */
+.sk-mlti {
+  /* the row: margins 12 / 16 (defaultEdgeLayoutMargins, SKMultiLineTextInputEntity.swift:92) */
+  padding: 12px 16px;
+}
+.sk-mlti__box {
+  position: relative;
+  /* 1 pt border, radius 12 continuous (MultiLineTextInputEmbeddableViewController.swift:36-38, :259-271) */
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_primary);
+}
+.sk-mlti.is-error .sk-mlti__box {
+  /* .errorBorder: important.outline (SKMultiLineTextInputEntity.swift:71-79; June sk_raspberry_red) */
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_important);
+}
+.sk-mlti.is-disabled .sk-mlti__box {
+  /* disabled: baseSecondary behind the text (MultiLineTextInputEmbeddableViewController.swift:44, :257) */
+  background: var(--dt_color_base_secondary);
+}
+.sk-mlti__input,
+.sk-mlti__placeholder {
+  /* text inset 12 / 16, .body (SKMultiLineTextInputEntity.swift:61-64, :98) */
+  box-sizing: border-box;
+  padding: 12px 16px;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-mlti__input {
+  display: block;
+  width: 100%;
+  min-height: calc(20.67px + 24px);
+  margin: 0;
+  border: 0;
+  outline: 0;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  color: var(--dt_color_content_primary);
+  -webkit-user-select: text;
+  user-select: text;
+}
+.sk-mlti.is-disabled .sk-mlti__input {
+  color: var(--dt_color_content_tertiary);
+  -webkit-text-fill-color: var(--dt_color_content_tertiary);
+  opacity: 1;
+}
+.sk-mlti__placeholder {
+  /* contentTertiary, the same insets (SKMultiLineTextInputEntity.swift:96) */
+  position: absolute;
+  inset: 0;
+  color: var(--dt_color_content_tertiary);
+  pointer-events: none;
+  white-space: pre-wrap;
+}

@@ -1,0 +1,68 @@
+/* SKNavigationTitle. Spec: slackkit-components.md › SKNavigationTitle; SKNavigationTitle.swift:68-86, :195-262,
+   SKNavigationTitleOrnament.swift:20-121. */
+
+.sk-nav-title {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0 5px; /* Constants.verticalStackViewInsets 0 / 5 / 0 / 5 */
+}
+.sk-nav-title.is-leading {
+  align-items: flex-start;
+}
+.sk-nav-title__line {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+}
+.sk-nav-title__text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sk-nav-title__title {
+  /* Style.titleStyle: SKFont.bodyBlack, primary.contentPrimary */
+  font: var(--sk-body-black);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+}
+.sk-nav-title__subtitle {
+  /* Style.subtitleStyle: SKFont.smallBody, primary.contentSecondary */
+  font: var(--sk-small-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sk-nav-title__subtitle.is-animated {
+  /* smooth/medium spring, 0.4 s */
+  animation: sk-nav-title-fade 0.4s var(--sk-spring-smooth);
+}
+@keyframes sk-nav-title-fade {
+  from {
+    opacity: 0;
+  }
+}
+.sk-nav-title__ornament {
+  /* 20 × 20; icons take the line's text color */
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  color: currentColor;
+}
+.sk-nav-title__ornament.is-badge {
+  width: auto;
+}
+.sk-nav-title__image {
+  /* SKImageView .proportional: 0.25 × 20 */
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  object-fit: cover;
+  display: block;
+}

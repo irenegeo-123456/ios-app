@@ -1,0 +1,46 @@
+{
+  "name": "slack-mobile-clone",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit -p . && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm test && npm run build",
+    "harvest": "node tools/ios/harvest.mjs",
+    "selftest": "node tools/selftest.mjs",
+    "shot": "node tools/shot.mjs",
+    "new": "node tools/new-prototype.mjs",
+    "demo": "npm run build && vite preview --port 4190 --strictPort",
+    "doctor": "node tools/doctor.mjs",
+    "compare": "node tools/compare.mjs",
+    "snapshots": "node tools/snapshots.mjs",
+    "predev": "node tools/doctor.mjs --quick",
+    "prebuild": "node tools/doctor.mjs --quick",
+    "publish:site": "node tools/publish.mjs"
+  },
+  "dependencies": {
+    "@material/material-color-utilities": "^0.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "emoji-datasource-apple": "16.0.0",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
+  }
+}

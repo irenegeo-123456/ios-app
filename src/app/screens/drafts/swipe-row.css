@@ -1,0 +1,58 @@
+/* SwipeRow (SKSwipeableContentDecorator), shared by DMs, Activity, Drafts and Scheduled rows. */
+
+/* SKSwipeableContentDecorator: the row clips its content; the action's background fills it behind the content */
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.swipe-row__background {
+  position: absolute;
+  inset: 0;
+}
+/* the revealed SKButton .medium .default(textColor: foregroundColor): icon left of the label, smallBodyBold 15, 10 / 12
+   padding, centered on the row (:399-407) */
+.ios-app .swipe-row__button {
+  position: absolute;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  font: var(--sk-small-body-bold);
+  transform: translateY(-50%);
+  /* crossing the threshold snaps it along, .snappy / .medium (:299) */
+  transition:
+    right 0.368s var(--sk-spring-snappy),
+    left 0.368s var(--sk-spring-snappy);
+}
+.swipe-row__label {
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.swipe-row__content {
+  position: relative;
+  background: var(--sk_primary_background);
+  /* settles .smooth / .medium (:251) */
+  transition:
+    transform 0.4s var(--sk-spring-smooth),
+    border-radius 0.4s var(--sk-spring-smooth),
+    box-shadow 0.4s var(--sk-spring-smooth);
+}
+/* the row follows the finger */
+.swipe-row.is-dragging .swipe-row__content {
+  transition:
+    border-radius 0.4s var(--sk-spring-smooth),
+    box-shadow 0.4s var(--sk-spring-smooth);
+}
+/* while moved: 12 pt continuous corners and a black shadow, opacity 0.4, radius 4 (:79-87, :471-482) */
+.swipe-row.is-moved .swipe-row__content {
+  border-radius: 12px;
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.4);
+}
+
+/* .slideAwayAndDelete: the row leaves before the action removes it */
+.swipe-row.is-sliding .swipe-row__content {
+  transition: transform 0.25s ease-in;
+}

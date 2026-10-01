@@ -1,0 +1,84 @@
+/* SKEmptyState. Spec: slackkit-components.md › SKEmptyState; Constants at SKEmptyState.swift:35-52, stack :140-184. */
+
+.sk-empty-state {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  /* edge margins 16 / 32 / 16 / 32 */
+  padding: 16px 32px;
+  background: var(--dt_color_base_primary);
+  overflow: hidden;
+}
+.sk-empty-state__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  text-align: center;
+  /* keyboard avoidance (SKEmptyState.tsx; SKEmptyState.swift:329-393): up by half the covered height, through the
+     transform (:388-389), over half the keyboard animation, ease-out (:333-342) */
+  transform: translateY(calc(var(--es-offset, 0px) * -1));
+  transition: transform 0.125s ease-out;
+}
+.sk-empty-state__item {
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+}
+.sk-empty-state__decoration {
+  display: flex;
+  /* only the decoration shrinks to fit above the keyboard: its size constraints × the scale (:390-392) */
+  zoom: var(--es-deco-scale, 1);
+}
+.sk-empty-state__image {
+  display: block;
+  width: 120px;
+  height: 120px;
+}
+.sk-empty-state__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+[data-appearance='dark'] .sk-empty-state__image .is-light-only,
+[data-appearance='light'] .sk-empty-state__image .is-dark-only {
+  display: none;
+}
+.sk-empty-state__emoji {
+  width: 48px;
+  height: 48px;
+}
+.sk-empty-state__title {
+  font: var(--sk-title);
+  /* A wrapping UILabel: its lines advance by the font's 1.2 em (26.4 pt; a device's DMs empty state, measurements.md
+     D: baselines 26.33 apart, 20.33 in the body) and only the label's box is rounded up to the pixel grid, once. So the
+     line height stays 1.2 and this padding makes a one-line title 26.67 tall; a per-line round(up) line height
+     stepped 27 a line here (docs/conventions.md, "Text baselines"). */
+  padding-bottom: calc(round(up, 1lh - 0.001px, 1px / 3) - 1lh);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: break-word;
+}
+.sk-empty-state__adjacent {
+  /* PaddedLabel: SKFont.microBold, insets 2/4/2/4, radius 4 (:39-41) */
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font: var(--sk-micro-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-empty-state__body {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  overflow-wrap: break-word;
+}
+.sk-empty-state__buttons {
+  /* horizontal, 8 pt apart; vertical and full width at accessibility sizes (:325-340, :387-399) */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

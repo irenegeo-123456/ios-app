@@ -1,0 +1,90 @@
+/* Forward Message (SM/ShareMessageViewController.swift; ShareMessageView.swift) on basePrimary */
+.fw {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.fw__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 60px;
+  padding-bottom: calc(var(--kb-height, 0px) + var(--sheet-safe-bottom, var(--safe-bottom, 0px)));
+}
+/* the hairlines: 1 pt outlineTertiary (SMVC:353-358,628-635) */
+.fw__rule {
+  height: 1px;
+  background: var(--dt_color_outline_tertiary);
+}
+/* the destination field: 50 pt; the ConversationPickerView 8 pt in, its placeholder 4 pt further (Spacing.small), body
+   17 in contentTertiary, typed text contentPrimary (SMVC:1516; ConversationPickerView.swift:355-365;
+   ComposeMessageDestinationPickerPresentable.swift:23-33,101-106). Measured on test_shareMessage@3x.png: text at 12.7 pt. */
+.fw__to {
+  height: 50px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  cursor: text;
+}
+.fw__to-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border: 0;
+  outline: 0;
+  padding: 0 0 0 4px;
+  background: transparent;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  caret-color: var(--dt_color_content_highlight_1);
+}
+.fw__to-input::placeholder {
+  color: var(--dt_color_content_tertiary);
+  opacity: 1;
+}
+.fw__results {
+  padding-top: 4px;
+}
+/* the message field: 8 pt from the rules, the sides and the preview, text inset 8 / 5 / 8 / 0; placeholder
+   contentTertiary (September 2026; June sk_foreground_high_solid) (SMVC:325,349,374,482; ShareMessagePresenter.swift:
+   184-192). Checked against the June test_shareMessage@3x.png: the rules at 0 / 51, the placeholder's ink at 71.7, the
+   card's top at 120 (the September PNG isn't pulled from LFS). */
+.fw__note {
+  display: block;
+  box-sizing: border-box;
+  width: calc(100% - 16px);
+  margin: 8px;
+  border: 0;
+  outline: 0;
+  padding: 8px 0 8px 5px;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  caret-color: var(--dt_color_content_highlight_1);
+}
+.fw__note::placeholder {
+  color: var(--dt_color_content_tertiary);
+  opacity: 1;
+}
+/* the preview container starts 8 pt under the field; MKMessagePreview sits 15 pt inside it, clipped to 8 pt corners
+   under a one-device-pixel outlinePrimary layer border (UIUtilities.onePixel(): drawn over the content, taking no room)
+   (SMVC:491-492,1330-1348) */
+.fw-card {
+  position: relative;
+  margin: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.fw-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--hairline) var(--dt_color_outline_primary);
+  pointer-events: none;
+}

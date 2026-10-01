@@ -1,0 +1,72 @@
+/* Drafts & Sent (spec dms-activity.md §7). Rows are MKMessagePreviews (src/messagekit); tabs are SKPageController's. */
+
+/* the page controller hangs from the safe area's top, under the bar; the view is base_primary
+   (OutboundsViewController.swift:84-96) */
+.drafts__pager {
+  flex: 1;
+  min-height: 0;
+  margin-top: calc(var(--navbar-bottom));
+}
+/* each tab's list: SKList on iPhone draws sk_primary_background (ListThemeOptions.swift:67) */
+.drafts__list {
+  position: relative;
+  height: 100%;
+  background: var(--sk_primary_background);
+}
+/* the tab bar floats over the list (iOS 26): clear it */
+.drafts__bottom-space {
+  height: calc(21px + 62px + 16px);
+}
+/* the empty-state row: the section's 8 pt default header, then the rest of the list above the tab bar, centered
+   (SKList.swift:1991-1993, :2011-2016) */
+.drafts__empty {
+  box-sizing: border-box;
+  height: calc(100% - 21px - 62px);
+  padding-top: 8px;
+}
+
+/* Sent's day headers: SKHeaderEntity .medium, 8 extra + 12 / 16 / 12 / 16, smallBodyBold 15 content_primary
+   (SKHeaderEntity.swift:84-86, :300, :458-465) */
+.drafts__section-header {
+  padding: calc(8px + 12px) 16px 12px;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "Edit" / "Cancel": an SKButton .barButton has no padding of its own; the glass capsule's layout margins give it
+   12 pt a side, as compose.css draws its bar buttons */
+.drafts__bar-button {
+  padding: 0 12px;
+}
+
+/* BulkDeleteAccessoryView (:43-124): basePrimary, margins 4 / 16, a 1 px outlineTertiary hairline at the bottom
+   (BulkDeleteAccessoryView.swift:16-20, :47; June sk_primary_background and sk_foreground_low_solid), the controls
+   vertically centered */
+.drafts-bulk {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding: 4px 16px;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--dt_color_outline_tertiary);
+}
+.drafts-bulk__spacer {
+  flex: 1;
+  /* greaterThanOrEqualToSystemSpacingAfter: at least 8 pt */
+  min-width: 8px;
+}
+
+/* app.css's `.ios-app button { font: inherit; color: inherit }` outranks SKButton's own font and color outside sheets
+   (src/slackkit/buttons.css), so they're restated, as compose.css does */
+.drafts .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.drafts .sk-button.is-pressed,
+.drafts .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}

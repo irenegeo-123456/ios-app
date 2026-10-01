@@ -1,0 +1,105 @@
+/* Later (spec dms-activity.md §6). Rows are MKMessagePreviews (src/messagekit); the tabs are SKPageController's. */
+
+/* the page controller hangs from the safe area's top, under the bar (TasksViewController.swift:233-243); the view is
+   base_primary (:168) */
+.later__pager {
+  flex: 1;
+  min-height: 0;
+  margin-top: calc(var(--navbar-bottom));
+}
+/* each tab's list: SKList on iPhone draws sk_primary_background (ListThemeOptions.swift:67) */
+.later__list {
+  position: relative;
+  height: 100%;
+  background: var(--sk_primary_background);
+}
+/* the tab bar floats over the list (iOS 26): clear it */
+.later__bottom-space {
+  height: calc(21px + 62px + 16px);
+}
+
+/* SKButtonEntity .wrapContent(indentedForMessageAlignment: true): 10 / 16 padding + 48 extra on the left, 8 pt apart,
+   center aligned, in the list cell's color (SKButtonEntity.swift:21, :143-158, :212-221) */
+.later__buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 10px 64px;
+  background: var(--sk_primary_background);
+}
+
+/* SKList's empty-state row: the section's 8 pt default header, then the rest of the list above the tab bar, the
+   SKEmptyState centered in it (SKList.swift:1991-1993, :2011-2016) */
+.later__empty {
+  box-sizing: border-box;
+  height: calc(100% - 21px - 62px);
+  padding-top: 8px;
+}
+
+/* A deleted message: SKGenericEntity .medium, a 36 pt ornament box and body text in content_secondary, 12 pt apart,
+   10 / 16 padding (TasksListPresenter.swift:251-308) */
+.later__deleted {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  transition: opacity 0.15s;
+}
+.later__deleted.is-pressed {
+  opacity: 0.6;
+}
+.later__deleted-text {
+  flex: 1;
+  min-width: 0;
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}
+
+/* ------------------------------------------------------------------------------------------------ the header */
+/* makeHeaderText: the spans keep their spaces ("  ", "●  "); micro 12, the detail spans bold */
+.later-header {
+  white-space: pre;
+}
+.later-header__detail {
+  font-weight: 700;
+}
+/* SavedItemsTimeFormatter + detailDangerAttributes: an overdue reminder in sk_raspberry_red (SavedItemMessagePreview.swift:24) */
+.later-header__detail.is-overdue {
+  color: var(--sk_raspberry_red);
+}
+/* the channel span's lock, a text attachment as tall as the font's ascender, in the text's color
+   (Text+Display.swift:1806-1846) */
+.later-header__icon {
+  display: inline-block !important;
+  width: 0.987em !important;
+  height: 0.987em !important;
+  vertical-align: -0.106em;
+  margin-right: 0.1em;
+}
+
+/* ------------------------------------------------------------------------------------------------ the bar */
+/* "Clear all" is the bar button's custom view: SKButton .systemDefault(isPadded: true) .medium, whose own 12 pt padding
+   is the capsule's (TasksViewController.swift:57-75) */
+/* a title bar button's capsule: the title 12 pt in from its ends (nav.css) */
+.later__clear-all {
+  padding: 0 12px;
+}
+
+/* app.css's `.ios-app button { font: inherit; color: inherit }` outranks SKButton's own font and color outside sheets
+   (src/slackkit/buttons.css), so they're restated, as compose.css does */
+.later .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.later .sk-button.is-pressed,
+.later .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}
+
+/* ------------------------------------------------------------------------------------------------ the reminder sheet */
+/* "Clear Due Date" in sk_raspberry_red (:230-232) */
+.later-reminder__clear {
+  color: var(--sk_raspberry_red);
+}

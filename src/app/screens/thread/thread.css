@@ -1,0 +1,69 @@
+/* The thread screen (spec messages.md §10.7). Rows come from MessageKit (src/messagekit/messagekit.css). */
+
+/* threads open at the top and short ones stay there (TopContentInsetAccounting.swift:74-84) */
+.thread-list__content {
+  box-sizing: border-box;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The title view fills the bar between the back circle and the right items, 12 pt from each (UIKit's spacing between
+   glass groups), its capsule nudged 6 pt right for the back button (HeaderTitleView.swift:405-409 [Sept]); measured on a
+   device: x 82–309 with the back circle ending at 64 and the right capsule starting at 321 (reference/device/IMG_2248). */
+.thread-title-slot {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding-left: 6px;
+  display: flex;
+}
+/* the iOS 26 capsule: glass, 44 tall, text inset 16 leading / 10 trailing (HeaderTitleView.swift:30-32, :358-364) */
+.thread-title {
+  pointer-events: auto;
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  padding: 0 10px 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+}
+.thread-title.is-pressed {
+  opacity: 0.5;
+}
+/* "Thread": Lato Black capped at 16 in the capsule, content_primary, 1 line (HeaderTitleView.swift:430 [Sept]; June:
+   sk_primary_foreground) */
+.thread-title__title {
+  max-width: 100%;
+  font: 900 16px/1.2 Lato;
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* the conversation: Lato 13 (max 13), content_secondary in the capsule (HeaderTitleView.swift:527-552) */
+.thread-title__subtitle {
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+}
+.thread-title__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+/* channel icons are drawn at the font's ascender (Text+Display.swift:1912-1968) */
+.thread-title__icon {
+  flex: none;
+  width: 12.83px !important;
+  height: 12.83px !important;
+}

@@ -1,0 +1,681 @@
+/* Slackbot (spec search-slackbot-huddles.md §2): the Slackbot DM, its landing page, thread rows and sheets, and the
+   Slackbot tab's landing page. Values are cited per rule (Swift lines are slack-objc 14b3cbaf, Sept 2026); the components
+   cite their Swift in comments too. */
+
+/* ------------------------------------------------------------------------------------------------- screen */
+.sb {
+  /* the conversation's root background is base_primary, the list sk_primary_background (messages.md §1.4, §10.1) */
+  background: var(--sk_primary_background);
+  /* the composer's host bottom: the floating tab bar's top (21 + 62, measurements.md), else the safe area (composer.css) */
+  --sb-dock: 83px;
+}
+.ios-screen[data-device='iphone-se'] .sb {
+  --sb-dock: 70px;
+}
+.ios-tab:has(> .ios-tabbar-host.is-hidden) .sb {
+  --sb-dock: var(--safe-bottom);
+}
+/* SKButton keeps its own font and color on this screen (app.css resets `.ios-app button` to inherit) */
+.sb .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.sb .sk-button.is-pressed,
+.sb .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}
+.sb__list {
+  /* content scrolls under the glass bar (AnyConversationViewController.swift:170, 250); it ends above the composer, which
+     floats 12 pt above the tab bar or the keyboard (liquidGlassBottomPadding, ComposerViewConstants.swift:43) */
+  padding-top: calc(var(--navbar-bottom));
+  padding-bottom: calc(var(--sb-composer-h) + 12px + max(var(--kb-height), var(--sb-dock)));
+  transition: padding-bottom 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+/* the landing page's list also stops above the disclaimer's context bar: 6 + the 36 pt capsule + 6 (§2.3) */
+.sb.has-disclaimer .sb__list {
+  padding-bottom: calc(var(--sb-composer-h) + 12px + max(var(--kb-height), var(--sb-dock)) + 48px);
+}
+/* The disclaimer context bar (SlackbotAiLandingContentPlugin.swift:277-287): the conversation's SKContextBar cell, centered
+   6 pt above the composer with the composer's side margins (ContextBarBottomDrawer.swift:77-79, :107-130); the capsule
+   itself is the composer's context-bar style (composer.css .cmp-banner--bar: SKContextBar.swift:34-52, 66-77). The composer
+   floats 8 pt above the tab bar (--cmp-gap, composer.css), 8 pt in from the sides once focused. */
+.sb-ctx {
+  --sb-ctx-side: 21px;
+  /* .cmp-context's padding reads the composer's side margin */
+  --cmp-side: var(--sb-ctx-side);
+  position: absolute;
+  z-index: 24;
+  left: 0;
+  right: 0;
+  bottom: calc(max(var(--kb-height), var(--sb-dock)) + 8px + var(--sb-composer-h));
+  display: flex;
+  padding: 6px var(--sb-ctx-side);
+  pointer-events: none;
+  transition:
+    bottom 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77),
+    padding 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+.ios-screen[data-device='iphone-se'] .sb-ctx {
+  --sb-ctx-side: 16px;
+}
+.ios-app.has-keyboard .sb-ctx {
+  --sb-ctx-side: 8px;
+}
+
+/* ------------------------------------------------------------------------------------------------- nav bar */
+/* The DM title capsule (ConversationNavigationTitleView.swift:106-120, 396-486; ConversationHeaderPresentationObject.swift:
+   285-290, 402): interactive glass, 44 tall, filling the bar; the 36 pt round avatar in a 44 pt slot, 4 pt, then the name
+   (Lato Black 15, contentPrimary) over the subtitle (Lato 13, contentSecondary); 6 pt to the trailing edge. */
+.sb-title {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border-radius: 22px;
+  padding: 0 6px 0 0;
+  display: flex;
+  align-items: center;
+  color: var(--dt_color_content_primary);
+}
+.sb-title__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin-right: 4px;
+  display: grid;
+  place-items: center;
+}
+.sb-title__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sb-title__name {
+  font: var(--sk-small-body-black);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-title__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* bar buttons: 20 pt icons in contentPrimary (SKBarButtonItem.swift:216-225), one shared capsule (52 pt apart, §3.5) */
+.sb-bar-buttons {
+  color: var(--dt_color_content_primary);
+}
+[data-appearance='dark'] .sb-bar-buttons {
+  color: var(--glass-ink);
+}
+
+/* ------------------------------------------------------------------------------------------------- landing */
+/* one SKEmptyState row that fills what the list's insets leave, re-laid out when they change, so it shrinks above the
+   keyboard (SKList .fillsRemaining, SKList.swift:964-974, 1925-1993); the avatar hides when it doesn't fit */
+.sb-landing {
+  height: 100%;
+  display: flex;
+}
+.sb-landing__empty {
+  flex: 1;
+  height: auto;
+}
+/* With the keyboard up the stack's center moves up by half the keyboard's height, but only at low priority under its
+   16 pt top margin, then scales to 0.75 (SKEmptyState.swift:159-172, 309-323): centered with a keyboard-tall bottom
+   margin, top aligned when that doesn't fit */
+.ios-app.has-keyboard .sb-landing__empty {
+  align-items: safe center;
+}
+.ios-app.has-keyboard .sb-landing__empty .sk-empty-state__stack {
+  margin-bottom: var(--kb-height, 0px);
+  transform: scale(0.75);
+}
+
+/* NUX (SlackbotAiNuxPromptsView.swift:47; AiComponents/SlackbotAiNuxPromptRow.swift:69-75, 261-288): anchored to the bottom; rows
+   12 apart inside 12 / 64 / 12 / 32 insets; a 36 pt emoji circle, 8 pt, the prompt in .smallBodyBold; 8 pt padding,
+   radius 12; pressed 0.96 */
+.sb-nux {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.sb-nux__question {
+  font-weight: 700;
+  color: var(--dt_color_content_primary);
+}
+.sb-nux__prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 32px 12px 64px;
+}
+.sb-nux__prompt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  text-align: left;
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.sb-nux__prompt.is-pressed {
+  transform: scale(0.96);
+  transition-duration: 0.2s;
+}
+.sb-nux__label {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+
+/* ------------------------------------------------------------------------------------------------- messages */
+/* MKMessageView (messages.md §1.1-§1.3): 8 / 16 / 8 insets, a 36 pt avatar, 12 pt to the column */
+.sb-thread {
+  padding-top: 0;
+}
+.sb-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 16px;
+  color: var(--sk_primary_foreground);
+  font: var(--sk-body);
+}
+.sb-msg__avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+.sb-msg__column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* name · time, centered on each other, 4 apart (MKPrimaryContentStackView.swift:51-114; MKCoreMessageProperties.swift:184-228) */
+.sb-msg__header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.sb-msg__name {
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.sb-msg__time {
+  flex: none;
+  font: var(--sk-micro);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+}
+/* the body: the first block 4 pt below the name, later blocks 12 (Utils.swift:24-53); Lato 17 sk_primary_foreground */
+.sb-msg__text {
+  margin-top: 4px;
+  font: var(--sk-body);
+  color: var(--sk_primary_foreground);
+}
+.sb-msg__text.is-after-block {
+  margin-top: 12px;
+}
+.sb-blocks {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The citation (RichTextCitation+Presentation.swift:17-95): the number in the body font, message_rendering_mention_text on
+   the mention background (sk_frosty_blue_solid), no padding, radius 3 like a mention (text.css .rt-mention) */
+.sb-cite {
+  color: var(--sk_mention_text);
+  background: var(--sk_frosty_blue_solid);
+  border-radius: 3px;
+}
+.sb-cite.is-pressed {
+  opacity: 0.6;
+}
+/* svgLockFilled at 1.6 × the cap height, centered on it (:104-113) */
+.sb-cite__lock {
+  display: inline-block !important;
+  width: 1.15em !important;
+  height: 1.15em !important;
+  vertical-align: -0.215em;
+}
+
+/* The "thinking / tools" line (BKTimelineHeaderView.swift:25-26, 70-77; AiLabel.swift:24-190): [20 pt icon box, the glyph
+   at 0.8] 6 [text, .smallBody] 4 [20 pt caret_right]; aubergine_70 while running, with the shimmer; contentTertiary done */
+.sb-timeline {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 20px;
+  color: var(--dt_color_content_tertiary);
+}
+.sb-timeline.is-running {
+  color: var(--dt_color_palettes_aubergine_70);
+}
+.sb-timeline.is-pressed {
+  opacity: 0.6;
+}
+.sb-timeline__label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sb-timeline__icon {
+  flex: none;
+  width: 20px !important;
+  height: 20px !important;
+  transform: scale(0.8);
+}
+.sb-timeline__text {
+  min-width: 0;
+  font: var(--sk-small-body);
+}
+.sb-timeline__caret {
+  flex: none;
+}
+/* the shimmer: a mask of alphas 1 / 0.15 / 1 whose stops move from (-0.9, -0.5, -0.1) to (0.7, 1.0, 1.3) over 1.3 s,
+   linear, repeating (AiLabel.swift:163-190) */
+@property --sb-sh-a {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: -0.9;
+}
+@property --sb-sh-b {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: -0.5;
+}
+@property --sb-sh-c {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: -0.1;
+}
+.sb-timeline.is-running .sb-timeline__label {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--sb-sh-a) * 100%), rgba(0, 0, 0, 0.15) calc(var(--sb-sh-b) * 100%), #000 calc(var(--sb-sh-c) * 100%));
+  mask-image: linear-gradient(90deg, #000 calc(var(--sb-sh-a) * 100%), rgba(0, 0, 0, 0.15) calc(var(--sb-sh-b) * 100%), #000 calc(var(--sb-sh-c) * 100%));
+  animation: sb-shimmer 1.3s linear infinite;
+}
+@keyframes sb-shimmer {
+  from {
+    --sb-sh-a: -0.9;
+    --sb-sh-b: -0.5;
+    --sb-sh-c: -0.1;
+  }
+  to {
+    --sb-sh-a: 0.7;
+    --sb-sh-b: 1;
+    --sb-sh-c: 1.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-timeline.is-running .sb-timeline__label {
+    animation: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* The footer bar (MessageFooterActionBar.swift:26-40, 114-127, 160-304; measured (June) in
+   testMessageWithContentAndMessageFooterActionBar): 8 pt below the content, a 40 pt row of 40 pt icon buttons and the
+   Sources chip at the right. With ios_hangbar_updates_v2 on, the last answer's disclaimer comes first: a 1 px
+   outlineTertiary line, 12 pt, the line in .caption contentTertiary, 4 pt, then the row (June: below the row, contentSecondary) */
+.sb-footer {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.sb-footer__row {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sb-footer__buttons {
+  display: flex;
+  align-items: center;
+}
+.sb-footer__divider {
+  /* one device pixel (src/styles/hairline.css) */
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.sb-footer__disclaimer {
+  margin: 12px 0 4px;
+  font: var(--sk-caption);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_tertiary);
+}
+
+/* ------------------------------------------------------------------------------------------------- sheets */
+/* a sheet's navigation bar: 44 pt glass items 16 pt from the sheet's top and sides, the title centered in Lato Bold 17
+   contentPrimary (UINavigationBar+SlackStyles.swift:83-84; measurements.md › Sheets); since Sept the close button (SF
+   xmark, contentPrimary) leads (UIViewController+CloseButton.swift:61-97) */
+.sb-sheet-nav {
+  position: relative;
+  flex: none;
+  height: 44px;
+  margin: 16px 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sb-sheet-nav__close {
+  display: grid;
+  place-items: center;
+}
+.sb-sheet-nav__title {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  text-align: center;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.sb-sheet-nav__button {
+  color: var(--dt_color_content_primary);
+}
+[data-appearance='dark'] .sb-sheet-nav__button {
+  color: var(--glass-ink);
+}
+
+/* History (AiHistoryViewController.swift:60-62): basePrimary */
+.sb-history {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.sb-history__list {
+  padding-bottom: var(--sheet-safe-bottom, 0px);
+}
+.sb-history__empty {
+  flex: 1;
+  height: auto;
+}
+
+/* Sources (AiTimelineSourcesViewController.swift:26-45): basePrimary (June sk_primary_background), the list 16 pt in from
+   the sides, below the bar and from the bottom */
+.sb-sources {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.sb-sources__list {
+  margin: 16px 16px 0;
+  padding-bottom: calc(16px + var(--sheet-safe-bottom, 0px));
+}
+.sb-sources__lock {
+  display: inline-block !important;
+  vertical-align: -0.1em;
+}
+
+/* the tool timeline (AiToolTimelinePointRow.swift:27-33; AiToolTimelineViewController.swift:26-39): basePrimary (June
+   sk_primary_background) */
+.sb-tools {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.sb-tools__list {
+  padding: 16px;
+}
+.sb-tools__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 16px 0;
+  color: var(--dt_color_content_secondary);
+  font: var(--sk-body);
+}
+.sb-tools__row.is-live {
+  color: var(--dt_color_palettes_aubergine_70);
+}
+.sb-tools__icon {
+  flex: none;
+  width: 20px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* with a connector the row is at least the icon + 12 pt of line (minConnectorHeight) */
+.sb-tools__row.has-connector .sb-tools__icon {
+  min-height: 32px;
+}
+/* the connector: 1 pt outlineTertiary, centered under the icon, down to the row's bottom */
+.sb-tools__connector {
+  flex: 1;
+  width: 1px;
+  background: var(--dt_color_outline_tertiary);
+}
+.sb-tools__text {
+  min-width: 0;
+}
+
+/* Skills (SlackbotSkillsViewController.swift:30-32): the empty state under the bar */
+.sb-skills {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+
+/* ------------------------------------------------------------------------------------------------- the Slackbot tab */
+/* SlackbotViewController.swift:113-125, 204-215: basePrimary; one list over the whole view; its bottom drawer (the
+   recommendations, then the composer) sits 16 pt above the tab bar (composerBottomMargin, SlackbotPresenter.swift:18-23) */
+.sb-tab {
+  background: var(--dt_color_base_primary);
+  --sb-dock: 83px;
+  --sb-drawer-gap: 16px;
+  /* the recommendations hide while the composer is focused (SlackbotPresenter.swift:71-77) */
+  --sb-drawer-h: var(--sb-recs-h, 0px);
+}
+.ios-screen[data-device='iphone-se'] .sb-tab {
+  --sb-dock: 70px;
+}
+.sb-tab:has(.cmp.is-focused) {
+  --sb-drawer-h: 0px;
+}
+.sb-tab:has(.cmp.is-focused) .sb-tab__recs {
+  display: none;
+}
+/* the composer: 16 pt above the tab bar instead of the conversation's 8 (the drawer's margin) */
+.sb-tab .cmp {
+  --cmp-gap: var(--sb-drawer-gap);
+}
+.sb-tab__list {
+  position: absolute;
+  inset: 0;
+  /* the list's background is the theme's list background: sk_primary_background on iPhone (theme-colors.md §3.8) */
+  background: var(--sk_primary_background);
+  padding-bottom: calc(max(var(--kb-height), var(--sb-dock)) + var(--sb-drawer-gap) + var(--sb-composer-h) + var(--sb-drawer-h));
+  box-sizing: border-box;
+  transition: padding-bottom 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+
+/* The greeting row (SlackbotGreetingRow.swift:22-159): fills what the list's insets leave (.fillsRemaining, at least 24 +
+   the label + 12); the greeting centered, .subtitle (Lato Black 20) contentPrimary, at least 64 pt from each side; behind
+   it a 200 pt wash from the row's top (never past the row) fading top to bottom from the tint to basePrimary
+   (SKGradientView .verticalFade). Tints (SlackbotGreeting.swift:189-199, literal hex in the Swift; evening light is
+   aubergine 0). */
+.sb-greeting {
+  --sb-tint: #fffae0;
+  position: relative;
+  min-height: max(100%, calc(24px + 24px + 12px));
+  box-sizing: border-box;
+  padding: 24px 64px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, var(--sb-tint), var(--dt_color_base_primary)) top / 100% min(200px, 100%) no-repeat;
+}
+.sb-greeting.is-afternoon {
+  --sb-tint: #e6f5fe;
+}
+.sb-greeting.is-evening {
+  --sb-tint: var(--dt_color_palettes_aubergine_0);
+}
+[data-appearance='dark'] .sb-greeting.is-morning {
+  --sb-tint: #2b2825;
+}
+[data-appearance='dark'] .sb-greeting.is-afternoon {
+  --sb-tint: #1f2a30;
+}
+[data-appearance='dark'] .sb-greeting.is-evening {
+  --sb-tint: #2a2130;
+}
+.sb-greeting__text {
+  font: var(--sk-subtitle);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+/* "Recommended for you" (SlackbotRecommendationsEmbeddable.swift:67-101): an SKHeaderEntity .medium (Lato Bold 15, 12 / 16
+   margins, SKHeaderEntity.swift:88, 466-476) in contentSecondary on clear, over the card band (SlackbotCardCarousel.swift:
+   15-21: 8 above, 16 in from the sides, 16 below — the gap to the composer — cards 8 apart, all as tall as the tallest) */
+.sb-tab__recs {
+  position: absolute;
+  z-index: 24;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--sb-dock) + var(--sb-drawer-gap) + var(--sb-composer-h));
+  transition: bottom 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+.sb-tab__recs-header {
+  padding: 12px 16px;
+  font: var(--sk-small-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sb-tab__cards {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px 16px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.sb-tab__cards::-webkit-scrollbar {
+  display: none;
+}
+/* a card (SlackbotSuggestionCardView.swift:75-160; SlackbotRecommendationsEmbeddable.swift:57-59): 280 wide, radius 12
+   continuous, a 2 px outlineTertiary border (onePixel × 2, drawn over the content like a CALayer border), baseSecondary;
+   16 / 12 / 16 / 12 insets; a 36 pt circle in aubergine 10 with the icon at 0.9 (18 pt) in aubergine 70; 8 pt; the title
+   .smallBodyBold contentPrimary, 4 pt, the subtitle .smallBody contentTertiary; pressed alpha 0.6 (SlackbotCardCarousel
+   .swift:183-187) */
+.sb-card {
+  position: relative;
+  flex: none;
+  width: 280px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 16px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--dt_color_base_secondary);
+  color: var(--dt_color_content_primary);
+  text-align: left;
+}
+.sb-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 calc(var(--hairline) * 2) var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.sb-card.is-pressed {
+  opacity: 0.6;
+}
+.sb-card__ornament {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: var(--dt_color_palettes_aubergine_10);
+  color: var(--dt_color_palettes_aubergine_70);
+}
+.sb-card__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sb-card__title {
+  font: var(--sk-small-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+}
+.sb-card__subtitle {
+  font: var(--sk-small-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_tertiary);
+}
+
+/* The Slackbot glow (ComposerSlackbotGlowView.swift:14-109; ComposerViewController.swift:477-489): behind the composer and
+   12 pt past it, a conic rainbow (#36C4F0, #2EB57D, #EDB22E, #E01E59, #36C4F0, evenly spaced from the trailing edge) at
+   opacity 0.32, the composer pill blurred (shadowRadius 6 = blur 12 in the design) with the pill itself knocked out so the
+   glass isn't tinted. Here: the pill as the content box of a box 12 pt larger, blurred, then masked to the ring around it. */
+.sb-tab .cmp::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: calc(var(--cmp-side) - 12px);
+  right: calc(var(--cmp-side) - 12px);
+  bottom: -12px;
+  height: calc(var(--sb-composer-h) + 24px);
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: calc(var(--sb-composer-h) / 2 + 12px);
+  background: conic-gradient(from 90deg, #36c4f0 0%, #2eb57d 25%, #edb22e 50%, #e01e59 75%, #36c4f0 100%) content-box;
+  filter: blur(6px);
+  opacity: 0.32;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+  transition:
+    left 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77),
+    right 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+
+/* the root bar's items: More actions, then the avatar in its own circle (the separator, SlackbotPresenter.swift:118-120) */
+.sb-tab__menu-anchor {
+  display: grid;
+  place-items: center;
+}
+.sb-tab__avatar.has-status {
+  width: auto;
+  padding: 0 4px 0 12px;
+  gap: 8px;
+  display: flex;
+}

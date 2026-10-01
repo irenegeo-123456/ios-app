@@ -1,0 +1,111 @@
+/* A person's profile (spec sheets-menus.md §3). One list on basePrimary (UP/Root/UserProfileViewController.swift:21-29). */
+.pf {
+  background: var(--dt_color_base_primary);
+}
+.pf__list {
+  padding-top: calc(var(--navbar-bottom));
+}
+.pf__end {
+  height: calc(var(--safe-bottom) + 24px);
+}
+/* plain nav titles: Lato Bold 17 contentPrimary (shell-navigation.md §3.2) */
+.pf-nav-title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+/* SKMemberAvatar .profile, square, 16 pt above and at the sides, 0 below (PC/Views/ImageRow.swift:33-40,142-172) */
+.pf-photo {
+  margin: 16px 16px 0;
+}
+.pf-photo .sk-avatar__image {
+  border-radius: 20px !important;
+}
+/* NameRow: .title (Lato Black 22), wraps; padding top 12, sides 16 (PC/Views/NameRow.swift:25-43,109-117) */
+.pf-name {
+  padding: 12px 16px 0;
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+/* TitleRow: the title in body 17, the pronouns in smallBody 15, both contentPrimary; padding 4 / 16 / 12
+   (PC/Views/TitleRow.swift:18-25,61-81) */
+.pf-title {
+  padding: 4px 16px 12px;
+  color: var(--dt_color_content_primary);
+}
+.pf-title__title {
+  font: var(--sk-body);
+}
+.pf-title__pronouns {
+  font: var(--sk-small-body);
+}
+.pf-name + .pf-orow {
+  margin-top: 12px;
+}
+/* OrnamentTextRow: a 20 pt box, 8 pt gap, smallBody 15 contentPrimary, padding 0 / 16 / 8 (PC/Views/OrnamentTextRow.swift:18-25,72-99) */
+.pf-orow {
+  padding: 0 16px 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.pf-orow__ornament {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+}
+.pf-orow__text {
+  min-width: 0;
+  padding-top: 1px;
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_primary);
+}
+/* The action buttons: one SKButtonEntity row each (padding 10 / 16), outlineDefault large, full width
+   (UP/Root/UserProfileViewStateMapper.swift:232-303; SKButtonEntity.swift:221-222) */
+.pf-buttons {
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+}
+.pf-buttons > .sk-button {
+  width: calc(100% - 32px);
+  margin: 10px 16px;
+}
+.pf-buttons > .sk-button + .sk-button {
+  margin-top: 0;
+}
+.pf-section {
+  padding-top: 8px;
+}
+/* Contact rows: S rows, the icon in contentPrimary (UserProfileContentProvider.swift:1073, 1100, 1113), the address with
+   "Work" below it in caption 13 */
+.pf .pf-row {
+  --row-color: var(--dt_color_content_primary);
+}
+.pf-contact {
+  display: flex;
+  flex-direction: column;
+  white-space: normal;
+}
+.pf-contact__primary {
+  font: var(--sk-body);
+  overflow-wrap: anywhere;
+}
+.pf-contact__secondary {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+/* M info rows (no ornament): the label in captionBold contentSecondary, the value in body contentPrimary */
+.pf-info {
+  padding: 10px 16px;
+}
+.pf-info__label {
+  font: var(--sk-caption-bold);
+  color: var(--dt_color_content_secondary);
+}
+.pf-info__value {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}

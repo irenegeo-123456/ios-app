@@ -1,0 +1,145 @@
+/* EntityRow: SKEntityBaseView at .small and .medium (EntityRow.tsx cites each value). */
+
+.ent-row {
+  position: relative;
+  --ent-bg: transparent;
+  --ent-pressed: var(--dt_color_base_tertiary);
+  --ent-ornament: 24px;
+  background: var(--ent-bg);
+}
+.ent-row--medium {
+  --ent-ornament: 36px;
+}
+/* .extraLarge: a 56 pt ornament, 16 pt to the text (SKEntityBaseView.swift:386-389), 76 pt rows (10 + 56 + 10) */
+.ent-row--extraLarge {
+  --ent-ornament: 56px;
+}
+.ent-row--extraLarge .ent-row__content {
+  gap: 16px;
+  min-height: 76px;
+}
+.ent-row--extraLarge .ent-row__title,
+.ent-row--extraLarge .ent-row__title.is-bold {
+  /* .bodyBlack (SKEntityPrimaryContentView.swift:103-106) */
+  font: var(--sk-body-black);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.ent-row--extraLarge .ent-row__subtitle {
+  /* .smallBody (SKEntityContentView.swift:57-60) */
+  font: var(--sk-small-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.ent-row__bg {
+  /* SKEntityBackgroundView .rounded: inset 4 pt left and right, radius 12 */
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+  background: transparent;
+  pointer-events: none;
+}
+.ent-row.is-pressed .ent-row__bg,
+.ent-row.is-selected .ent-row__bg {
+  background: var(--ent-pressed);
+}
+.ent-row__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  /* bounce: back up over 0.4 s (smooth/medium), down over 0.2 s (smooth/fast) (UIView+BounceMode.swift:14-35) */
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.ent-row--medium .ent-row__content {
+  min-height: 56px;
+}
+.ent-row.is-top .ent-row__content {
+  align-items: flex-start;
+}
+.ent-row.is-pressed .ent-row__content {
+  transform: scale(calc((var(--screen-w) - 8px) / var(--screen-w)));
+  transition-duration: 0.2s;
+}
+.ent-row__ornament {
+  flex: none;
+  width: var(--ent-ornament);
+  height: var(--ent-ornament);
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+.ent-row.is-disabled .ent-row__ornament {
+  opacity: 0.6;
+}
+.ent-row__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.ent-row__primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ent-row__title {
+  min-width: 0;
+  font: var(--sk-body);
+  /* UILabel line boxes land on the @3x pixel grid: 20.4 → 20.67 */
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+.ent-row__title.is-bold {
+  font: var(--sk-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.ent-row__inline {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ent-row__subtitle {
+  font: var(--sk-caption);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+  overflow-wrap: anywhere;
+}
+.ent-row.is-disabled .ent-row__title,
+.ent-row.is-disabled .ent-row__subtitle {
+  color: var(--dt_color_content_tertiary) !important;
+}
+.ent-row__accessories {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* SKListFooter .hairlineDivider (SKListFooterView.swift:18-20, 106-112) */
+.ent-footer {
+  position: relative;
+  height: 8px;
+}
+.ent-footer.is-flush {
+  height: var(--hairline);
+}
+/* one device pixel at the footer's bottom edge (src/styles/hairline.css) */
+.ent-footer i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--dt_color_outline_tertiary);
+}
+.ent-footer.is-flush i {
+  bottom: auto;
+  top: 0;
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}

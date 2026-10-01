@@ -1,0 +1,581 @@
+/* A canvas (CanvasScreen.tsx; spec canvas-lists-creation.md §1, search-slackbot-huddles.md §4.4). The Quip SDK draws the
+   real document (not in the iOS repo). Here the article holds the web kit's Quip markup (src/data/canvas/model.ts),
+   styled from what iOS does state: the format picker's heading fonts (H1 .headline 28, H2 .title 22, H3 .subtitle 20,
+   body .body 17; CanvasToolbarItem.swift:246-259), Slack's loading skeleton for the page geometry (36 pt side margins,
+   16 pt lines on a 24 pt pitch, 28 pt between sections; CanvasLoadingItem.swift:10-17), and MessageKit's rich text for
+   inline code, code blocks, quotes, list markers, links and mentions (composer.md §8, src/app/text/text.css). */
+
+.canvas {
+  background: var(--dt_color_base_primary);
+}
+
+/* ------------------------------------------------------------------------------------------------ nav bar */
+.canvas__title {
+  /* HeaderTitleView for .canvas: the title only, bodyBlack 17 (max 17) in contentPrimary, leading, nudged 6 pt off the
+     back button (HeaderTitleView.swift:405-409, 428-431 at 14b3cbaf; was sk_primary_foreground) */
+  flex: 1;
+  min-width: 0;
+  margin-left: 6px;
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: auto;
+}
+.canvas__title.is-centered {
+  /* a new canvas's initial title, centered (CanvasPresenter.swift:82-89) */
+  text-align: center;
+  margin-right: 50px;
+}
+span.canvas__more {
+  display: contents;
+}
+/* Done while editing, iOS 26: a .prominent glass circle filled with the bar's tint (highlight1.content), the checkmark
+   white (SKBarButtonItem.swift:375-394, 412-414; Sept 2026 source — June drew the text "Done") */
+.glass-button.canvas__done {
+  background: var(--dt_color_content_highlight_1);
+  box-shadow: var(--glass-shadow);
+  color: var(--dt_color_constants_white);
+}
+/* Undo · Redo: one capsule after the back button's (a fixed space splits the glass); UIKit dims a disabled item */
+span.canvas__history-wrap {
+  display: contents;
+}
+.canvas__history .glass-group__item.is-disabled {
+  color: var(--dt_color_content_tertiary);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------------ the page */
+.canvas__scroll {
+  position: absolute;
+  inset: 0;
+}
+.cv-page {
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: calc(var(--navbar-bottom) + 16px) 36px calc(21px + 62px + 32px);
+}
+/* while editing, room for the keyboard and its 60 pt toolbar (CanvasToolbarView.swift:24-30) */
+.canvas.is-editing .cv-page {
+  padding-bottom: calc(var(--kb-height) + 60px + 32px);
+}
+
+/* ------------------------------------------------------------------------------------------------ document */
+.cv-article {
+  color: var(--dt_color_content_primary);
+  font: 400 17px/24px Lato;
+  overflow-wrap: break-word;
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.cv-article.is-read-only,
+.cv-article[contenteditable='false'] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* the markup's accessibility and collaboration helpers draw nothing here */
+.cv-article .remote-caret-ranges,
+.cv-article .a11y-section-menu-entrypoint,
+.cv-article .a11y-list-structure-container,
+.cv-article .a11y-sr-only,
+.cv-article .a11y-navigable-object-overflow-preventer,
+.cv-article .offscreen,
+.cv-article .particle-container,
+.cv-article .section-margin-filler,
+.cv-article .ghost-text-placeholder-overlay,
+.cv-article input.checkbox,
+.cv-article input.checkbox + label {
+  display: none;
+}
+.cv-article .section > .content {
+  position: relative;
+  outline: none;
+}
+/* placeholders: canvas_placeholder_title / the canvas's body line (CanvasService.swift:399-400;
+   CanvasSessionLoader.swift:224-243), in contentTertiary like SKTextInput's placeholder (composer.md §4) */
+.cv-article .content[data-placeholder]::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  color: var(--dt_color_content_tertiary);
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the title section (data-section-style 48): SKFont.headline, Lato Black 28 — the largest SKFont */
+.cv-article > .section[data-section-style='48'] {
+  margin: 0 0 16px;
+  font: var(--sk-headline);
+}
+/* headings as the format picker previews them: H1 .headline, H2 .title, H3 .subtitle */
+.cv-article > .section[data-section-style='1'],
+.cv-article > .section[data-section-style='2'],
+.cv-article > .section[data-section-style='3'] {
+  margin: 28px 0 8px;
+}
+.cv-article > .section[data-section-style='1'] {
+  font: var(--sk-headline);
+}
+.cv-article > .section[data-section-style='2'] {
+  font: var(--sk-title);
+}
+.cv-article > .section[data-section-style='3'] {
+  font: var(--sk-subtitle);
+}
+.cv-article > .section[data-section-style='48'] + .section[data-section-style='1'],
+.cv-article > .section[data-section-style='48'] + .section[data-section-style='2'],
+.cv-article > .section[data-section-style='48'] + .section[data-section-style='3'] {
+  margin-top: 0;
+}
+.cv-article > .section[data-section-style='0'] {
+  margin: 0 0 8px;
+}
+/* quote: a 4 pt bar, radius 2, outline_tertiary, from 2 pt below the first line's top; text 15 pt in
+   (RichTextTheming.swift:27-36; LayoutManager.swift:110-128) */
+.cv-article > .section[data-section-style='16'] {
+  margin: 0 0 8px;
+}
+.cv-article > .section[data-section-style='16'] > .content {
+  padding: 0 15px;
+}
+.cv-article > .section[data-section-style='16'] > .content::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--dt_color_outline_tertiary);
+}
+.cv-article > .section[data-section-style='16'] > .content[data-placeholder]::before {
+  left: 15px;
+}
+/* code block: Menlo 16 in the body color, message_rendering_code_block_fill with a 1 pt …_stroke, radius 3, text 10 pt
+   in, 2 pt above and below (Text+Display.swift:1681-1688; LayoutManager.swift:162-173; SKLegacyColors.swift:342-343) */
+.cv-article > .section[data-section-style='4'] {
+  margin: 0 0 8px;
+}
+.cv-article > .section[data-section-style='4'] > .content {
+  padding: 2px 10px;
+  border-radius: 3px;
+  background: var(--sk_code_block_fill);
+  box-shadow: inset 0 0 0 1px var(--sk_code_block_stroke);
+  font: 400 16px Menlo, 'SF Mono', ui-monospace, monospace;
+  line-height: normal;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* inline code: Menlo base − 1, message_rendering_code, surface_primary with a 1 pt outline_tertiary, radius 3
+   (Text+Display.swift:1657-1663; SKLegacyColors.swift:339) */
+.cv-article code {
+  font-family: Menlo, 'SF Mono', ui-monospace, monospace;
+  font-size: calc(1em - 1px);
+  color: var(--sk_code);
+  background: var(--dt_color_surface_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  border-radius: 3px;
+  padding: 1px 0;
+}
+.cv-article > .section[data-section-style='4'] code {
+  color: inherit;
+  background: none;
+  box-shadow: none;
+}
+.cv-article del {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+/* dividers (data-section-style 18): a 1 pt outline_tertiary rule */
+.cv-article > .section[data-section-style='18'] {
+  padding: 16px 0;
+}
+.cv-article hr {
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--dt_color_outline_tertiary);
+}
+/* links: content_highlight_1, no underline (Text+Display.swift:659) */
+.cv-article a[href] {
+  color: var(--dt_color_content_highlight_1);
+  text-decoration: none;
+}
+/* mentions look like MessageKit's (src/app/text/text.css): sk_mention_text on surface_highlight_1, radius 3; you on
+   surface_highlight_3 */
+.cv-article control a.slack-mention {
+  color: var(--sk_mention_text);
+  background: var(--dt_color_surface_highlight_1);
+  border-radius: 3px;
+}
+.cv-article control a.slack-self {
+  background: var(--dt_color_surface_highlight_3);
+}
+[data-appearance='dark'] .cv-article control a.slack-self {
+  color: var(--dt_color_content_highlight_3);
+}
+.cv-article control a .slack-icon-font {
+  margin-right: 1px;
+}
+
+/* lists: one item per line, the marker at 29 pt × level and the text 28 pt after it (RichTextTheming.swift:71-82);
+   "•" "◦" "▪" and "1." "a." "i." by level (BulletedListPrefixGenerator.swift / OrderedListPrefixGenerator.swift:11-25),
+   drawn from data-marker (CanvasScreen numbers them) */
+.cv-article > .section[data-section-type='1'] {
+  margin: 0 0 8px;
+}
+.cv-article ul.draggable {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cv-article li.with-list-item-marker-container {
+  display: flex;
+  align-items: flex-start;
+  margin-left: 0 !important;
+}
+.cv-article li[data-indent='1'] {
+  margin-left: 29px !important;
+}
+.cv-article li[data-indent='2'] {
+  margin-left: 58px !important;
+}
+.cv-article li[data-indent='3'] {
+  margin-left: 87px !important;
+}
+.cv-article li[data-indent='4'] {
+  margin-left: 116px !important;
+}
+.cv-article .list-item-marker-container {
+  flex: none;
+  width: 28px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+.cv-article .list-item-marker-container::before {
+  content: attr(data-marker);
+  font-variant-numeric: tabular-nums;
+}
+.cv-article li > .section {
+  flex: 1;
+  min-width: 0;
+}
+/* checklist items: SKCheckbox (21 pt) on the first line; checked items read secondary, struck through */
+.cv-article .checkbox-container::before {
+  content: none;
+}
+.cv-check {
+  display: inline-flex;
+}
+.cv-check.is-read-only {
+  /* view-only canvases: the checkbox keeps its enabled look but takes no taps */
+  pointer-events: none;
+}
+.cv-article li.checked > .section > .content {
+  color: var(--dt_color_content_secondary);
+  text-decoration: line-through;
+}
+
+/* embedded cards (the canvas's card-view: elevation 1, medium) */
+.cv-article > .section[data-section-style='44'] {
+  margin: 8px 0 16px;
+}
+.cv-embed {
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  overflow: hidden;
+  font: var(--sk-body);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cv-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.cv-file.is-pressed {
+  transform: scale(0.98);
+  transition-duration: 0.2s;
+}
+.cv-file__text {
+  min-width: 0;
+}
+.cv-file__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cv-file__type {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+
+/* ------------------------------------------------------------------------------------------------ editing toolbar */
+.cv-toolbar {
+  /* the keyboard's input accessory: 60 pt on top of the keyboard; the glass capsule centered, top at its top, bottom
+     12 pt above the keyboard, at least 16 pt from the sides (CanvasToolbarView.swift:24-32, 222-232) */
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  bottom: var(--kb-height);
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.cv-toolbar__glass {
+  box-sizing: border-box;
+  height: 48px;
+  max-width: calc(100% - 32px);
+  padding: 0 16px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+  animation: cv-toolbar-in 0.25s ease-out;
+}
+@keyframes cv-toolbar-in {
+  from {
+    opacity: 0;
+  }
+}
+/* The selected "+" (a circle inset 2 pt in highlight1.surface, the icon highlight1.content; SKTextToolbarItemCell.swift:
+   21, 46-47, 81-88, 118-125 [Sept]) is SKTextToolbar's own selected chrome since the SlackKit refresh (src/slackkit/
+   SKTextToolbar.tsx, text-input.css): no override here. */
+.cv-toolbar__back {
+  /* the range layout's back button: 36 × 36, 12 pt before the items (CanvasToolbarView.swift:253-277) */
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s;
+}
+.cv-toolbar__back.is-pressed {
+  transform: scale(0.96);
+}
+.cv-ac {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------------ format picker */
+/* an undimmed native sheet: the canvas above it stays live, so the overlay takes no touches of its own */
+.ios-overlay[data-sheet='canvas-format'] {
+  pointer-events: none;
+}
+.cv-format-host {
+  position: absolute;
+  inset: 0;
+  --sheet-dur: 420ms;
+  --sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+.cv-format {
+  pointer-events: auto;
+  /* basePrimary (CanvasFormatPickerViewController.swift:26, Sept 2026; June: sk_primary_background) */
+  background: var(--dt_color_base_primary);
+}
+.cv-format__bar {
+  /* the navigation bar: 60 pt in the flow (16 pt + a 44 pt glass item, as SheetBar measures iOS 26's sheet bar) */
+  position: relative;
+  flex: none;
+}
+.cv-format__title {
+  /* SKNavigationTitle: Lato Black 17 */
+  font: var(--sk-body-black);
+}
+.cv-format__rows {
+  flex: 1;
+  min-height: 0;
+}
+.cv-format__headings {
+  /* row = the H1 label + 2 × 8 + 2 × 5; 12 pt content insets (CanvasFormatHeadingCustomRow.swift:25-30, 65-117) */
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  height: calc(28px * 1.2 + 26px);
+  padding: 8px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cv-format__headings::-webkit-scrollbar {
+  display: none;
+}
+.cv-format__heading {
+  /* label + Spacing.medium each side, 5 pt above and below, radius 8; selected highlight1.base
+     (CanvasFormatHeadingCustomRow.swift:144-221) */
+  flex: none;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--dt_color_content_primary);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  transition: transform 0.2s;
+}
+.cv-format__heading.is-pressed {
+  transform: scale(0.96);
+}
+.cv-format__heading.is-selected {
+  background: var(--dt_color_base_highlight_1);
+  color: var(--dt_color_content_highlight_1);
+}
+.cv-format__heading.is-disabled {
+  color: var(--dt_color_content_tertiary);
+}
+.cv-format__row {
+  /* 16 pt from the sides, 8 pt above and below the control (CanvasFormatCustomRow.swift:413-415; CanvasFormatItemView.swift:248, 311-319) */
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+}
+.cv-format__segment {
+  /* a 1 pt outlineTertiary @13 % border, radius 8; the buttons 1 pt inside, radius 7 (CanvasFormatItemView.swift:241-301) */
+  flex: 1 1 0;
+  display: flex;
+  min-width: 0;
+  padding: 1px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgb(from var(--dt_color_outline_tertiary) r g b / 0.13);
+}
+.cv-format__segment > .cv-format__cell:first-child > .sk-button {
+  border-top-left-radius: 7px;
+  border-bottom-left-radius: 7px;
+}
+.cv-format__segment > .cv-format__cell:last-child > .sk-button {
+  border-top-right-radius: 7px;
+  border-bottom-right-radius: 7px;
+}
+.cv-format__cell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+.cv-format__cell > .sk-button {
+  flex: 1;
+}
+.cv-format__separator {
+  /* 1 pt outlineTertiary, the control's full height (CanvasFormatItemView.swift:148-156, Sept 2026; June:
+     sk_foreground_low_solid) */
+  flex: none;
+  width: 1px;
+  background: var(--dt_color_outline_tertiary);
+}
+
+/* ------------------------------------------------------------------------------------------------ "+" sheet */
+.cv-plus {
+  /* SKListBottomSheetViewController.swift:165: basePrimary */
+  background: var(--dt_color_base_primary);
+}
+.cv-plus__gap {
+  /* the next section's blank divider header: 8 pt (SKListFooterView.Constants.topMargin) */
+  height: 8px;
+}
+
+/* ------------------------------------------------------------------------------------------------ banner */
+.canvas__banner {
+  /* pinned 16 pt from the sides and 16 pt above the context bar: here, above the floating tab bar
+     (CanvasViewController.swift:35-40, 248-270); measured 44 pt tall, radius ≈12 (test_view_with_templateBanner@3x.png) */
+  position: absolute;
+  z-index: 20;
+  left: 16px;
+  right: 16px;
+  bottom: calc(21px + 62px + 16px);
+}
+.canvas__banner-text {
+  font: var(--sk-small-body);
+}
+
+/* ------------------------------------------------------------------------------------------------ loading */
+.cv-loading {
+  /* CanvasLoadingStateView: a basePrimary view with the shapes cut out over SKLoadingShimmerView, a CAGradientLayer of
+     [surfacePrimary, surfaceSecondary, surfacePrimary] from start (-1, 0.2) to end (0, 0.5) in unit coordinates,
+     animated to (1, 0.5) → (2, 0.8) over 1.8 s, repeating (SKLoadingShimmerView.swift:19-27, 77-102): a band as wide
+     as the view, skewed 0.3 of its height, crossing it left to right */
+  position: absolute;
+  inset: calc(var(--navbar-bottom)) 0 0;
+  overflow: hidden;
+  background: var(--dt_color_surface_primary);
+}
+.cv-loading__shimmer {
+  /* three view-widths wide: surfacePrimary, the band in the middle third, surfacePrimary; translated −2W → 0 so the
+     band's center goes from −W/2 to 3W/2 (the gradient layer's start x −1 → 1) */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(var(--screen-w) * 3);
+  background: linear-gradient(120deg, var(--dt_color_surface_primary) 33.3%, var(--dt_color_surface_secondary) 50%, var(--dt_color_surface_primary) 66.7%);
+  animation: cv-shimmer 1.8s linear infinite;
+}
+@keyframes cv-shimmer {
+  from {
+    transform: translateX(calc(var(--screen-w) * -2));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.cv-loading__cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  fill: var(--dt_color_base_primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cv-loading__shimmer {
+    animation: none;
+    transform: translateX(calc(var(--screen-w) * -1));
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ no access */
+.cv-no-access {
+  /* FileNoAccessOverlayView: basePrimary; a centered stack (spacing 10, 44 pt side insets, centerY + 10): the 20 pt lock,
+     the title .bodyBold (5 pt top offset) and the description .caption, both contentPrimary (:17-23, 44-121, 131-153) */
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 44px;
+  background: var(--dt_color_base_primary);
+}
+.cv-no-access__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(10px);
+  text-align: center;
+}
+.cv-no-access__title {
+  margin-top: 5px;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.cv-no-access__body {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_primary);
+}

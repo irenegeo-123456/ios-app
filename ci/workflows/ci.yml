@@ -1,0 +1,45 @@
+# Every push and PR: typecheck, unit tests, production build, then the app's own self-test in headless Chrome
+# (light and dark) against the built bundle.
+#
+# Runs on GitHub-hosted Ubuntu by default. On an internal GitHub with self-hosted runners, set the repository
+# variable RUNNER (Settings › Secrets and variables › Actions › Variables) to your runner label.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # typecheck + vitest + production build
+      - run: npm run check
+
+      - name: Self-test in headless Chrome (production build, light and dark)
+        run: |
+          npx vite preview --port 4190 --strictPort &
+          for i in $(seq 1 60); do curl -sf http://localhost:4190/ > /dev/null && break; sleep 1; done
+          npm run selftest -- --base http://localhost:4190/
+          npm run selftest -- --base http://localhost:4190/ --dark

@@ -1,0 +1,175 @@
+/* ?kit=blocks: the Block Kit gallery. Each specimen is drawn on the surfaces it's allowed on, each surface on a light and
+   a dark 393 pt preview (.ios-screen with data-appearance, so tokens, SKFont type and the theme resolve inside). The
+   page chrome around the previews is the kit's own (kit-pages.css); only what's inside a preview is Slack's. */
+
+.bkg {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.bkg__toc {
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  padding-bottom: 24px;
+}
+.bkg__toc h2 {
+  margin: 14px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sim-ink-2);
+}
+.bkg__toc a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  padding: 1px 0;
+}
+.bkg__toc a:hover {
+  color: var(--sim-accent);
+}
+.bkg__filter {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  margin-bottom: 6px;
+}
+.bkg__empty {
+  color: var(--sim-ink-2);
+  font-size: 13px;
+}
+
+.bkg-spec {
+  margin: 0 0 56px;
+  scroll-margin-top: 16px;
+}
+.bkg-spec__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.bkg-spec__name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+.bkg-spec__snapshot {
+  font: 12px ui-monospace, 'SF Mono', Menlo, monospace;
+  color: var(--sim-ink-2);
+}
+.bkg-spec__about {
+  margin: 0 0 14px;
+  max-width: 820px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--sim-ink-2);
+}
+.bkg-spec__where {
+  margin-left: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.bkg-spec__issue {
+  max-width: 820px;
+  margin: 0 0 8px;
+  font: 12px/1.45 ui-monospace, 'SF Mono', Menlo, monospace;
+  color: #c4541d;
+}
+
+.bkg-code {
+  position: relative;
+  max-width: 820px;
+  margin: 0 0 16px;
+}
+.bkg-code pre {
+  margin: 0;
+  padding: 10px 70px 10px 12px;
+  border-radius: 8px;
+  background: #1d1d1f;
+  color: #f5f5f7;
+  font: 12px/1.55 ui-monospace, 'SF Mono', Menlo, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.bkg-code button {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font: 11px var(--sim-font);
+  color: #f5f5f7;
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  border-radius: 5px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.bkg-code button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.bkg-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bkg-row {
+  display: grid;
+  grid-template-columns: 90px auto auto;
+  gap: 12px;
+  align-items: start;
+  justify-content: start;
+}
+.bkg-row__label {
+  padding-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+/* The previews: an .ios-screen 393 pt wide (iPhone 16 Pro), as tall as its content (the app's screen is a fixed size). */
+.ios-screen.bkg-screen {
+  width: 393px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  display: flow-root;
+}
+.kit-page.is-dark .ios-screen.bkg-screen {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+/* A message's blocks sit in its text column: the row's 8 / 16 insets and the 36 pt avatar + 12 pt before the column
+   (MKMessageView.swift:55-56,121-127; MKOuterHorizontalStack.swift:128-130; src/messagekit/messagekit.css). */
+.bkg-frame--message {
+  padding: 8px 16px 8px calc(16px + 36px + 12px);
+}
+/* Snapshot fixtures (gallery.ts `fixture`): the block alone, 393 pt wide like Slack's component snapshots, its first
+   block --fixture-top pt down (the test's edge insets) instead of the message's 4. */
+.bkg-frame--fixture {
+  padding: 0;
+}
+.bkg-frame--fixture .bk-surface > .bk-row.is-first {
+  padding-top: var(--fixture-top, 0px);
+}
+/* Modals and App Homes: the surface's own 8 pt header and 16 pt insets (blocks.css); room below the last block. */
+.bkg-frame--modal,
+.bkg-frame--home {
+  padding-bottom: 16px;
+}
+
+.bkg-event {
+  white-space: normal;
+  text-overflow: clip;
+}

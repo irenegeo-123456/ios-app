@@ -1,0 +1,648 @@
+/* What Block Kit presents: the app modal (spec blockkit.md §7), the option and people pickers (§5.1–5.2), the date /
+   time sheet (§5.3) and the text editor (§5.4). Sheet chrome is SheetHost's (src/app/nav/SheetHost.tsx). */
+
+/* ------------------------------------------------------------------------------------------------ sheet nav bar */
+/* iOS 26 sheet bars: items 16 pt from the sheet's top and sides, 44 tall (Apple's sheets-large-detent render); their
+   text Lato 17 in content_highlight_1, content_tertiary disabled (AppViewViewController.swift:195-244). */
+.bk-sheet-nav {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  height: 44px;
+  margin: 16px 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bk-sheet-nav__side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 44px;
+}
+.bk-sheet-nav__side.is-trailing {
+  justify-content: flex-end;
+}
+.bk-sheet-nav__item {
+  padding: 0 12px;
+}
+.bk-sheet-nav__item.is-disabled {
+  pointer-events: none;
+}
+.ios-app .bk-sheet-nav__button {
+  height: 44px;
+  /* the capsule's 12 pt (.bk-sheet-nav__item) is the whole inset (June 2026 SKBarButtonItemTests testTitleButtons: 12.3 pt) */
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--sk-body);
+  color: var(--dt_color_content_highlight_1);
+  white-space: nowrap;
+}
+.ios-app .bk-sheet-nav__button.is-done,
+.ios-app .bk-sheet-nav__button.is-bold {
+  font: var(--sk-body-bold);
+}
+/* a plain UIBarButtonItem title: UIKit's 17 pt system font, semibold for .done (OptionPickerViewController.swift:101-111) */
+.ios-app .bk-sheet-nav__button.is-system {
+  font: 400 17px/1.2 var(--sf);
+}
+.ios-app .bk-sheet-nav__button.is-system.is-done {
+  font-weight: 600;
+}
+.ios-app .bk-sheet-nav__button:disabled {
+  color: var(--dt_color_content_tertiary);
+}
+.bk-sheet-nav__button.is-pressed {
+  opacity: 0.5;
+}
+/* AppViewTitleView: the title Lato Bold 15 over the app name Lato 13, both content_primary, centered, 4 pt margins
+   (AppViewTitleView.swift:33-84) */
+.bk-sheet-nav__title {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--dt_color_content_primary);
+  pointer-events: none;
+}
+.bk-sheet-nav__title-text {
+  max-width: 100%;
+  font: var(--sk-small-body-bold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* a navigationItem.title: Lato Bold 17 (SLAppearance.swift:38-40; UINavigationBar+SlackStyles.swift:84) */
+.bk-sheet-nav__title.is-nav .bk-sheet-nav__title-text {
+  font: var(--sk-body-bold);
+}
+.bk-sheet-nav__subtitle {
+  max-width: 100%;
+  font: var(--sk-caption);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------------------------------ app modal */
+.bk-modal {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--dt_color_base_primary);
+}
+.bk-modal__page {
+  position: absolute;
+  inset: 0;
+  background: var(--dt_color_base_primary);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.bk-modal__page.is-covered {
+  transform: translateX(-30%);
+  pointer-events: none;
+}
+.bk-modal__page.is-entering {
+  animation: bk-push-in 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.08);
+}
+.bk-modal__page.is-leaving {
+  animation: bk-push-out 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+}
+@keyframes bk-push-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes bk-push-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+.bk-modal__view {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+/* the body: SKList with keyboard avoidance (AppViewViewController.swift:29,108-144) */
+.bk-modal__body {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: calc(var(--sheet-safe-bottom, var(--safe-bottom)) + 16px + var(--kb-height, 0px));
+}
+/* the error banner: SKBanner regular, error tone, 12 / 16 margins (AppViewViewController.swift:35,85-91) */
+.bk-modal__banner {
+  padding: 12px 16px;
+}
+/* base_primary @70 % with a 46 pt spinner, below the bar (AppViewLoadingView.swift:33,44) */
+.bk-modal__loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 60px;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(from var(--dt_color_base_primary) r g b / 0.7);
+}
+/* SnackBarAlertView: a full-width content_primary bar flush with the bottom, base_primary Lato 16, padding 18 / 15 plus
+   the safe area; it slides up in 0.2 s and leaves after 3 s (SnackBarAlertView.swift:52-77,116-160,175-237) */
+.bk-snackbar {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 15px calc(18px + var(--sheet-safe-bottom, var(--safe-bottom)));
+  background: var(--dt_color_content_primary);
+  color: var(--dt_color_base_primary);
+  font: 400 16px/1.2 Lato;
+  transform: translateY(100%);
+  transition: transform 0.2s ease-in-out;
+}
+.bk-snackbar.is-shown {
+  transform: none;
+  animation: bk-snack-in 0.2s ease-in-out;
+}
+@keyframes bk-snack-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ option rows */
+/* SKGenericEntity .small, text only (measured 40.8 tall): 10 / 16 padding, Lato 17 content_primary; pressed: a
+   base_tertiary highlight inset 4 pt, radius 12, and the row shrinks 8 pt (spec sheets-menus.md §0.3,
+   slackkit-components.md › SKList row cell) */
+.bk-option-row {
+  position: relative;
+  padding: 10px 16px;
+  min-height: 20.67px;
+}
+.bk-option-row__bg {
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+  background: var(--dt_color_base_tertiary);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.bk-option-row.is-pressed .bk-option-row__bg {
+  opacity: 1;
+  transition-duration: 0s;
+}
+.bk-option-row__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.bk-option-row.is-pressed .bk-option-row__content {
+  transform: scale(0.98);
+  transition-duration: 0.2s;
+}
+.bk-option-row__ornament {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+.bk-option-row__text {
+  flex: 1;
+  min-width: 0;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.bk-option-row__name {
+  font-weight: 700;
+}
+.bk-option-row__secondary {
+  color: var(--dt_color_content_secondary);
+}
+.bk-option-row__accessory {
+  flex: none;
+  display: flex;
+  margin-left: -4px;
+}
+.bk-option-row__checkbox {
+  pointer-events: none;
+}
+.bk-option-row.is-disabled .bk-option-row__text {
+  color: var(--dt_color_content_tertiary);
+}
+.bk-option-sheet {
+  padding-bottom: 8px;
+}
+
+/* ------------------------------------------------------------------------------------------------ full-screen pickers */
+.bk-picker {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+/* SKSearchBar inside 12 / 16 margins; a 1 px outline_tertiary separator (Sept OptionPickerViewController.swift:142-148;
+   June sk_primary_foreground @25 %; OptionPickerSearchView.swift:29-41,105-110); background base_primary */
+.bk-picker__search {
+  flex: none;
+  padding: 12px 16px;
+}
+.bk-picker__separator {
+  /* one device pixel (src/styles/hairline.css) */
+  flex: none;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.bk-picker__list {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: calc(var(--sheet-safe-bottom, var(--safe-bottom)) + var(--kb-height, 0px));
+}
+/* option groups: SKHeaderEntity .medium, Lato Bold 15 content_primary, 12 / 16 padding (SKHeaderEntity.swift:86,453-483) */
+.bk-picker__header {
+  padding: 12px 16px;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.bk-picker__max {
+  padding: 12px 16px 4px;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.bk-picker-empty {
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.bk-picker-empty__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.bk-picker-empty__body {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}
+.ios-app .bk-picker-empty__button {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_secondary);
+  background: var(--dt_color_base_primary);
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+
+/* ------------------------------------------------------------------------------------------------ date / time sheet */
+/* a native self-sized sheet (Sept, DateTimePickerFeature.swift:52-63): the content's margins 20 / 16 / 12 / 16 from the
+   sheet's top (the grabber floats over them) and the sheet's bottom safe area below, 12 pt apart; background
+   base_primary (DateTimePickerViewController.swift:42-46,76-122,168-171) */
+.bk-datetime {
+  padding: 20px 16px calc(12px + var(--sheet-safe-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--dt_color_base_primary);
+}
+.bk-datetime__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bk-datetime__title {
+  flex: 1;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.ios-app .bk-datetime__done {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_highlight_1);
+}
+.bk-datetime__done.is-pressed {
+  opacity: 0.5;
+}
+.bk-datetime__clear {
+  margin-top: 0;
+}
+/* UIDatePicker .inline, tinted content_highlight_1 (measured on testScreenshotDate@3x.png) */
+.bk-calendar {
+  --cal-tint: var(--dt_color_content_highlight_1);
+  font-family: var(--sf);
+  color: var(--ios-label, var(--dt_color_content_primary));
+  padding: 0 0 4px;
+}
+.bk-calendar__head {
+  height: 44px;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 21px;
+}
+.bk-calendar__month {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 17px;
+}
+.bk-calendar__chevron {
+  color: var(--cal-tint);
+}
+.bk-calendar__nav {
+  display: flex;
+  gap: 18px;
+  padding-right: 22px;
+}
+.ios-app .bk-calendar__nav button {
+  width: 28px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--cal-tint);
+  display: grid;
+  place-items: center;
+}
+.bk-calendar__weekdays,
+.bk-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 45.25px);
+  justify-content: center;
+}
+.bk-calendar__weekdays {
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  color: var(--ios-tertiary-label, var(--dt_color_content_tertiary));
+}
+.bk-calendar__grid {
+  margin-top: 9px;
+  grid-auto-rows: 45.7px;
+}
+.ios-app .bk-calendar__day {
+  justify-self: center;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: none;
+  font-family: var(--sf);
+  font-size: 20px;
+  color: inherit;
+}
+.ios-app .bk-calendar__day.is-today {
+  color: var(--cal-tint);
+}
+.ios-app .bk-calendar__day.is-selected {
+  background: rgb(from var(--cal-tint) r g b / 0.12);
+  color: var(--cal-tint);
+  font-weight: 600;
+}
+.bk-datetime__time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 21px;
+  font: 600 17px var(--sf);
+  color: var(--ios-label, var(--dt_color_content_primary));
+}
+.ios-app .bk-datetime__time-pill {
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--ios-fill, rgba(120, 120, 128, 0.16));
+  font: 400 17px var(--sf);
+  color: inherit;
+}
+.ios-app .bk-datetime__time-pill.is-open {
+  color: var(--dt_color_content_highlight_1);
+}
+/* UIDatePicker .wheels: a 216 pt picker, a rounded selection band behind the middle row (UIKit's; not in Slack's source) */
+.bk-wheels {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  font-family: var(--sf);
+  color: var(--ios-label, var(--dt_color_content_primary));
+  -webkit-mask: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+  mask: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+}
+.bk-wheels__band {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: calc(50% - 17px);
+  height: 34px;
+  border-radius: 8px;
+  background: var(--ios-fill, rgba(120, 120, 128, 0.16));
+  pointer-events: none;
+}
+.bk-wheel {
+  position: relative;
+  width: 64px;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-snap-type: y mandatory;
+}
+.bk-wheel__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  scroll-snap-align: center;
+  color: var(--ios-secondary-label, var(--dt_color_content_secondary));
+}
+.bk-wheel__item.is-selected {
+  color: var(--ios-label, var(--dt_color_content_primary));
+}
+.bk-wheel.is-end .bk-wheel__item {
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+.bk-wheel.is-start .bk-wheel__item {
+  justify-content: flex-start;
+  padding-left: 8px;
+}
+
+/* ------------------------------------------------------------------------------------------------ text editor */
+/* Over the current context, cross-dissolved, on black 40 % (KeyboardAttachedTextInputModal.swift:68-71,
+   RichTextInputViewController.swift:237-240). The keyboard is its own window above the app on iOS: overlays draw over
+   the clone's keyboard, so the dim stops at its top edge and follows it (its curve: src/app/app.css .ios-kb). */
+.bk-editor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: var(--kb-height, 0px);
+  background: rgb(0 0 0 / 0.4);
+  transition: bottom 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+  /* the dim fades by its color, not opacity: an ancestor with opacity would cut the glass card's backdrop blur */
+  animation: bk-editor-dim-in 0.3s ease-out both;
+}
+/* the dim also fills the corners the keyboard's rounded top leaves (26 pt, src/app/app.css .ios-kb) */
+.bk-editor::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 26px;
+  background: inherit;
+  -webkit-mask:
+    radial-gradient(circle at 26px 26px, transparent 25.5px, #000 26px) top left / 26px 26px no-repeat,
+    radial-gradient(circle at 0 26px, transparent 25.5px, #000 26px) top right / 26px 26px no-repeat;
+  mask:
+    radial-gradient(circle at 26px 26px, transparent 25.5px, #000 26px) top left / 26px 26px no-repeat,
+    radial-gradient(circle at 0 26px, transparent 25.5px, #000 26px) top right / 26px 26px no-repeat;
+}
+.bk-editor.is-closing {
+  animation: bk-editor-dim-out 0.3s ease-in both;
+}
+.bk-editor > .bk-editor__card {
+  animation: bk-editor-in 0.3s ease-out both;
+}
+.bk-editor.is-closing > .bk-editor__card {
+  animation: bk-editor-out 0.3s ease-in both;
+}
+@keyframes bk-editor-dim-in {
+  from {
+    background-color: rgb(0 0 0 / 0);
+  }
+}
+@keyframes bk-editor-dim-out {
+  to {
+    background-color: rgb(0 0 0 / 0);
+  }
+}
+@keyframes bk-editor-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes bk-editor-out {
+  to {
+    opacity: 0;
+  }
+}
+/* the card: on the keyboard's top edge */
+.bk-editor__card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+/* single-line: full width, top corners 8, base_primary (SinglelineTextInputViewController.swift:26-29;
+   KeyboardAttachedTextInputModal.swift:25-32,75-104) */
+.bk-editor__card.is-single {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: var(--dt_color_base_primary);
+}
+/* iOS 26: Liquid Glass (UIGlassEffect .regular), radius 24, 16 pt from the sides, 12 above the keyboard
+   (RichTextInputViewController.swift:49-66,169-176,366-370) */
+.bk-editor__card.is-glass {
+  left: 16px;
+  right: 16px;
+  bottom: 12px;
+  border-radius: 24px;
+  max-height: calc(100% - 12px - var(--safe-top, 0px));
+}
+/* the input's label: Lato Bold 17 content_primary (SinglelineTextInputViewController.swift:171-173;
+   RichTextInputViewController.swift:432-438) */
+.bk-editor__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.bk-editor__field {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  outline: none;
+  padding: 0;
+  background: none;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  caret-color: var(--dt_color_content_highlight_1);
+}
+/* the single-line field: ceil(Lato 17's line height) = 21 pt (SinglelineTextInputViewController.swift:23,114-117) */
+.bk-editor__card.is-single .bk-editor__field {
+  height: 21px;
+}
+.bk-editor__field.is-multiline {
+  resize: none;
+  overflow-y: auto;
+  min-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.bk-editor__field::placeholder {
+  color: var(--dt_color_content_tertiary);
+}
+/* the error: Lato 15 sk_raspberry_red; single-line keeps its line when there's none, then 20 pt (8 + 12) to the
+   buttons (SinglelineTextInputViewController.swift:21-22,67-71,189-197); the rich card 12 (8 + 4)
+   (RichTextInputViewController.swift:71,136,443-448) */
+.bk-editor__error {
+  font: var(--sk-small-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--sk_raspberry_red);
+  margin-bottom: 12px;
+}
+.bk-editor__card.is-glass .bk-editor__error {
+  margin-bottom: 4px;
+}
+.bk-editor__error.is-empty {
+  opacity: 0;
+}
+/* rich_text_input's formatting toolbar, clear, 16 pt above the buttons (RichTextInputPresenter.swift:31;
+   RichTextInputViewController.swift:138-142) */
+.bk-editor__toolbar {
+  margin: 0 -4px 8px;
+}
+/* Cancel at the leading edge, Done at the trailing one: SKTappableLabel, Lato Bold 17 content_highlight_1, 60 % while
+   pressed (SinglelineTextInputViewController.swift:119-143; SKTappableLabel.swift:43-46,77-78) */
+.bk-editor__buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ios-app .bk-editor__button {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: var(--sk-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_highlight_1);
+}
+.bk-editor__button.is-pressed {
+  opacity: 0.6;
+}
+

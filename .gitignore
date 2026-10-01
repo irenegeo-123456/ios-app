@@ -1,0 +1,15 @@
+node_modules
+dist
+.DS_Store
+*.tsbuildinfo
+# screenshots and diffs from tools/shot.mjs and tools/compare.mjs
+reference/shots/
+# Claude Code session state and parked worktrees
+.claude/scheduled_tasks.lock
+.claude/worktrees/
+.claude/.cc-writes/
+site/
+
+# real-device screenshots stay local (reference/device/README.md)
+reference/device/*
+!reference/device/README.md

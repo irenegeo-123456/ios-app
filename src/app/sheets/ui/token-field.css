@@ -1,0 +1,36 @@
+/* The tokenized search field (TokenField.tsx; TokenizedSearch/Interface/Views/TokenSearchInputStyle.swift) */
+.token-field {
+  box-sizing: border-box;
+  min-height: 48px;
+  max-height: 108px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 4px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 8px;
+  background: var(--dt_color_base_primary);
+  cursor: text;
+}
+/* each token sits in a 4 pt tap inset (TokenCell.swift:120-121) */
+.token-field__token {
+  display: flex;
+  padding: 4px 0;
+}
+.token-field__input {
+  flex: 1 0 128px;
+  min-width: 128px;
+  height: 40px;
+  border: 0;
+  outline: 0;
+  padding: 0 0 0 5px;
+  background: transparent;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  caret-color: var(--sk_highlight, var(--dt_color_content_highlight_1));
+}
+.token-field__input::placeholder {
+  color: var(--dt_color_content_secondary);
+  opacity: 1;
+}

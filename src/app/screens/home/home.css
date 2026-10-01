@@ -1,0 +1,258 @@
+/* Home (spec home.md). The header gradient (.root-header-gradient) is shared by the tab roots: nav.css. */
+
+.home__list {
+  position: relative;
+  /* the list is basePrimary (ListThemeOptions.ia4Phone, Sept ListThemeOptions.swift:67) */
+  background: var(--dt_color_base_primary);
+}
+
+/* The list's item colors, Sept 2026: ListThemeOptions.ia4Phone moved from the sk_* grays to the dt tokens
+   (ListThemeOptions.swift:76-78 [Sept]): unread names contentPrimary (June sk_primary_foreground), read names and
+   action rows contentSecondary (June sk_foreground_max_solid), muted contentTertiary (June sk_foreground_high_solid).
+   Measured on a device (reference/device/IMG_2246, dark): read rows and "Add channel" (185,186,189) = #b9babd. */
+.home .sk-row--unread {
+  --row-color: var(--dt_color_content_primary);
+}
+.home .sk-row--read,
+.home .sk-row--action {
+  --row-color: var(--dt_color_content_secondary);
+}
+.home .sk-row--muted {
+  --row-color: var(--dt_color_content_tertiary);
+}
+.home .sk-list-header.is-unread .sk-list-header__title {
+  color: var(--dt_color_content_primary);
+}
+/* the header's "+": itemTertiaryForegroundColor = contentTertiary (DefaultTransformingPipe.swift:161 [Sept]) */
+.home .sk-list-header__icon-button {
+  color: var(--dt_color_content_tertiary);
+}
+
+/* ------------------------------------------------------------------------------------- section headers (V3) */
+/* the section's icon: a 24 pt .small ornament box (clear) with the 20 pt icon centered, contentPrimary
+   (SKHeaderEntity.swift:625, SKOrnamentBox.swift:274-285, SKIcon.swift:159 [Sept]); the header's static height counts it
+   as 20, so the content stays 44 tall (SKHeaderEntity.swift:83, :565) */
+.home-header__ornament {
+  flex: none;
+  width: 24px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+/* the title and its "›" are one target, 0 pt apart (SKHeaderEntity.swift:51-63, :262-267) */
+.home-header .home-header__title {
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  font: inherit;
+  color: inherit;
+}
+.home-header__chevron {
+  flex: none;
+  color: var(--dt_color_content_primary);
+}
+/* .down orientation: expanded rotates the down caret 180° (up); collapsed it points down (SKHeaderEntity.swift:720-726) */
+.home-header .home-header__caret {
+  transform: rotate(180deg);
+}
+.home-header .home-header__caret.is-collapsed {
+  transform: none;
+}
+/* Add Teammates' .blankDivider header (DefaultTransformingPipe.swift:213 [Sept]): 8 pt */
+.home-section__blank-header {
+  height: 8px;
+}
+.home__bottom-space {
+  height: calc(21px + 62px + 16px + 56px + 24px);
+}
+.home__status-emoji {
+  display: block;
+}
+
+/* Mention badge on Home: theme.baseInverseImportant / contentInverseImportant (ListThemeOptions badgeStyle) */
+.home-badge {
+  background: var(--theme_baseInverseImportant);
+  color: var(--theme_contentInverseImportant);
+}
+/* App DM ornament: the app icon, 24 pt, radius 4 (SKEntityOrnamentView.swift:367-391) */
+.home-app-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ------------------------------------------------------------------------------------------------ tiles */
+.tiles-section {
+  padding-top: 8px;
+}
+.tiles-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.tiles-row::-webkit-scrollbar {
+  display: none;
+}
+.tile {
+  flex: none;
+  min-width: 100px;
+  height: 90px;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  color: var(--dt_color_content_secondary);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.5s, box-shadow 0.5s;
+}
+.tile.is-pressed {
+  transform: scale(0.94);
+  background: var(--dt_color_base_secondary);
+}
+[data-appearance='dark'] .tile.is-pressed {
+  background: var(--dt_color_surface_primary);
+}
+/* The tile's stack is pinned 13 pt inside a 90 pt tile, so its 64 pt hold the 20 pt ornament, 4 pt, two 18 pt lines and
+   4 spare points (SyntheticViewTile.swift:16-20, :447-499; all tiles are stretched to the tallest, …CustomRow.swift).
+   On a device (reference/device/IMG_2246) an icon tile keeps its icon at the top (y 13–33) and gives the spare points
+   to the title label, whose text centers in it (title ink 42.67, subtitle 62.67 from the tile's top); the Slackbot
+   tile's image container takes them instead (its 18 pt image centered in 24, title ink 44.67). */
+.tile__icon-row {
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+.tile__icon-row.is-image {
+  height: 24px;
+}
+.tile__icon {
+  position: relative;
+}
+/* the badge: a 6 pt dot at (icon width − 4, −1), the icon masked by a circle r 5 centered (19, 2) so the tile shows
+   through around it (SyntheticViewTile.swift:378-395: createBadgeLayer, createBadgeMaskLayer) */
+.tile__badge {
+  position: absolute;
+  left: 16px;
+  top: -1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--theme_baseInverseImportant);
+}
+.tile__icon.has-badge > :first-child {
+  -webkit-mask-image: radial-gradient(circle at 19px 2px, transparent 5px, #000 5px);
+  mask-image: radial-gradient(circle at 19px 2px, transparent 5px, #000 5px);
+}
+.tile__icon.has-badge > .tile__slackbot {
+  -webkit-mask-image: radial-gradient(circle at 18px 1px, transparent 5px, #000 5px);
+  mask-image: radial-gradient(circle at 18px 1px, transparent 5px, #000 5px);
+}
+.tile__title {
+  margin-top: 4px;
+  padding: 2px 0;
+  font: var(--sk-small-body);
+  white-space: nowrap;
+}
+.tile__icon-row.is-image + .tile__title {
+  padding: 0;
+}
+.tile__subtitle {
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+}
+.tile.is-unread {
+  background: var(--theme_tileUnreadBackground);
+  box-shadow: inset 0 0 0 1px var(--theme_tileUnreadBorder);
+  color: var(--theme_tileUnreadContent);
+}
+.tile.is-unread .tile__title {
+  font: var(--sk-small-body-black);
+}
+.tile.is-unread .tile__subtitle {
+  color: var(--theme_tileUnreadContent);
+}
+/* the Slackbot image: 18 pt, 1 pt inside the 20 pt icon slot, radius 4 (SyntheticViewTile.swift:26-30, :308-333) */
+.tile__slackbot {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: 1px;
+  border-radius: 4px;
+}
+.tile-circle {
+  flex: none;
+  align-self: center;
+  width: 48px;
+  height: 48px;
+  margin-left: 8px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  color: var(--dt_color_content_secondary);
+  display: grid;
+  place-items: center;
+}
+
+/* the active-filter banner's row: the card sits 12 pt from the row's top and bottom, 16 pt from its sides
+   (SKBannerEntity.swift:23) */
+.home-filter-banner {
+  padding: 12px 16px;
+}
+
+/* ------------------------------------------------------------------------------------------ section browser */
+/* basePrimary (ConversationSectionBrowserViewController.swift:69 [Sept]); the tab bar pinned under the bar, the list below */
+.section-browser {
+  background: var(--dt_color_base_primary);
+}
+.section-browser__list {
+  background: var(--dt_color_base_primary);
+}
+.section-browser__tabs {
+  /* sticky offsets count from inside the scroller's padding (the bar region), so 0 pins it right under the bar */
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  background: var(--dt_color_base_primary);
+}
+/* SKTabBar measures cells in whole pixels and can ellipsize a bold title a fraction too wide (as on Activity) */
+.section-browser__tabs .sk-tab__title {
+  overflow: visible;
+  text-overflow: clip;
+}
+.section-browser__rows {
+  padding-bottom: calc(21px + 62px + 24px);
+}
+/* a plain bar title: Lato Bold 17 contentPrimary (UINavigationBar+SlackStyles.swift:84 [Sept]) */
+.section-browser__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+/* the Catch Up pill (CatchUpFabDrawerEmbeddable.swift:61-75): a 56 pt glass capsule in the list's bottom drawer, 16 pt
+   from the trailing edge and 16 pt above the bottom of the safe area (the floating tab bar's top) */
+.section-browser__catch-up.sk-pill-button {
+  position: absolute;
+  z-index: 39;
+  right: 16px;
+  bottom: calc(21px + 62px + 16px);
+  height: 56px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 6px 20px rgba(0, 0, 0, 0.14);
+}

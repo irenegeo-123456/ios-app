@@ -1,0 +1,149 @@
+/* SKBanner. Spec: slackkit-components.md › SKBanner. Layout from SKBanner.swift:112-165 (DisplayType) and
+   Banner.swift:41-47, :150-262, :371-430; colors per tone from SKBanner.swift:208-315. */
+
+.sk-banner {
+  --bn-bg: var(--dt_color_base_tertiary);
+  --bn-text: var(--dt_color_content_primary);
+  --bn-ornament: var(--dt_color_content_secondary);
+  --bn-outline-light: var(--dt_color_outline_secondary);
+  --bn-outline-dark: var(--dt_color_outline_secondary);
+  --bn-outline: var(--bn-outline-light);
+  display: flex;
+  align-items: flex-start; /* the container stack aligns .top (Banner.swift:59-65) */
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* masksToBounds */
+  background: var(--bn-bg);
+  /* 1 pt layer border, inside the bounds (Banner.swift:371-387) */
+  box-shadow: inset 0 0 0 1px var(--bn-outline);
+  color: var(--bn-text);
+}
+[data-appearance='dark'] .sk-banner {
+  --bn-outline: var(--bn-outline-dark);
+}
+.sk-banner--regular {
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font: var(--sk-body);
+}
+.sk-banner--small {
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font: var(--sk-caption);
+}
+.sk-banner__ornament {
+  flex: none;
+}
+.sk-banner__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sk-banner__heading {
+  /* Constants.headingFont .bodyBold, 4 pt above the body (Banner.swift:43-46) */
+  align-self: stretch;
+  margin-bottom: 4px;
+  font: var(--sk-body-bold);
+  /* each SKLabel's height is its lines' 1.2 em rounded up to the pixel grid (height(for:) adds the heading and the
+     text, Banner.swift:394-427): 20.67 + 4 + 20.67 + 24 = 69.33 in SNAP/SKBannerSnapshotTests/
+     testBannerRegularGenericWithHeading (docs/conventions.md › Type) */
+  padding-bottom: calc(round(up, 1lh - 0.001px, 1px / 3) - 1lh);
+}
+.sk-banner__text {
+  align-self: stretch;
+  overflow-wrap: break-word;
+  padding-bottom: calc(round(up, 1lh - 0.001px, 1px / 3) - 1lh);
+}
+.sk-banner__action {
+  /* 12 pt below the text (Constants.actionButtonVerticalSpacing) */
+  margin-top: 12px;
+  display: flex;
+}
+.sk-banner__accessories {
+  align-self: center;
+}
+/* highlighted: alpha 0.6, only when selectable (Banner.swift:45, :433-437) */
+.sk-banner.is-selectable.is-pressed {
+  opacity: 0.6;
+}
+
+/* Tones (SKBanner.swift:208-315). Opaque = the tone's base; transparent = its surface. */
+.sk-banner--genericDark {
+  --bn-bg: var(--dt_color_base_inverse_primary);
+  --bn-text: var(--dt_color_content_inverse_primary);
+  --bn-ornament: var(--dt_color_content_inverse_secondary);
+}
+.sk-banner--info {
+  --bn-bg: var(--dt_color_base_highlight_1);
+  --bn-ornament: var(--dt_color_content_highlight_1);
+  --bn-outline-light: var(--dt_color_outline_highlight_1_secondary);
+  --bn-outline-dark: var(--dt_color_outline_highlight_1_secondary);
+}
+.sk-banner--info.is-transparent {
+  --bn-bg: var(--dt_color_surface_highlight_1);
+}
+.sk-banner--success {
+  --bn-bg: var(--dt_color_base_highlight_2);
+  --bn-ornament: var(--dt_color_content_highlight_2);
+  --bn-outline-light: var(--dt_color_outline_highlight_2_secondary);
+  --bn-outline-dark: var(--dt_color_outline_highlight_2_secondary);
+}
+.sk-banner--success.is-transparent {
+  --bn-bg: var(--dt_color_surface_highlight_2);
+}
+.sk-banner--warning {
+  --bn-bg: var(--dt_color_base_highlight_3);
+  --bn-ornament: var(--dt_color_content_highlight_3);
+  --bn-outline-light: var(--dt_color_outline_highlight_3_secondary);
+  --bn-outline-dark: var(--dt_color_outline_highlight_3_secondary);
+}
+.sk-banner--warning.is-transparent {
+  --bn-bg: var(--dt_color_surface_highlight_3);
+}
+.sk-banner--error {
+  --bn-bg: var(--dt_color_base_important);
+  --bn-ornament: var(--dt_color_content_important);
+  --bn-outline-light: var(--dt_color_outline_important_secondary);
+  --bn-outline-dark: var(--dt_color_outline_important_secondary);
+}
+.sk-banner--error.is-transparent {
+  --bn-bg: var(--dt_color_surface_important);
+}
+.sk-banner--trials {
+  /* trials_banner_text for text-adjacent ornament; outline in dark mode only */
+  --bn-bg: var(--dt_color_container_secondary);
+  --bn-ornament: var(--sk_trials_banner_text);
+  --bn-outline-light: transparent;
+}
+.sk-banner--trials_new {
+  --bn-bg: var(--dt_color_palettes_horchata_0);
+  --bn-outline-light: var(--dt_color_outline_tertiary);
+  --bn-outline-dark: var(--dt_color_outline_tertiary);
+}
+.sk-banner--business_trial {
+  --bn-bg: var(--dt_color_palettes_aubergine_0);
+  --bn-ornament: var(--sk-aubergine-content-secondary);
+  --bn-outline-light: var(--dt_color_outline_tertiary);
+  --bn-outline-dark: var(--dt_color_outline_tertiary);
+}
+.sk-banner--pro {
+  /* UIColor(red: 175/255, green: 75/255, blue: 245/255, alpha: 0.10), a literal (SKBanner.swift:228) */
+  --bn-bg: rgb(175 75 245 / 0.1);
+  --bn-ornament: var(--sk-aubergine-content-secondary);
+  --bn-outline-light: var(--dt_color_outline_tertiary);
+  --bn-outline-dark: var(--dt_color_outline_tertiary);
+}
+.sk-banner--coachmark {
+  --bn-bg: var(--sk_coachmark_background);
+  --bn-text: var(--dt_color_content_inverse_primary);
+  --bn-ornament: var(--dt_color_content_inverse_primary);
+  --bn-outline-light: transparent;
+}
+.sk-banner--custom {
+  --bn-outline-light: transparent;
+  --bn-outline-dark: transparent;
+}

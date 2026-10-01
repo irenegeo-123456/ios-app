@@ -1,0 +1,398 @@
+/* Catch Up (spec dms-activity.md §5; Modules/Features/AllUnreads). */
+
+.catch-up {
+  /* the Undo / title row: SwiftUI's bodyBlack 17 line on the pixel grid */
+  --cu-title-h: round(up, calc(20.4px - 0.01px), calc(1px / 3));
+  /* SKButton .large: 14 pt padding around a bodyBold 17 line */
+  --cu-button-h: calc(28px + round(up, calc(20.4px - 0.01px), calc(1px / 3)));
+  /* the card stack's bottom above the screen's: the buttons (at the safe area's bottom) and 20 pt */
+  --cu-stack-gap: calc(var(--safe-bottom) + var(--cu-button-h) + 20px);
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* the title 8 pt under the safe area's top (Constants.titleTopInset, AllUnreadsViewController.swift:22-29) */
+  padding: calc(var(--safe-top) + 8px) 0 var(--safe-bottom);
+  overflow: hidden;
+  /* theme.baseInverseSecondary under the theme gradient pref's top-to-bottom backgroundGradient1 → 2, as tall as the
+     screen (:186-199, :657-665) */
+  background: linear-gradient(var(--theme_backgroundGradient1), var(--theme_backgroundGradient2)), var(--theme_baseInverseSecondary);
+  color: var(--theme_contentInversePrimary);
+  touch-action: pan-y;
+}
+
+/* ------------------------------------------------------------------------------------------------ the header */
+.catch-up__header {
+  position: relative;
+  flex: none;
+  height: var(--cu-title-h);
+  /* with the keyboard's own slide (0.25 s, the curve composer.css and app.css's .ios-kb use) */
+  transition:
+    margin-top 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77),
+    opacity 0.25s;
+}
+/* "%@ Left": bodyBlack 17, theme.textColor (contentInversePrimary), centered; it drops in 20 pt and fades in once
+   loaded, and out again on completion (AllUnreadsPresenter.swift:82-131: smooth / long, 0.6 s) */
+.catch-up__title {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  font: var(--sk-body-black);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  transition:
+    opacity 0.6s var(--sk-spring-smooth),
+    transform 0.6s var(--sk-spring-smooth);
+}
+.catch-up.is-entering .catch-up__title,
+.catch-up.is-completed .catch-up__title {
+  opacity: 0;
+  transform: translate(-50%, -20px);
+}
+/* SKIconButton .medium: 56 pt, a 20 pt icon in the text color, 40 % while pressed; 6 pt from the leading edge, centered
+   on the title (:201-207, :630-639) */
+.ios-app .catch-up__close {
+  position: absolute;
+  left: 6px;
+  top: calc(var(--cu-title-h) / 2 - 28px);
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme_contentInversePrimary);
+  transition: opacity 0.15s;
+}
+.catch-up__close.is-pressed {
+  opacity: 0.4;
+}
+/* Undo, 6 pt from the trailing edge: scales in from 0.5 with a spring once a card is swiped (:606-627) */
+.catch-up__undo {
+  position: absolute;
+  right: 6px;
+  top: calc(var(--cu-title-h) / 2);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) scale(0.5);
+  transform-origin: 100% 50%;
+  transition:
+    opacity 0.4s var(--sk-spring-smooth),
+    transform 0.4s var(--sk-spring-smooth);
+}
+.catch-up__undo.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%);
+}
+
+/* ------------------------------------------------------------------------------------------------ the stack */
+/* 12 pt under the title, 16 pt from the sides, 20 pt above the buttons (:22-29, :230-247) */
+.catch-up__stack {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 12px 16px 20px;
+  transition: opacity 0.6s var(--sk-spring-smooth);
+}
+.catch-up.is-completed .catch-up__stack {
+  opacity: 0;
+}
+.catch-up__slot {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  touch-action: pan-y;
+}
+/* only the top card takes touches (SwipeCardStack.swift:131-136) */
+.catch-up__slot:not(.is-top),
+.catch-up__slot:not(.is-top) * {
+  pointer-events: none !important;
+}
+
+/* ------------------------------------------------------------------------------------------------ the buttons */
+/* equal widths, 16 pt from the edges and apart, on the safe area's bottom (:230-247); they rise in 30 pt from half
+   size once loaded, and go on completion */
+.catch-up__buttons {
+  display: flex;
+  flex: none;
+  gap: 16px;
+  padding: 0 16px;
+  transition:
+    opacity 0.6s var(--sk-spring-smooth),
+    transform 0.6s var(--sk-spring-smooth);
+}
+.catch-up.is-entering .catch-up__buttons,
+.catch-up.is-completed .catch-up__buttons {
+  opacity: 0;
+  transform: translateY(30px) scale(0.5);
+  pointer-events: none;
+}
+.catch-up__button-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+.catch-up__button-wrap > .catch-up__button {
+  flex: 1;
+}
+/* the .conversation glow: a black shadow, opacity 0.3, (0, 3), radius 16 (AllUnreadsDataTypes.swift:189-240) */
+.catch-up .catch-up__button {
+  box-shadow: 0 3px 32px rgb(0 0 0 / 0.3);
+}
+
+/* ------------------------------------------------------------------------------------------------ completion */
+/* from the close button's bottom to the safe area's bottom, full width; it grows in from 0.5 (:233-236, :82-131) */
+.catch-up__completion {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--safe-top) + 8px + var(--cu-title-h) / 2 + 28px);
+  bottom: var(--safe-bottom);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.5);
+  transition:
+    opacity 0.6s var(--sk-spring-smooth),
+    transform 0.6s var(--sk-spring-smooth);
+}
+.catch-up.is-completed .catch-up__completion {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+/* a 48 pt emoji, 8 pt, the title in headline 28 theme.textColor, 240 pt wide, centered (AllUnreadsCompletionView.swift
+   :14-18, :145-163, :208-215) */
+.catch-up__completion-stack {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transform: translateY(-50%);
+}
+.catch-up__completion-title {
+  width: 240px;
+  font: var(--sk-headline);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--theme_contentInversePrimary);
+  text-align: center;
+}
+.catch-up__completion-buttons {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ------------------------------------------------------------------------------------------------ the card */
+/* CardContentView: 38 pt continuous corners on iOS 26, base_tertiary, masked; a 1 pt outline_tertiary border in dark
+   mode (CardContentView.swift:11-55). The SwipeCard's shadow: black 0.3, (0, 3), radius 16 (:748-751). */
+.catch-up-card {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 38px;
+  background: var(--dt_color_base_tertiary);
+  box-shadow: 0 3px 32px rgb(0 0 0 / 0.3);
+}
+[data-appearance='dark'] .catch-up-card::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+/* the content container: radius 14, base_primary, a 1 pt gray_10 border, filling the card (whose corners clip it)
+   (UnreadConversationView.swift:49-58, :309-314) */
+.catch-up-card__container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--dt_color_base_primary);
+}
+.catch-up-card__container::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_palettes_gray_10);
+  pointer-events: none;
+}
+/* the title bar: at least 48 pt, 12 pt in from the container's sides, an SKNavigationTitle 12 pt from its top and
+   bottom on sk_primary_background, a 1 pt outlineTertiary divider along its bottom (UnreadConversationTitleView.swift
+   :33-47; UnreadConversationView.swift:229-282) */
+.catch-up-card__title {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 12px;
+  background: var(--sk_primary_background);
+  /* the 1 pt divider under the title, outlineTertiary (UnreadConversationView.swift:71-76, :282-286; June sk_foreground_low) */
+  box-shadow: inset 0 -1px 0 var(--dt_color_outline_tertiary);
+}
+/* UnreadConversationPresenter Constants (:19-23): bodyBold 17 sk_primary_foreground; captionBold 13
+   theme.contentSecondary */
+.catch-up-card__title .sk-nav-title__title {
+  font: var(--sk-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--sk_primary_foreground);
+}
+.catch-up-card__title .sk-nav-title__subtitle {
+  font: var(--sk-caption-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--theme_contentSecondary);
+}
+/* the channel span's lock: a text attachment the height of the font's ascender, in the text's color */
+.catch-up-card__lock {
+  display: inline-block !important;
+  width: 0.987em !important;
+  height: 0.987em !important;
+  vertical-align: -0.106em;
+  margin-right: 0.1em;
+}
+.catch-up-card__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.catch-up-card__transcript {
+  position: absolute;
+  inset: 0;
+}
+/* the composer floats over the transcript's end: the last message sits above it */
+.catch-up-card__rows {
+  padding-bottom: calc(var(--catch-up-composer-h, 60px) + 12px + var(--cu-kb-extra, 0px));
+}
+/* The card's composer: reduced Liquid Glass insets, 12 pt from the sides whatever the focus, and 12 pt from the card's
+   bottom (useReducedLiquidGlassComposerInsets; ComposerViewConstants.swift:43-47; ComposerViewController.swift:302-312).
+   With the keyboard up it rides on the keyboard, as the transcript's composer does. */
+.catch-up .catch-up-card .catch-up-card__body .cmp {
+  bottom: 12px;
+}
+.catch-up .catch-up-card .catch-up-card__body .cmp .cmp-card,
+.catch-up .catch-up-card .catch-up-card__body .cmp.is-focused .cmp-card {
+  margin: 0 12px;
+}
+.ios-app.has-keyboard .catch-up .catch-up-card .catch-up-card__body .cmp {
+  bottom: max(12px, calc(var(--kb-height) - var(--cu-stack-gap) + 12px));
+}
+.ios-app.has-keyboard .catch-up-card {
+  --cu-kb-extra: max(0px, calc(var(--kb-height) - var(--cu-stack-gap)));
+}
+/* with the keyboard up the title slides off above the card, which grows to the safe area's top, and the buttons fade
+   (AllUnreadsViewController.swift:693-727) */
+.ios-app.has-keyboard .catch-up__header {
+  margin-top: calc(-1 * (var(--cu-title-h) + 20px));
+  opacity: 0;
+}
+.ios-app.has-keyboard .catch-up__buttons {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------------ swipe overlays */
+/* AllUnreadsOverlayView: the card's corners, a radial gradient centered on the top corner the card moves from and
+   reaching the far side and 75 % down, jade (right) or ocean (left) 50 → 80 at 95 %, resolved in the light palette
+   (AllUnreadsThemePublisher.swift:59-62; AllUnreadsOverlayView.swift:59-100) */
+.catch-up-overlay {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  border-radius: 38px;
+  pointer-events: none;
+}
+.catch-up-overlay.is-right {
+  /* jade_50 #20a271, jade_80 #0e674d (light) */
+  --cu-overlay-dark: #0e674d;
+  background: radial-gradient(100% 75% at 0% 0%, rgb(32 162 113 / 0.95), rgb(14 103 77 / 0.95));
+}
+.catch-up-overlay.is-left {
+  /* ocean_50 #2985cd, ocean_80 #0b4c8c (light) */
+  --cu-overlay-dark: #0b4c8c;
+  background: radial-gradient(100% 75% at 100% 0%, rgb(41 133 205 / 0.95), rgb(11 76 140 / 0.95));
+}
+/* the ring and title: a 120 pt stack 20 pt from the top and from the side, 4 pt apart */
+.catch-up-overlay__stack {
+  position: absolute;
+  top: 20px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.catch-up-overlay.is-right .catch-up-overlay__stack {
+  left: 20px;
+  align-items: flex-start;
+}
+.catch-up-overlay.is-left .catch-up-overlay__stack {
+  right: 20px;
+  align-items: flex-end;
+}
+/* AllUnreadsOverlayProgressView: 48 pt, a 3 pt white arc from 12 o'clock, a 24 pt white icon; at 100 % the circle fills
+   white and the icon takes the darker color, over 0.3 s (:14-19, :79-108) */
+.catch-up-overlay__ring {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--dt_color_constants_white);
+  transition: background-color 0.3s;
+}
+.catch-up-overlay__ring svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.catch-up-overlay__icon {
+  position: relative;
+  transition: color 0.3s;
+}
+.catch-up-overlay__ring.is-full {
+  background: var(--dt_color_constants_white);
+}
+.catch-up-overlay__ring.is-full .catch-up-overlay__icon {
+  color: var(--cu-overlay-dark);
+}
+/* the action in headline 28 white, left or right aligned, wrapping in the stack's 120 pt (SKLabel's default
+   numberOfLines 0, SKLabelPresentationObject.swift:50-53) */
+.catch-up-overlay__title {
+  max-width: 100%;
+  font: var(--sk-headline);
+  color: var(--dt_color_constants_white);
+}
+.catch-up-overlay.is-left .catch-up-overlay__title {
+  text-align: right;
+}
+
+/* app.css's `.ios-app button { font: inherit; color: inherit }` outranks SKButton's own font and color outside sheets
+   (src/slackkit/buttons.css), so they're restated, as compose.css does */
+.catch-up .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.catch-up .sk-button.is-pressed,
+.catch-up .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}

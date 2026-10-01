@@ -1,0 +1,1036 @@
+/* Block Kit on iOS (reference/ios/specs/blockkit.md, updated to slack-objc main @ 14b3cbaf; citations marked Sept are
+   that checkout's lines, older ones June cd22922's, see the spec). BKC = Modules/UIInfra/
+   BlockKitComponents/Implementation. Colors are design tokens; text is SKFont (src/tokens/type.css). Every block carries
+   its own top inset and nothing is added between rows (BKC/Helpers/Utils.swift:24-53): --bk-top is set per row. */
+
+.ios-screen {
+  /* sk_raspberry_red (SKLegacyColors.swift:202): input errors and their divider (BKInputBlockView.swift:77) */
+  --bk-error: var(--sk_raspberry_red);
+}
+
+/* ------------------------------------------------------------------------------------------------ surfaces */
+/* Text a block doesn't style is Lato Regular 17 in content_primary (TextAttributes+Display.swift:21-53). */
+.bk-surface {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  min-width: 0;
+  overflow-wrap: break-word;
+  text-align: left;
+}
+/* Messages: blocks fill the text column with no side insets (BlocksConverterUtility.swift:90-110). Modals and App
+   Homes: an 8 pt blank list header (SKList.swift:2017-2021, SKListFooterView.swift:19), then rows with 16 / 16 insets
+   (ModernAppViewInteractor.swift:341). */
+.bk-surface--modal,
+.bk-surface--home {
+  padding: 8px 16px 0;
+}
+.bk-row {
+  padding-top: var(--bk-top, 12px);
+}
+/* The fallback banner pads itself 8 / 8 and ignores the row's insets (BKFallbackBlockView.swift:31-44) */
+.bk-row--unknown {
+  padding-top: 0;
+}
+.bk-surface--modal > .bk-row--unknown,
+.bk-surface--home > .bk-row--unknown {
+  margin: 0 -16px;
+}
+/* the internal loading row: 12 above (4 first), 12 below (Utils.swift:40-44) */
+.bk-row--loading {
+  padding-bottom: 12px;
+}
+.bk-plain {
+  white-space: pre-wrap;
+}
+
+/* ------------------------------------------------------------------------------------------------ section */
+/* An outer stack 6 pt apart: text column + inline accessory (8 pt, top-aligned), then the full-width accessory; the
+   text column is the text then the fields, 6 apart; fields are one full-width column 8 apart
+   (BKSectionBlockView.swift:71-115,255-258; Section/Views/BKFields.swift:18-20,42-48) */
+.bk-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bk-section__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.bk-section__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bk-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* SKThumbnailAttachment 68 × 68: radius min(20, 0.225 × 68) = 15.3, 1 pt outline_tertiary border, base_primary
+   (BKInlineAccessory.swift:22,253-255; SKThumbnailAttachment.swift:69-72,86-89,106-108) */
+.bk-thumbnail {
+  flex: none;
+  width: 68px;
+  height: 68px;
+  border-radius: 15.3px;
+  object-fit: cover;
+  background: var(--dt_color_base_primary);
+  outline: 1px solid var(--dt_color_outline_tertiary);
+  outline-offset: -1px;
+}
+.bk-button.is-fill {
+  width: 100%;
+}
+/* `.ios-app button { font: inherit; color: inherit }` (app.css) outranks `.sk-button`'s own font and color; restated
+   for buttons on block surfaces, as app.css does for sheets */
+.bk-surface .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.bk-surface .sk-button.is-pressed,
+.bk-surface .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}
+
+/* ------------------------------------------------------------------------------------------------ header */
+/* one label, content_primary, font by level, level 2 when unset (BKHeaderBlockView.swift:79-91; Text+Display.swift:49-61):
+   ≤ 1 headline, 2 title, ≥ 3 subtitleBold. The same scale draws rich text headers (Text+Display.swift:224-237). */
+.bk-header {
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  white-space: pre-wrap;
+}
+.bk-header--1 {
+  font: var(--sk-headline);
+}
+.bk-header--2 {
+  font: var(--sk-title);
+}
+.bk-header--3,
+.bk-header--4 {
+  font: var(--sk-subtitle-bold);
+}
+
+/* ------------------------------------------------------------------------------------------------ divider */
+/* 2 device pixels of outline_tertiary, full width, 10 above (the row) and 10 below (BKDividerBlockView.swift:18-21,75-82) */
+.bk-divider {
+  height: 0;
+  border-top: calc(2px / 3) solid var(--dt_color_outline_tertiary);
+  margin-bottom: 10px;
+}
+
+/* ------------------------------------------------------------------------------------------------ context */
+/* Lato 15 content_secondary; 20 × 20 images, radius 2, stretched; left-aligned flow, 12 after a text and 4 after an
+   image, rows 4 apart, items centered in their row, 4 after the last row (BKContextBlockView+PresentationObject.swift:54-70;
+   ContextBlockFlowLayout.swift:22-27,88-177) */
+.bk-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 4px;
+  padding-bottom: 4px;
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_secondary);
+}
+.bk-context__text {
+  min-width: 0;
+  max-width: 100%;
+  margin-right: 12px;
+}
+.bk-context__image {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  object-fit: fill;
+  margin-right: 4px;
+}
+.bk-context > :last-child {
+  margin-right: 0;
+}
+
+/* ------------------------------------------------------------------------------------------------ image */
+/* title above in Lato 13 content_secondary, 8 pt gap (BKImageBlockView.swift:26,165-169); the frame is an
+   SKExpandedAttachment: radius 15, 1 pt outline_tertiary, base_secondary; height = displayed width (min(image, row)) ×
+   the image's ratio, 30–400; pressed 60 % (SKExpandedAttachment.swift:68-89,113-114,140-141,399-418,517-535) */
+.bk-image {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  container-type: inline-size;
+}
+.bk-image__title {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.bk-image__frame {
+  position: relative;
+  width: 100%;
+  height: clamp(30px, calc(min(var(--bk-img-w), 100cqw) * var(--bk-img-ratio)), 400px);
+  border-radius: 15px;
+  overflow: hidden;
+  background: var(--dt_color_base_secondary);
+  display: grid;
+  place-items: center;
+}
+.bk-image__frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.bk-image__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.bk-image__frame.is-fill img {
+  object-fit: cover;
+}
+.bk-image__frame.is-pressed {
+  opacity: 0.6;
+}
+/* failed: warning_filled 30 pt in surface_secondary (SKExpandedAttachment.swift:73-74) */
+.bk-image__error {
+  color: var(--dt_color_surface_secondary);
+}
+
+/* ------------------------------------------------------------------------------------------------ actions */
+/* every element full width, stacked 8 pt apart (BKActionsBlockView.swift:18-20,62-96) */
+.bk-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ------------------------------------------------------------------------------------------------ input */
+/* a stack 10 pt apart: label row, element, divider, hint or error (BKInputBlockView.swift:95-104,137-175) */
+.bk-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bk-input__label-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* Lato Bold 17 content_primary; " (optional)" in content_tertiary (+PresentationObject.swift:135-142) */
+.bk-input__label {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  min-width: 0;
+}
+.bk-input__optional {
+  color: var(--dt_color_content_tertiary);
+  white-space: pre;
+}
+/* file_input's info button: info.svg in a 20 × 20 accessory SKIconButton (+PresentationObject.swift:74-85) */
+.bk-input__info {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--dt_color_content_primary);
+}
+.bk-input__info.is-pressed {
+  opacity: 0.75;
+}
+.bk-input__element {
+  min-width: 0;
+}
+/* 2 device pixels of outline_tertiary, raspberry red while an error shows (BKInputBlockView.swift:98-99,350-361) */
+.bk-input__divider {
+  height: 0;
+  border-top: calc(2px / 3) solid var(--dt_color_outline_tertiary);
+}
+.bk-input.has-error > .bk-input__divider {
+  border-top-color: var(--bk-error);
+}
+/* hint Lato 13 content_tertiary; error Lato 13 sk_raspberry_red, in the hint's place (+PresentationObject.swift:144-152) */
+.bk-input__hint {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+}
+.bk-input__error {
+  font: var(--sk-caption);
+  color: var(--bk-error);
+}
+
+/* The select row: label Lato 17 (value content_primary, placeholder content_secondary), a 20 pt caret_right_full in
+   content_primary, 16 apart, no vertical padding; 40 % alpha while pressed (0.15 s), 70 % disabled
+   (BKInputSelectView.swift:26-157; SlackUI/.../ContainerControl.swift:28-31,112-114; Utils.swift:56) */
+.bk-select-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 20.67px;
+  transition: opacity 0.15s;
+}
+.bk-select-row.is-pressed {
+  opacity: 0.4;
+}
+.bk-select-row.is-disabled {
+  opacity: 0.7;
+}
+.bk-select-row__label {
+  flex: 1;
+  min-width: 0;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.bk-select-row__label.is-placeholder {
+  color: var(--dt_color_content_secondary);
+}
+.bk-select-row__icon,
+.bk-select-row__chevron {
+  flex: none;
+  color: var(--dt_color_content_primary);
+}
+
+/* Inline text inputs: borderless SKTextField, no padding, Lato 17, content_primary / content_tertiary placeholder; a
+   single line is 22 pt (BKInputBlockSnapshotTests/testTextInput_plainStyle) */
+.bk-text-field {
+  width: 100%;
+}
+.bk-textarea {
+  display: block;
+  width: 100%;
+  min-height: 22px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  background: none;
+  font: var(--sk-body);
+  line-height: 22px;
+  color: var(--dt_color_content_primary);
+  caret-color: var(--dt_color_content_highlight_1);
+}
+.bk-textarea::placeholder {
+  color: var(--dt_color_content_tertiary);
+}
+.bk-textarea:disabled {
+  color: var(--dt_color_content_tertiary);
+}
+/* In messages the input shows its value (or placeholder) and the whole block opens the editor */
+.bk-text-display {
+  font: var(--sk-body);
+  line-height: 22px;
+  min-height: 22px;
+  color: var(--dt_color_content_primary);
+  white-space: pre-wrap;
+}
+.bk-text-display.is-placeholder {
+  color: var(--dt_color_content_tertiary);
+}
+.bk-input.is-modal-text {
+  cursor: default;
+}
+
+/* ------------------------------------------------------------------------------------------------ checkboxes and radios */
+/* Rows: the text column (Lato 17 content_primary; description Lato 13 content_secondary 2 below) and the control at
+   the right, 12 apart, centered; 8 pt above and below each option; 60 % while pressed (BKCheckboxOptionView.swift:59-86,
+   145-197; Utils.swift:61-72) */
+.bk-choices {
+  display: flex;
+  flex-direction: column;
+}
+.bk-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+.bk-choice.is-pressed {
+  opacity: 0.6;
+}
+.bk-choice__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bk-choice__label {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.bk-choice__description {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.bk-choice__control {
+  flex: none;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------------ file input */
+/* "Upload File", then the picked files 8 pt apart (BKFileUploadView.swift:18,223-235); the file cards are
+   SKCompactAttachment's: 12 padding, radius 15, 1 pt outline_tertiary, a 36 pt ornament, title Lato Bold 15 over
+   subtitle Lato 13 content_tertiary (SKCompactAttachment.swift:72-93,573-627) */
+.bk-file-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bk-file-input__files {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.bk-file-card {
+  flex: none;
+  width: 260px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 15px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  background: var(--dt_color_base_primary);
+}
+.bk-file-card__ornament {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--dt_color_surface_primary);
+  color: var(--dt_color_content_primary);
+}
+.bk-file-card__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bk-file-card__title {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bk-file-card__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+}
+.bk-file-card__remove {
+  flex: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: rgb(from var(--dt_color_content_primary) r g b / 0.3);
+}
+
+/* ------------------------------------------------------------------------------------------------ video */
+/* a stack 4 pt apart: provider row (20 pt icon radius 2, "Provider | Author" Lato Bold 17), title Lato 17 (a link when
+   title_url), a 295 × 166 thumbnail radius 8 with the "Video" badge 4 / 4 from its bottom-left, the description Lato 13
+   content_secondary (BKVideoBlockView.swift:21-203; +PresentationObject.swift:31-120) */
+.bk-video {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bk-video__provider {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: var(--sk-body-bold);
+}
+.bk-video__provider-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+}
+.bk-video__title.is-link {
+  color: var(--dt_color_content_highlight_1);
+}
+.bk-video__thumb {
+  position: relative;
+  width: 295px;
+  max-width: 100%;
+  height: 166px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--dt_color_base_primary);
+}
+.bk-video__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bk-video__badge {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  background: rgb(29 28 29 / 0.7);
+  color: #fff;
+  font: var(--sk-caption-bold);
+}
+.bk-video__description {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+
+/* ------------------------------------------------------------------------------------------------ file */
+/* SKCompactAttachment: 12 padding, radius 15, 1 pt outline_tertiary, base_primary, 60 % pressed; a 36 × 36 ornament, 8 pt,
+   title Lato Bold 15 content_primary (1 line) over subtitle Lato 13 content_tertiary, 2 apart
+   (SKCompactAttachment.swift:72-93,120-121,573-627; AttachmentOrnament.swift:24) */
+.bk-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 15px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  background: var(--dt_color_base_primary);
+}
+.bk-file.is-pressed {
+  opacity: 0.6;
+}
+.bk-file__ornament {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--dt_color_surface_primary);
+  color: var(--dt_color_content_primary);
+}
+.bk-file__ornament img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bk-file__ornament.is-warning {
+  background: none;
+  color: var(--dt_color_content_secondary);
+}
+.bk-file__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bk-file__title {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bk-file__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------------------------------ table */
+/* Lato 17 cells padded 8 / 12 (first row bold), columns as wide as the widest cell (at most 260, at least 40), 1 pt grid
+   and outer border in outline_tertiary, radius 8, 2 pt above and below; at most 8 rows, then a 50 pt fade into
+   base_primary (BKTableBlockCell.swift:24; BKTableBlockCollectionViewLayout.swift:28-30,40-111; BKTableBlockGrid.swift:19-45;
+   BKTableBlockView.swift:43-47,99,121,145-148,206-211) */
+.bk-table {
+  position: relative;
+  margin: 2px 0;
+}
+.bk-table__scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+}
+.bk-table__grid {
+  /* columns take their content's width (a cell at most 260), never squeezed to the block: wider tables scroll */
+  width: max-content;
+  border-collapse: collapse;
+  border-style: hidden;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.bk-table__grid td {
+  border: 1px solid var(--dt_color_outline_tertiary);
+  padding: 8px 12px;
+  vertical-align: top;
+  min-width: 40px;
+}
+.bk-table__cell {
+  max-width: 260px;
+  min-width: 16px;
+}
+.bk-table__grid tr.is-header td {
+  font-weight: 700;
+}
+.bk-table__fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, var(--dt_color_base_primary));
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------------ card, carousel, container */
+/* radius 12, a 2-device-pixel outline_tertiary border, base_primary, clipped (BKCardBlockView.swift:33-42); measured on
+   test_fullCard_withoutHeroImage@3x.png: content inset 12, the header row's own 10 pt vertical padding, 12 between
+   parts, buttons 8 apart, 12 below the content and 12 from the bottom */
+.bk-card {
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 calc(2px / 3) var(--dt_color_outline_tertiary);
+  background: var(--dt_color_base_primary);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.bk-card__hero {
+  margin: 12px 12px 0;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.bk-card__hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.bk-card__content {
+  padding: 12px 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bk-card__content:last-child {
+  padding-bottom: 12px;
+}
+.bk-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+.bk-card__icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+/* a slack_icon in an ornament box tinted content_tertiary (CardBlock+BKBlockConvertible.swift:45-47; June
+   sk_foreground_high_solid; SKEntityOrnamentView.swift:397-427) */
+.bk-card__icon.is-slack-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--dt_color_surface_primary);
+  color: var(--dt_color_content_tertiary);
+}
+.bk-card__titles {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* title Lato Black 17 (≤ 2 lines) content_primary; subtitle Lato 17 content_tertiary (≤ 2 lines): the converter's
+   fallback attributes win over the entity's Lato 13 (CardBlock+BKBlockConvertible.swift:56-66 → SKGenericEntity
+   secondaryText, SKEntityContentView.swift:226; June: a plain string in the entity's Lato 13 content_secondary) */
+.bk-card__title {
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bk-card__subtitle {
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* body Lato 17 (≤ 30 lines); subtext Lato 13 content_tertiary (≤ 5 lines) */
+.bk-card__body {
+  display: -webkit-box;
+  -webkit-line-clamp: 30;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bk-card__subtext {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bk-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+/* cards min(container − 16 − 40 − 12, 320) wide, 16 from the leading edge, 12 apart, one at a time
+   (BKCarouselBlockView.swift:15-25,81-146) */
+.bk-carousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 0 16px;
+  scroll-padding: 0 16px;
+  container-type: inline-size;
+}
+.bk-carousel::-webkit-scrollbar {
+  display: none;
+}
+.bk-carousel__item {
+  flex: none;
+  display: flex;
+  width: min(calc(100cqw - 16px - 40px - 12px), 320px);
+  scroll-snap-align: start;
+}
+.bk-carousel__item > .bk-card {
+  flex: 1;
+}
+.bk-surface--modal > .bk-row--carousel,
+.bk-surface--home > .bk-row--carousel {
+  margin: 0 -16px;
+}
+/* radius 12, 1 pt outline_tertiary, base_primary, 12 padding, children 8 apart, the header 8 above the body: 36 pt
+   icon, 12 pt, title Lato Bold 17 over subtitle Lato 13 content_secondary, a 20 pt caret when collapsible
+   (BKContainerBlockView.swift:40-47,81-114,385-407) */
+.bk-container {
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  background: var(--dt_color_base_primary);
+  padding: 12px;
+}
+.bk-container__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bk-container__icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  object-fit: cover;
+}
+.bk-container__titles {
+  flex: 1;
+  min-width: 0;
+}
+.bk-container__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* a rich_text_title is the title's label: its own styles over Lato Bold 17 content_primary, one line
+   (BKBlockPresentationService.swift:541-548) */
+.bk-container__title > .bk-rich-text {
+  font: inherit;
+  color: inherit;
+}
+.bk-container__title > .bk-rich-text .rt-p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* has_header_divider: 1 pt outline_tertiary across the box (through the 12 pt padding), 8 below the header, the body
+   8 below it (BKContainerBlockView.swift:47-50,115-119,141-145,213-216) */
+.bk-container__divider {
+  height: 1px;
+  margin: 8px -12px 0;
+  background: var(--dt_color_outline_tertiary);
+}
+.bk-container__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bk-container__caret {
+  flex: none;
+  color: var(--dt_color_content_primary);
+}
+.bk-container__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bk-container__body.has-header {
+  margin-top: 8px;
+}
+.bk-container__body > .bk-row {
+  padding-top: 0;
+}
+
+/* ------------------------------------------------------------------------------------------------ alert */
+/* radius 12, padding 12 / 16, a 20 pt icon 12 pt from the text (Lato 17 content_primary); background and icon by level
+   (BKAlertBlockView.swift:16-20,60-80; AlertBlock+BKBlockConvertible.swift:14-57) */
+.bk-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--dt_color_base_tertiary);
+  color: var(--dt_color_content_primary);
+}
+.bk-alert__icon {
+  flex: none;
+  margin-top: 0.34px;
+  color: var(--dt_color_content_secondary);
+}
+.bk-alert__text {
+  flex: 1;
+  min-width: 0;
+}
+.bk-alert--info {
+  background: var(--dt_color_base_highlight_1);
+}
+.bk-alert--info .bk-alert__icon {
+  color: var(--dt_color_content_highlight_1);
+}
+.bk-alert--success {
+  background: var(--dt_color_base_highlight_2);
+}
+.bk-alert--success .bk-alert__icon {
+  color: var(--dt_color_content_highlight_2);
+}
+.bk-alert--warning {
+  background: var(--dt_color_base_highlight_3);
+}
+.bk-alert--warning .bk-alert__icon {
+  color: var(--dt_color_content_highlight_3);
+}
+.bk-alert--error {
+  background: var(--dt_color_base_important);
+}
+.bk-alert--error .bk-alert__icon {
+  color: var(--dt_color_content_important);
+}
+
+/* ------------------------------------------------------------------------------------------------ fallback, loading */
+.bk-fallback {
+  padding: 8px 0;
+}
+.bk-loading {
+  display: flex;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------------------------------------ rich_text */
+/* base Lato 17 content_primary (RichTextBlock+BKContainerBlockConvertible.swift:27-32 → the text options' baseTextColor,
+   BlockKitPresentationServiceInterface.swift:108-112, MessageViewPresentationObjectFactory.swift:58-59; June
+   sk_primary_foreground #D1D2D3 in dark); the rest is text.css (Text+Display.swift) */
+.bk-rich-text {
+  color: var(--dt_color_content_primary);
+}
+/* lists: markers at indent × 29, text 28 further; bullets •, ◦, ▪ by indent (RichTextTheming.swift:71-80;
+   BulletedListPrefixGenerator.swift:11-24) */
+.bk-rt-list {
+  padding-left: var(--bk-indent, 0px);
+}
+.bk-rt-list--ring .rt-li__marker {
+  background: none !important;
+  box-shadow: inset 0 0 0 1.2px currentColor;
+}
+.bk-rt-list--square .rt-li__marker {
+  border-radius: 1.5px !important;
+}
+/* a quote with a border: the second bar at x = 15, text at 30 (LayoutManager.swift:16,97-128) */
+.rt-quote.bk-rt-quote--double {
+  padding-left: 30px;
+}
+.rt-quote.bk-rt-quote--double::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 2px;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--dt_color_outline_tertiary);
+}
+.bk-rt-divider {
+  margin: 10px 0;
+}
+.bk-rt-header {
+  color: var(--dt_color_content_primary);
+}
+
+/* ------------------------------------------------------------------------------------------------ plan, task_card */
+/* Sept: no border; base_primary, radius 12 (continuous), clipped, base_secondary while pressed (0.15 s) when it can
+   expand; 8 pt padding, rows 12 apart (BKTaskContainerView.swift:20-34,43-45,78-81; BKPlanBlockView.swift:27-30,
+   BKTaskBlockView.swift:27-30). June had a 2-device-pixel outline_tertiary border and 12 pt padding. */
+.bk-task-card {
+  border-radius: 12px;
+  background: var(--dt_color_base_primary);
+  padding: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: background-color 0.15s;
+}
+.bk-task-card.is-pressed {
+  background: var(--dt_color_base_secondary);
+}
+/* ornament 20, 8 pt, the title, 8 pt, the 20 pt caret; top-aligned (BKTaskHeaderView.swift:30-35,51-75) */
+.bk-task__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+/* a 20 pt box, the icon centered (the dot is 8 pt); content_secondary, errors sk_raspberry_red
+   (BKTaskOrnamentView.swift:20-22,47-66,96-138) */
+.bk-task__ornament {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_secondary);
+}
+.bk-task__ornament.is-error {
+  color: var(--sk_raspberry_red);
+}
+/* the title: Lato Regular 17 (titleFont .body()), content_secondary in every state (BKTaskHeaderView.swift:187-202,
+   246,290-294; June Lato Bold 17, aubergine_button_fill while loading, else content_primary) */
+.bk-task__title {
+  flex: 1;
+  min-width: 0;
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}
+/* while loading the title shimmers: a mask that dims a band to 15 % and sweeps it across in 1.4 s, ease-in-out,
+   forever; nothing with Reduce Motion (BKShimmeringLabel.swift:17-25,44-78,113-123). The mask is 4 × the title's
+   width: opaque, then opaque → 15 % → opaque over its middle half, moved from −3 W to 0 (locations −2…0 → 1…3). */
+.bk-task__title.is-loading {
+  -webkit-mask-image: linear-gradient(90deg, #000 25%, rgb(0 0 0 / 0.15) 50%, #000 75%);
+  mask-image: linear-gradient(90deg, #000 25%, rgb(0 0 0 / 0.15) 50%, #000 75%);
+  -webkit-mask-size: 400% 100%;
+  mask-size: 400% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: bk-task-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes bk-task-shimmer {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  to {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bk-task__title.is-loading {
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: none;
+  }
+}
+/* the expand caret: caret_down / caret_up, 20 pt, content_secondary (BKTaskHeaderView.swift:204-215) */
+.bk-task__caret {
+  flex: none;
+  color: var(--dt_color_content_secondary);
+}
+/* one item per task: the ornament column, 8 pt, the texts 8 apart (BKTaskItemView.swift:27-32,53-80) */
+.bk-task__item {
+  display: flex;
+  gap: 8px;
+}
+/* the ornament column: 20 pt wide, the ornament on top and the 2 pt pipe 8 below it down to the bottom, centered;
+   without an ornament the pipe is the whole column. With one, the pipe only shows once the item is taller than 32 pt
+   (ornament 20 + 8 + 4), so a one-line item has none (BKTaskItemView.swift:27-32,173-192; BKTaskPipeView.swift:14-17,
+   49-59: outline_tertiary, radius 1; June 4 pt) */
+.bk-task__rail {
+  position: relative;
+  flex: none;
+  width: 20px;
+}
+.bk-task__pipe {
+  position: absolute;
+  left: 9px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--dt_color_outline_tertiary);
+}
+.bk-task__item.has-ornament .bk-task__pipe {
+  top: 28px;
+}
+.bk-task__texts {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* details and outputs: the text's own attributes, Lato 17 content_primary (TaskBlock+BKBlockConvertible.swift:25-31 →
+   TextBlockElement.bkTextPresentation; TextAttributes+Display.swift) */
+.bk-task__texts > .bk-rich-text {
+  color: var(--dt_color_content_primary);
+}
+/* Each of the card's labels (SKLabel) is as tall as its lines rounded up to the pixel grid (docs/conventions.md,
+   "Pixels"): a one-line label is 20.67 pt, so the plan in BKPlanBlockSnapshotTests/testExpandedState_tasksWithOutput
+   is 216.67 pt tall, as on iOS (650 px). */
+.bk-task__title,
+.bk-plan__task-title,
+.bk-task__texts > .bk-rich-text,
+.bk-task__source {
+  padding-bottom: calc(round(up, 1lh - 0.001px, 1px / 3) - 1lh);
+}
+/* a plan task's title: Lato Bold 17 content_primary, whatever its status (BKPlanTaskView.swift:128-136) */
+.bk-plan__task-title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+/* a source: a link in Lato 17 (TaskBlock+BKBlockConvertible.swift:124-140): content_highlight_1 (Text+Display.swift links) */
+.bk-task__source {
+  font: var(--sk-body);
+}
+
+/* ------------------------------------------------------------------------------------------------ context_actions */
+/* a horizontal row, items hug (BKContextActionsBlockView.swift:60-126); icon buttons are 40 × 40 with 20 pt icons */
+.bk-context-actions {
+  display: flex;
+  align-items: center;
+}

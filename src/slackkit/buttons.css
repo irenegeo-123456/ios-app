@@ -1,0 +1,343 @@
+/* SKButton, SKIconButton, SKPillButton, ClearButton. Spec: slackkit-components.md › Buttons; Swift cited inline
+   (Types = DC/Button/SKButton+Types.swift). */
+
+/* ------------------------------------------------------------------------------------------------- SKButton */
+.sk-button {
+  --btn-bg: transparent;
+  --btn-bg-pressed: var(--btn-bg);
+  --btn-border: transparent;
+  --btn-title: var(--dt_color_content_primary);
+  --btn-title-pressed: var(--btn-title);
+  --sk-bounce-scale: 0.96; /* Constants.bounceScale (SKButton.swift:47) */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  box-sizing: border-box;
+  /* at least as big as the 18 pt processing spinner (SKButton.swift:182-217) */
+  min-width: 18px;
+  min-height: 18px;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--btn-pad-v) var(--btn-pad-h);
+  border: 0;
+  border-radius: var(--btn-radius);
+  background: var(--btn-bg);
+  /* the 1 pt CALayer border sits inside the bounds (SKButton.swift:46, :274) */
+  box-shadow: inset 0 0 0 1px var(--btn-border);
+  color: var(--btn-title);
+  font: var(--btn-font);
+  text-align: center;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  /* the fill changes inside the bounce animation: down 0.2 s, up 0.4 s (SKButton.swift:427-446) */
+  transition:
+    transform 0.4s var(--sk-spring-smooth),
+    background-color 0.4s var(--sk-spring-smooth);
+}
+.sk-button.is-pressed,
+.sk-button.is-selected {
+  background: var(--btn-bg-pressed);
+  color: var(--btn-title-pressed);
+  transition-duration: 0.2s;
+}
+.sk-button__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  min-width: 0;
+  max-width: 100%;
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.sk-button__content.is-vertical {
+  flex-direction: column;
+}
+.sk-button__title {
+  min-width: 0;
+  /* UILabel sizes itself up to the @3x pixel grid: 17 pt Lato is 20.67 tall, 15 pt is 18 (spec "Text heights") */
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  white-space: pre-wrap;
+}
+.sk-button__icon {
+  color: currentColor;
+}
+/* animationStyle .scaleContentOnly: only the title and icon scale */
+.sk-button--bounce-content.is-pressed .sk-button__content,
+.sk-button--bounce-content.is-selected .sk-button__content {
+  transform: scale(var(--sk-bounce-scale));
+  transition-duration: 0.2s;
+}
+/* processing: the title and icon are hidden (the size stays), the spinner is centered (SKButton.swift:30-35, :298-300) */
+.sk-button.is-processing .sk-button__content {
+  visibility: hidden;
+}
+.sk-button__spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Colors per style (Types:134-234, SKButton.swift:242-251, :393-421). September 2026: primary, danger and the outline
+   styles use the highlight2 / important tokens instead of sk_lilypad_green / sk_raspberry_red (Types:146-148,
+   :167-169, :189-191, :209-216), so their dark fills changed (#177E56, #D3305D with design tokens f76ac0a). */
+.sk-button--outlineDefault {
+  --btn-bg: var(--dt_color_base_primary);
+  /* baseTertiary.dynamicLighten(0.8) → #FBFBFB / #1B1E22 */
+  --btn-bg-pressed: color-mix(in srgb, var(--dt_color_base_tertiary) 20%, var(--dt_color_base_primary));
+  --btn-border: var(--dt_color_outline_secondary);
+  --btn-title: var(--dt_color_content_primary);
+}
+/* primary: highlight2.baseInverse #007A5A / #177E56; pressed darken(0.2) → #006248 / #126545 (Types:167, :189) */
+.sk-button--primary {
+  --btn-bg: var(--dt_color_base_inverse_highlight_2);
+  --btn-bg-pressed: rgb(from var(--dt_color_base_inverse_highlight_2) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8));
+  --btn-title: var(--dt_color_constants_white);
+}
+/* danger: important.baseInverse #E01E5A / #D3305D; pressed darken(0.2) → #B31848 / #A9264A (Types:169, :191) */
+.sk-button--danger {
+  --btn-bg: var(--dt_color_base_inverse_important);
+  --btn-bg-pressed: rgb(from var(--dt_color_base_inverse_important) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8));
+  --btn-title: var(--dt_color_constants_white);
+}
+/* outlinePrimary: border highlight2.outline #007A5A / #259B69, title highlight2.content #007A5A / #3DAA7C
+   (Types:146, :214) */
+.sk-button--outlinePrimary {
+  --btn-bg: var(--dt_color_base_primary);
+  --btn-bg-pressed: color-mix(in srgb, var(--dt_color_base_tertiary) 20%, var(--dt_color_base_primary));
+  --btn-border: var(--dt_color_outline_highlight_2);
+  --btn-title: var(--dt_color_content_highlight_2);
+}
+/* outlineDanger: border important.outline #E01E5A / #D94C75, title important.content #C01343 / #DE678A
+   (Types:148, :216) */
+.sk-button--outlineDanger {
+  --btn-bg: var(--dt_color_base_primary);
+  --btn-bg-pressed: color-mix(in srgb, var(--dt_color_base_tertiary) 20%, var(--dt_color_base_primary));
+  --btn-border: var(--dt_color_outline_important);
+  --btn-title: var(--dt_color_content_important);
+}
+/* default(textColor): title only; pressed = textColor @ Modifiers.pressedOpacity 0.75 (Types:229-230, June 0.8) */
+.sk-button--default {
+  --btn-title-pressed: rgb(from var(--btn-title) r g b / calc(alpha * 0.75));
+}
+/* systemDefault / systemDanger: pressed = title.dynamicLighten(0.5) (Types:226-228); systemDanger's title is
+   important.content #C01343 / #DE678A since September 2026 (Types:209; June sk_raspberry_red) */
+.sk-button--systemDefault {
+  --btn-title: var(--dt_color_content_highlight_1);
+  --btn-title-pressed: color-mix(in srgb, var(--dt_color_content_highlight_1) 50%, var(--dt_color_base_primary));
+}
+.sk-button--systemDanger {
+  --btn-title: var(--dt_color_content_important);
+  --btn-title-pressed: color-mix(in srgb, var(--dt_color_content_important) 50%, var(--dt_color_base_primary));
+}
+/* the text-only styles don't bounce, and their title color changes at once (Types:236-243) */
+.sk-button--default,
+.sk-button--systemDefault,
+.sk-button--systemDanger {
+  transition: none;
+}
+/* quickAction(isSelected): fill UIColor(light: baseSecondary, dark: surfacePrimary), border baseSecondary; selected
+   highlight1.base for both; pressed = fill.darken(0.2) (Types:151-195) */
+.sk-button--quickAction {
+  --btn-bg: var(--dt_color_base_secondary);
+  --btn-bg-pressed: rgb(from var(--dt_color_base_secondary) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8));
+  --btn-border: var(--dt_color_base_secondary);
+  --btn-title: var(--dt_color_content_primary);
+}
+[data-appearance='dark'] .sk-button--quickAction {
+  --btn-bg: var(--dt_color_surface_primary);
+  --btn-bg-pressed: rgb(from var(--dt_color_surface_primary) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8) / calc(alpha * 0.8 + 0.2));
+}
+.sk-button--quickAction.sk-button--quickAction-selected {
+  --btn-bg: var(--dt_color_base_highlight_1);
+  --btn-bg-pressed: rgb(from var(--dt_color_base_highlight_1) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8));
+  --btn-border: var(--dt_color_base_highlight_1);
+  --btn-title: var(--dt_color_content_highlight_1);
+}
+/* disabled (inactive) and processing: title contentSecondary; outline, primary and danger fill baseTertiary with no
+   border; custom keeps its fill and border; quickAction keeps its colors (SKButton.swift:393-421) */
+.sk-button.is-disabled {
+  --btn-title: var(--dt_color_content_secondary);
+  --btn-title-pressed: var(--dt_color_content_secondary);
+}
+.sk-button--outlineDefault.is-disabled,
+.sk-button--outlinePrimary.is-disabled,
+.sk-button--outlineDanger.is-disabled,
+.sk-button--primary.is-disabled,
+.sk-button--danger.is-disabled {
+  --btn-bg: var(--dt_color_base_tertiary);
+  --btn-bg-pressed: var(--dt_color_base_tertiary);
+  --btn-border: transparent;
+}
+.sk-button.is-disabled {
+  background: var(--btn-bg);
+}
+
+/* --------------------------------------------------------------------------------------------- SKIconButton */
+.sk-icon-button {
+  --sk-bounce-scale: 0.9; /* Constants.bounceScale (SKIconButton.swift:28) */
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+  width: var(--ib-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+.sk-icon-button__circle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--ib-size);
+  height: var(--ib-size);
+  border-radius: 50%; /* half the side (:712-721) */
+}
+.sk-icon-button.has-backdrop .sk-icon-button__circle {
+  background: var(--ib-fill);
+  transition: background-color 0.4s var(--sk-spring-smooth);
+}
+.sk-icon-button.has-backdrop.is-pressed .sk-icon-button__circle,
+.sk-icon-button.has-backdrop.is-selected .sk-icon-button__circle {
+  background: var(--ib-fill-selected);
+  transition-duration: 0.2s;
+}
+/* withShadow: black 10 %, offset (0, 6), radius 7 (:650-661); withStroke: 1 pt outlineTertiary (:664-673) */
+.sk-icon-button__circle.has-shadow {
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.1);
+}
+.sk-icon-button__circle.has-stroke {
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+}
+.sk-icon-button__circle.has-shadow.has-stroke {
+  box-shadow:
+    inset 0 0 0 1px var(--dt_color_outline_tertiary),
+    0 6px 14px rgb(0 0 0 / 0.1);
+}
+/* useGlassEffect: UIGlassEffect(.clear) tinted with the circle color, a capsule; drawn with the app's glass values
+   (src/app/nav/nav.css) */
+.sk-icon-button.has-backdrop .sk-icon-button__circle.is-glass {
+  background: color-mix(in srgb, var(--ib-fill) 88%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  backdrop-filter: blur(14px) saturate(1.6);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-rim, rgb(0 0 0 / 0.06)),
+    inset 0 1px 0 var(--glass-highlight, rgb(255 255 255 / 0.9)),
+    var(--glass-shadow, 0 6px 24px rgb(0 0 0 / 0.1));
+}
+.sk-icon-button.has-backdrop.is-pressed .sk-icon-button__circle.is-glass,
+.sk-icon-button.has-backdrop.is-selected .sk-icon-button__circle.is-glass {
+  background: color-mix(in srgb, var(--ib-fill-selected) 88%, transparent);
+}
+.sk-icon-button__icon {
+  grid-area: 1 / 1;
+  color: var(--ib-icon);
+}
+.sk-icon-button__icon.is-selected-icon {
+  display: none;
+  color: var(--ib-icon-selected);
+}
+/* highlighted, selected or long-pressed: the selected icon and color (:260-262) */
+.sk-icon-button.is-pressed .sk-icon-button__icon:not(.is-selected-icon),
+.sk-icon-button.is-selected .sk-icon-button__icon:not(.is-selected-icon) {
+  display: none;
+}
+.sk-icon-button.is-pressed .sk-icon-button__icon.is-selected-icon,
+.sk-icon-button.is-selected .sk-icon-button__icon.is-selected-icon {
+  display: block;
+}
+/* no backdrop: alpha 0.75 while pressed, no bounce */
+.sk-icon-button.no-backdrop.is-pressed {
+  opacity: 0.75;
+}
+.sk-icon-button.is-disabled {
+  opacity: 0.35;
+}
+.sk-icon-button.is-processing .sk-icon-button__icon {
+  visibility: hidden;
+}
+.sk-icon-button__spinner {
+  grid-area: 1 / 1;
+}
+.sk-icon-button__pulse {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+  animation: sk-badge-pulse 1s ease-in alternate;
+}
+.sk-icon-button__title {
+  /* 8 pt below the circle, Lato 17 contentSecondary, centered, may overflow the circle's width (:25-26, :422-430) */
+  margin-top: 8px;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------------------------- SKPillButton */
+.sk-pill-button {
+  --sk-bounce-scale: 0.9; /* Constants.bounceScale (SKPillButton.swift:20) */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Constants.spacing (:19) */
+  flex: none;
+  box-sizing: border-box;
+  min-width: calc(20px + 24px);
+  margin: 0;
+  border: 0;
+  border-radius: 999px; /* height / 2 (:165-170) */
+  background: var(--pill-fill);
+  color: var(--dt_color_content_primary);
+  font: var(--sk-body);
+  white-space: nowrap;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+.sk-pill-button.sk-bounce {
+  transition:
+    transform 0.4s var(--sk-spring-smooth),
+    background-color 0.4s var(--sk-spring-smooth);
+}
+.sk-pill-button.is-pressed,
+.sk-pill-button.is-selected {
+  background: var(--pill-fill-selected);
+}
+.sk-pill-button.is-disabled {
+  opacity: 0.35;
+}
+.sk-pill-button__label {
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-pill-button__emoji,
+.sk-pill-button__icon {
+  flex: none;
+}
+.sk-pill-button__badge {
+  position: absolute;
+  top: -5px;
+  right: 5px;
+  transform: translateX(50%);
+  display: flex;
+  animation: sk-pill-badge-in 0.431s var(--sk-spring-bouncy);
+}
+@keyframes sk-pill-badge-in {
+  /* the badge appears from scale 0.5, alpha 0 with the bouncy/medium spring (PillButtonAnimationHelpers.swift:15-52) */
+  from {
+    opacity: 0;
+    transform: translateX(50%) scale(0.5);
+  }
+}

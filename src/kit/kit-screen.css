@@ -1,0 +1,9 @@
+/* KitScreen: a prototype's pushed screen. The body starts under the navigation bar (safe area + 44 pt bar) and ends
+   above the floating tab bar (21 pt from the bottom + 62 pt tall, measurements.md) plus 12 pt. */
+.kit-screen__body {
+  padding-top: calc(var(--navbar-bottom));
+  padding-bottom: calc(21px + 62px + 12px);
+}
+.kit-screen__body--no-tabbar {
+  padding-bottom: calc(var(--safe-bottom) + 12px);
+}

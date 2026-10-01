@@ -1,0 +1,223 @@
+/* Rich text (Slack mrkdwn) as SKLabel draws a message body: Modules/UIInfra/SlackKit/Implementation/Extensions/
+   Text+Display.swift and CoreComponents/Label/Layout/LayoutManager.swift. Every value is from
+   reference/ios/specs/messages.md §3 (which cites the Swift and the SKLabelSnapshotTests PNGs it was measured on).
+   Text takes its container's font and color; a message body is Lato 17 / 1.2 in content_primary (#1d1c1d / #f8f8f8,
+   MessageViewPresentationObjectFactory.swift:59 [Sept]; June sk_primary_foreground, dark #d1d2d3). */
+
+.rt {
+  /* word wrap, no line limit, no "Show more" on message bodies (SKLabel+PresentationObject.swift:34-46) */
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+/* paragraph spacing 0; blocks of one rich_text are a line break apart (Text+Display.swift:93-114, 1702-1711) */
+.rt-p {
+  margin: 0;
+}
+.rt-bold {
+  font-weight: 700;
+}
+.rt-italic {
+  font-style: italic;
+}
+/* ~strike~: one 1 pt line in the span's color (Text+Display.swift:1600-1609) */
+.rt-strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.rt-tab {
+  white-space: pre;
+}
+
+/* "  (edited)": Lato Regular 15 (.smallBody), content_tertiary, on the last line (TextMapper.swift:36-39 [Sept]; June
+   sk_foreground_high_solid #868686 / #75777a) */
+.rt-edited {
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_tertiary);
+  white-space: pre-wrap;
+}
+
+/* ------------------------------------------------------------------------------------------- inline code */
+/* Menlo base − 1 (16 at body 17), message_rendering_code #e01e5a / #e8912d, a surface_primary box with a 1 pt
+   outline_tertiary border and radius 3 around the glyph run at full line height, no horizontal padding
+   (Text+Display.swift:774-786, 1743-1749; LayoutManagerRoundedRectanglePlugin.swift:15-104; SKLegacyColors.swift:339).
+   Still message_rendering_code in Sept: Text+Display.swift:778 [Sept] tints it, and the Sept testCodeText@3x.png measures
+   (224,30,90) / (232,145,45). (TextAttributes.defaultCodeText's content_primary Menlo 13, TextAttributes+Display.swift:
+   13-17, is the flagged-off rich code block's, not inline code's.) The
+   1 px vertical padding brings Menlo's 18.6 px content box to the 20.4 px Lato line; raising it 1 px aligns the box
+   with the line (measured in testCodeText@3x.png). Wrapped fragments round only their outer corners (slice). */
+.rt-code {
+  font-family: Menlo, 'SF Mono', ui-monospace, monospace;
+  font-size: calc(1em - 1px);
+  font-weight: inherit;
+  font-style: inherit;
+  line-height: 1;
+  color: var(--sk_code);
+  background: var(--dt_color_surface_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  border-radius: 3px;
+  padding: 1px 0;
+  vertical-align: 1px;
+}
+
+/* ------------------------------------------------------------------------------------------- code blocks */
+/* ``` (legacy style; the rich style is flagged off, ios_rich_code_block_rendering.json:6-7): Menlo 16, a full-width box
+   filled message_rendering_code_block_fill with a 1 pt message_rendering_code_block_stroke border, radius 3
+   (Text+Display.swift:139-155, 1767-1774 [Sept]; LayoutManager.swift:163-174; SKLegacyColors.swift:342-343). The text is
+   always content_primary, whatever the surrounding text's color (an ephemeral or system message's content_secondary):
+   the block overrides it (Text+Display.swift:145-147 [Sept]; June sk_primary_foreground, dark #d1d2d3). Text
+   inset 10 left and right; each line is a paragraph with 2 pt before and after (lines 22.6 apart), except the spacing
+   before the message's first line and after its last (measured: testPreRenderedText 41.33 pt for two lines,
+   testPlainTextWithPreRenderedText 21 pt for "Hello" + one line). */
+.rt-pre {
+  font: 400 16px Menlo, 'SF Mono', ui-monospace, monospace;
+  line-height: normal;
+  color: var(--dt_color_content_primary);
+  background: var(--sk_code_block_fill);
+  box-shadow: inset 0 0 0 1px var(--sk_code_block_stroke);
+  border-radius: 3px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.rt-pre__line {
+  padding: 2px 10px;
+}
+.rt > .rt-pre:first-child > .rt-pre__line:first-child {
+  padding-top: 0;
+}
+.rt > .rt-pre:last-child > .rt-pre__line:last-child {
+  padding-bottom: 0;
+}
+
+/* ------------------------------------------------------------------------------------------------ quotes */
+/* > quote: body font and color, indent 15 left and right; a 4 pt bar, radius 2, outline_tertiary, from 2 pt below the
+   top of the first line to the bottom of the last (RichTextTheming.swift:28-37; LayoutManager.swift:110-128;
+   Text+Display.swift:312-328) */
+.rt-quote {
+  position: relative;
+  padding: 0 15px;
+}
+.rt-quote::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--dt_color_outline_tertiary);
+}
+
+/* ------------------------------------------------------------------------------------------------- lists */
+/* marker at 0, text and wrapped lines at 28 (tab stop), no spacing between items (RichTextTheming.swift:72-104;
+   Text+Display.swift:194-223, 1526-1562). The bullet is the presenceOnline glyph: a dot ≈ 7.5 pt at 17 pt, vertically centered
+   (slack-icons.otf; SKIcon.swift:104-105). */
+.rt-li {
+  position: relative;
+  padding-left: 28px;
+}
+.rt-li__marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.rt-list--bullet .rt-li__marker {
+  top: calc(0.6em - 0.2205em);
+  width: 0.441em;
+  height: 0.441em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ------------------------------------------------------------------------------------------------- links */
+/* content_highlight_1, no underline, no background; pressed: a radius-3 surface_primary rect (Text+Display.swift:750;
+   TextDrawingView.swift:21-31) */
+.rt-link {
+  color: var(--dt_color_content_highlight_1);
+  border-radius: 3px;
+}
+.rt-link.is-pressed {
+  background: var(--dt_color_surface_primary);
+}
+
+/* -------------------------------------------------------------------------------------- mentions & channels */
+/* The surrounding weight is kept; the background is the glyph run's rect at full line height (Lato's content box is
+   its 1.2 em line), no padding, radius 3 (Text+Display.swift:1776-1783; LayoutManager.swift:158; testMentionText). */
+.rt-mention {
+  color: var(--sk_mention_text); /* message_rendering_mention_text #0b4c8c / #1d9bd1 (SKLegacyColors.swift:338) */
+  background: var(--dt_color_surface_highlight_1);
+  border-radius: 3px;
+}
+/* @you, @here/@channel/@everyone, your user groups: #0b4c8c / content_highlight_3 on surface_highlight_3
+   (Text+HighlightColors.swift:13-23) */
+.rt-mention--me {
+  background: var(--dt_color_surface_highlight_3);
+}
+[data-appearance='dark'] .rt-mention--me {
+  color: var(--dt_color_content_highlight_3);
+}
+/* "[group unavailable]" (yaml:23074): content_secondary on surface_primary (Text+Display.swift:591-619 [Sept]; June
+   sk_foreground_max_solid) */
+.rt-mention--unavailable {
+  color: var(--dt_color_content_secondary);
+  background: var(--dt_color_surface_primary);
+}
+/* private channel: the lock at the font's ascender before the name */
+.rt-channel__icon {
+  display: inline-block !important;
+  width: 0.987em !important;
+  height: 0.987em !important;
+  vertical-align: -0.106em;
+}
+/* an unresolved mention: a surface_primary pill 40 % of the line tall, fully rounded (LayoutManager.swift:140-155) */
+.rt-mention-loading {
+  white-space: pre;
+  background: linear-gradient(var(--dt_color_surface_primary), var(--dt_color_surface_primary)) center / 100% 0.48em no-repeat;
+  border-radius: 0.24em;
+}
+
+/* -------------------------------------------------------------------------------------------------- emoji */
+/* Unicode emoji are glyphs of the text font: ink ≈ 0.94 em, advance ≈ 1.09 em, sitting on the baseline (measured in
+   testEmojiText / testNonJumboEmoji_onlyEmojis @3x: ink y from baseline − 0.835 em to + 0.105 em). Apple's images fill
+   their box (60 of 64 px for 😀), so the image is 1 em with 0.045 em side bearings. */
+.rt-emoji {
+  width: 1em !important;
+  height: 1em !important;
+  margin: 0 0.045em;
+  vertical-align: -0.137em;
+}
+/* custom emoji: a square as tall as the font's ascender, centered in the line (Attachment.swift:47-58;
+   TextViewAttachmentManager.swift:185) */
+.rt-emoji--custom {
+  width: 0.987em !important;
+  height: 0.987em !important;
+  margin: 0;
+  vertical-align: -0.106em;
+}
+/* Jumbomoji: the whole paragraph at font × 2.0 (34 at body 17, a 40.8 line) (TextBlock.swift:257-268; TextSpan.swift:646-655).
+   At that size the glyph advance is 1.0 em and the ink 0.91 em (measured, testJumboEmoji_onlyEmojis: 44 pt advance). */
+.rt--jumbo {
+  font-size: 2em;
+}
+.rt-emoji--jumbo {
+  width: 0.97em !important;
+  height: 0.97em !important;
+  margin: 0 0.015em;
+  vertical-align: -0.128em;
+}
+.rt-emoji--jumbo.rt-emoji--custom {
+  width: 0.987em !important;
+  height: 0.987em !important;
+  margin: 0;
+  vertical-align: -0.106em;
+}
+
+/* <!date…>: plain text in the body color (Text+Display.swift:788-795). #RRGGBB: "#HEX " then an SKColorSwatch
+   attachment as tall as the ascender, radius min(20, 0.25 × side), centered in the line (Text+Display.swift:797-817;
+   SKColorSwatch.swift:68-75; Attachment.swift:47-58) */
+.rt-color i {
+  display: inline-block;
+  width: 0.987em;
+  height: 0.987em;
+  border-radius: 0.247em;
+  vertical-align: -0.106em;
+}

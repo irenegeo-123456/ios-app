@@ -1,0 +1,95 @@
+/* A form sheet's navigation bar on iOS 26 (SheetBar.tsx): 60 pt, the glass controls 44 pt at 16 pt from the sheet's
+   sides and top (sheets-large-detent@2x.png). The glass over a sheet reads as UIKit's systemFill (ios.css --ios-fill:
+   rgba(120,120,128,.16) light, .3 dark, measured on the same render). */
+.sheet-bar {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60px;
+  pointer-events: none;
+}
+.sheet-bar > button {
+  pointer-events: auto;
+}
+/* iOS 26's soft scroll edge under the bar once content scrolls beneath it */
+.sheet-bar__edge {
+  position: absolute;
+  inset: 0 0 -16px;
+  background: linear-gradient(to bottom, var(--sk_primary_background) 55%, color-mix(in srgb, var(--sk_primary_background) 70%, transparent) 78%, transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.sheet-bar.is-scrolled .sheet-bar__edge {
+  opacity: 1;
+}
+.sheet-bar__glass {
+  position: absolute;
+  top: 16px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  border-radius: 22px;
+  background: var(--ios-fill);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  backdrop-filter: blur(14px) saturate(1.6);
+  color: var(--dt_color_content_primary);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet-bar__glass.is-pressed {
+  transform: scale(0.94);
+}
+.sheet-bar__close {
+  left: 16px;
+  width: 44px;
+  display: grid;
+  place-items: center;
+}
+.sheet-bar__title {
+  position: absolute;
+  /* room for a title button on either side ("Cancel": 16 + 87 + 9) */
+  left: 112px;
+  right: 112px;
+  top: 16px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+}
+.sheet-bar__title > * {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* a title bar button: a glass capsule, UIKit's 17 pt system font unless Slack sets Lato, its text 12 pt in from the
+   capsule's ends (Slack's June 2026 iOS 26 bar snapshots, SKBarButtonItemTests testSystemCancelButton / testSystemSaveButton /
+   testTitleButtons @3x: 11–12.3 pt; nav.css) */
+.sheet-bar__text {
+  min-width: 44px;
+  padding: 0 12px;
+  font: 400 17px/1 var(--sf);
+}
+.sheet-bar__text.is-leading {
+  left: 16px;
+}
+.sheet-bar__text.is-trailing {
+  right: 16px;
+}
+.sheet-bar__text.is-bold {
+  font: 700 17px/1 Lato;
+}
+.sheet-bar__text.is-regular {
+  font: 400 17px/1 Lato;
+}
+.sheet-bar__text:disabled {
+  color: var(--dt_color_content_tertiary);
+  opacity: 0.6;
+}
+.sheet-bar__text.has-disabled-color:disabled {
+  opacity: 1;
+}

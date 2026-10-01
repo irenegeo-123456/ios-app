@@ -1,0 +1,202 @@
+/* Reactors (spec sheets-menus.md §2.8). Background basePrimary (RX/ReactorsViewController.swift:111; September 2026,
+   June .sk_primary_background with the same values). The legacy colors below moved to CoreColorSet tokens in September.
+   Measured on testViewInEditMode@3x.png (re-recorded with the September colors): indicator y 57–60, x 20–186.3 of the
+   first of two tabs; header 50 pt from the tab border to the first row; avatars at x 16, y 120 and 176; names at x 64.3;
+   the add bar's top rule at 791.3–792.7 of 852 and its icon centered 34 pt from the left. */
+.rx {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--dt_color_base_primary);
+}
+
+/* ---- tabs: 60 tall, 10 pt menu insets, a 1 pt outlineTertiary border along the bottom (RX/ReactorsViewController.swift:
+   36, 271-276; June .sk_foreground_low_solid #dddddd / #323538) */
+.rx-tabs {
+  position: relative;
+  flex: none;
+  height: 60px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  box-shadow: inset 0 -1px 0 var(--dt_color_outline_tertiary);
+}
+.rx-tabs::-webkit-scrollbar {
+  display: none;
+}
+.rx-tabs__row {
+  position: relative;
+  display: flex;
+  min-width: 100%;
+  height: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.ios-app .rx-tab {
+  flex: 1 0 auto;
+  min-width: 60px;
+  border: 0;
+  background: none;
+  padding: 18px 12px;
+  display: grid;
+  place-items: center;
+}
+/* emoji 24 + 6 + the count in Lato 17, contentPrimary → highlight1.content when selected (June sk_primary_foreground →
+   sk_highlight); unselected content at 0.8 scale (RX/Views/ReactorsPagingCell.swift:18-38,54-61,102-110) */
+.rx-tab__content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: scale(0.8);
+  transition: transform 0.25s;
+}
+.rx-tab.is-selected .rx-tab__content {
+  transform: none;
+}
+.rx-tab__count {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  transition: color 0.25s;
+}
+.rx-tab.is-selected .rx-tab__count {
+  color: var(--dt_color_content_highlight_1);
+}
+/* 3 pt, highlight1.content (RX/ReactorsViewController.swift:37,264-268) */
+.rx-tabs__indicator {
+  position: absolute;
+  bottom: 0;
+  height: 3px;
+  background: var(--dt_color_content_highlight_1);
+  transition:
+    left 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+    width 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ---- pages */
+.rx-pager {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.rx-pager__track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.rx-page {
+  flex: none;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: calc(60px + var(--sheet-safe-bottom, var(--safe-bottom)));
+  box-sizing: border-box;
+}
+/* view only: no add bar to keep clear of */
+.rx.is-view-only .rx-page {
+  padding-bottom: var(--sheet-safe-bottom, var(--safe-bottom));
+}
+/* SKHeaderEntity .medium: 8 pt above, 12 / 16 margins, smallBodyBold contentPrimary; the button smallBodyBold
+   highlight1.content, truncated (SKHeaderEntity.swift:82-88,465-495) */
+.rx-header {
+  padding: 20px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 50px;
+  box-sizing: border-box;
+}
+.rx-header__title {
+  flex: none;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.ios-app .rx-header__button {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_highlight_1);
+}
+/* member rows .medium: 36 pt avatar, 12 pt to the name in bodyBold 17, 56 pt tall (SKMemberEntity.swift:145) */
+.rx-row {
+  position: relative;
+  min-height: 56px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rx-row__bg {
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+}
+.rx-row.is-pressed .rx-row__bg {
+  background: var(--dt_color_base_tertiary);
+}
+.rx-row > .sk-avatar {
+  position: relative;
+}
+.rx-row__name {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.rx-row__remove {
+  position: relative;
+}
+
+/* ---- "Add a reaction": 60 tall on the bottom safe area; a 1 pt outlineTertiary outline across the top with 16 pt
+   rounded top corners, filled basePrimary; the icon (20, contentPrimary) in a clear 36 pt box, the text in body 17
+   contentTertiary; pressed alpha 0.6 (RX/Views/ReactorsAddReactionContainerView.swift:12-30,59-91,
+   AddReactionControl.swift:16-18,23-50; September 2026 — June: sk_foreground_low, sk_primary_background,
+   sk_primary_foreground, sk_foreground_high_solid) */
+.ios-app .rx-add {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(60px + var(--sheet-safe-bottom, var(--safe-bottom)));
+  padding: 0 16px var(--sheet-safe-bottom, var(--safe-bottom));
+  border: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 1px 0 var(--dt_color_outline_tertiary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.ios-app .rx-add:active {
+  opacity: 0.6;
+}
+.rx-add__icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+.rx-add__text {
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+}

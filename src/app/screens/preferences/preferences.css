@@ -1,0 +1,70 @@
+/* Preferences and its screens (PreferencesRoot.tsx, PreferencePages.tsx cite each value; spec you-settings.md §5). */
+
+.pf-section__header {
+  /* sectionHeaderPinningBehavior .pinToTop: the header sticks to the top of the list's visible area, under the bar
+     (PreferencesPresenter.swift:67) */
+  position: sticky;
+  z-index: 2;
+  /* the list's top padding (the bar) already offsets the sticky area */
+  top: 0;
+  background: var(--dt_color_base_primary);
+}
+.pf-section__header .sk-header-entity {
+  background: var(--dt_color_base_primary);
+}
+/* the Billing plan name: .captionBold in contentSecondary (PreferencesPresenter.swift:719-733) */
+.pf-plan {
+  font: var(--sk-caption-bold);
+}
+
+/* ------------------------------------------------------------------------------------------- Color Mode */
+.pf-mode {
+  /* AppearanceOptionRow (:16-24, :98-144): 96 pt (72 + 2 × 12), 20 pt in on both sides, the 93 × 72 picture, 16 pt to
+     the text, 16 pt to the radio; basePrimary, baseTertiary while highlighted (:74-76, :116-118; slack-objc 14b3cbaf —
+     June used UIKit's systemBackground / systemGray5) */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 96px;
+  box-sizing: border-box;
+  padding: 12px 20px;
+  background: var(--dt_color_base_primary);
+  transition: background-color 0.2s;
+}
+.pf-mode.is-pressed {
+  background: var(--dt_color_base_tertiary);
+}
+.pf-mode__image {
+  flex: none;
+  display: block;
+}
+.pf-mode__text {
+  /* the label stack: spacing 2, vertically centered */
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pf-mode__title {
+  /* an unattributed Text: .body, contentPrimary (TextAttributes+Display.swift:21-53) */
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.pf-mode__subtitle {
+  /* .caption in UIKit's secondaryLabel (AppearancePresenter.swift:58) */
+  font: var(--sk-caption);
+  color: var(--ios-secondary-label);
+}
+.pf-mode__radio {
+  /* the radio only shows the state: isUserInteractionEnabled = false (:54) */
+  flex: none;
+  display: flex;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------------------------------- Swipe Actions */
+.pf-swipe__button {
+  /* the row's accessory: the .quickAction pull-down button; it takes its own taps (SwipeActionsSettingsPresenter.swift:28) */
+  display: flex;
+}

@@ -1,0 +1,78 @@
+/* Edit Profile (EditProfileSheet.tsx, EditPhotoSheet.tsx cite each value; spec you-settings.md §2). */
+
+/* the title view: an SKLabel in .bodyBlack, contentPrimary (EditProfileViewController.swift:89-91) */
+.ep-title {
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+}
+
+/* ------------------------------------------------------------------------------------------- the photo row */
+.ep-photo {
+  /* a centered stack, spacing 16, 16 pt above and below (EditProfilePhotoRow.swift:24-41, :82-107) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+}
+.ep-photo__image {
+  /* SKImageView 160 × 160, aspect fill, corner radius 6 (:29-32, :110-111, :180-186) */
+  width: 160px;
+  height: 160px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--dt_color_base_tertiary);
+}
+.ep-photo__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ep-photo__button {
+  /* the button is 160 wide, 40 tall (:25, :114) */
+  width: 160px;
+  display: flex;
+}
+.ep-photo__button > * {
+  flex: 1;
+}
+
+/* ------------------------------------------------------------------------------------------- the field rows */
+.ep-label {
+  /* the label row: an SKGenericEntity .small (10 / 16), .smallBodyBold in contentPrimary, 1 line
+     (EditProfilePresenter.swift:149-160, slack-objc 14b3cbaf; June sk_primary_foreground; SKEntityBaseView.swift:61-67) */
+  padding: 10px 16px;
+  font: var(--sk-small-body-bold);
+  line-height: 18px;
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ep-label__lock {
+  /* the lock glyph in contentPrimary, then a space (:153-156) */
+  vertical-align: -2px;
+  color: var(--dt_color_content_primary);
+}
+.ep-error {
+  /* the error row: svgInfo in sk_raspberry_red, a space, the message in .caption sk_raspberry_red, wrapping (still the
+     legacy color, :180-191) */
+  padding: 10px 16px;
+  font: var(--sk-caption);
+  color: var(--sk_raspberry_red);
+}
+.ep-error__icon {
+  vertical-align: -2px;
+}
+
+/* ---------------------------------------------------------------------------------- the photo options sheet */
+.ep-photo-sheet {
+  /* SKListBottomSheet on basePrimary (SKListBottomSheetViewController.swift:165; June sk_primary_background) */
+  padding-bottom: calc(var(--safe-bottom) + 8px);
+  background: var(--dt_color_base_primary);
+}
+.ep-remove {
+  /* "Remove photo" in sk_raspberry_red, still a legacy color (EditPhotoBottomSheet.swift:62-72, :99-108) */
+  color: var(--sk_raspberry_red);
+}

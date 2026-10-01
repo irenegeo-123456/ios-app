@@ -1,0 +1,1627 @@
+{
+  "about": "Slack iOS snapshot regression suite: npm run snapshots (tools/snapshots.mjs). Each entry renders a kit-gallery specimen or an app route at @3x and diffs it against Slack's snapshot PNG (paths relative to SLACK_IOS_LFS_DIR, default in tools/ios/paths.mjs: slack-objc-latest, main @ 14b3cbaf). Component PNGs are a 2 x 2 grid (light / dark rows, normal / high-contrast columns); crop 'light' / 'dark' is the normal-contrast column. maxDiff is the % of pixels allowed to differ, set just above the numbers of 2026-09-30; change one only with a reason (npm run snapshots -- --update rewrites them all).",
+  "entries": [
+    {
+      "id": "skbutton-outline-default",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/outlineDefault\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonOutlineDefaultEnabled@3x.png",
+      "crop": "light",
+      "note": "medium (smallBodyBold 15), 1 pt outline",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-outline-default-dark",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/outlineDefault\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonOutlineDefaultEnabled@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-primary",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/primary\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonPrimaryEnabled@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-danger",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/danger\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonDangerEnabled@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-outline-primary",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/outlinePrimary\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonOutlinePrimaryEnabled@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skbutton-xs",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/sizes\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonExtraSmall@3x.png",
+      "crop": "light",
+      "note": "microBold 12",
+      "maxDiff": 1.9
+    },
+    {
+      "id": "skbutton-s",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/sizes\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonSmall@3x.png",
+      "crop": "light",
+      "note": "captionBold 13",
+      "maxDiff": 1.7
+    },
+    {
+      "id": "skbutton-m",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/sizes\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonMedium@3x.png",
+      "crop": "light",
+      "note": "smallBodyBold 15",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-l",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/sizes\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonLarge@3x.png",
+      "crop": "light",
+      "note": "bodyBold 17",
+      "maxDiff": 1
+    },
+    {
+      "id": "skbutton-xl",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/sizes\"][data-appearance=light] > :nth-child(5)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonExtraLarge@3x.png",
+      "crop": "light",
+      "note": "title 22 (Lato Black)",
+      "maxDiff": 0.9
+    },
+    {
+      "id": "skbutton-primary-dark",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/primary\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonPrimaryEnabled@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.5,
+      "note": "highlight2.baseInverse: #177E56 in dark with design tokens f76ac0a"
+    },
+    {
+      "id": "skbutton-danger-dark",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/danger\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonDangerEnabled@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.5,
+      "note": "important.baseInverse: #D3305D in dark"
+    },
+    {
+      "id": "skbutton-outline-primary-dark",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/outlinePrimary\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonOutlinePrimaryEnabled@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skbutton-outline-danger",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/outlineDanger\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonOutlineDangerEnabled@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5,
+      "note": "important.outline border, important.content title #C01343"
+    },
+    {
+      "id": "skbutton-outline-danger-dark",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/outlineDanger\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonOutlineDangerEnabled@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skbutton-system-default",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/systemDefault\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonSystemDefaultEnabled@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-system-danger",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/systemDanger\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonSystemDangerEnabled@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5,
+      "note": "important.content since September 2026"
+    },
+    {
+      "id": "skbutton-system-danger-dark",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/systemDanger\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonSystemDangerEnabled@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-default",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/default\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonDefaultEnabled@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-icon-color",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/iconColor\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonIconColorOverride@3x.png",
+      "crop": "light",
+      "note": "September 2026: iconPresentationObject colorOverride",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-icon-color-custom",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/iconColor\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonIconColorOverrideTakesPriorityOverTitleColor@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skbutton-icon-color-custom-dark",
+      "route": "/?kit=components&only=SKButton",
+      "clip": "[data-specimen=\"SKButton/iconColor\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKButtonSnapshotTests/testButtonIconColorOverrideTakesPriorityOverTitleColor@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skpillbutton-text",
+      "route": "/?kit=components&only=SKPillButton",
+      "clip": "[data-specimen=\"SKPillButton/text\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKPillButtonSnapshotTests/testMediumButtonWithOnlyText@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skpillbutton-caption-small",
+      "route": "/?kit=components&only=SKPillButton",
+      "clip": "[data-specimen=\"SKPillButton/caption\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKPillButtonSnapshotTests/testSmallButtonWithShortCaptionText@3x.png",
+      "crop": "light",
+      "note": "September 2026: a text-only pill is as tall as its label (SKPillButton.swift:341-342)",
+      "maxDiff": 0.8
+    },
+    {
+      "id": "skpillbutton-caption-medium",
+      "route": "/?kit=components&only=SKPillButton",
+      "clip": "[data-specimen=\"SKPillButton/caption\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKPillButtonSnapshotTests/testMediumButtonWithShortCaptionText@3x.png",
+      "crop": "light",
+      "maxDiff": 0.7
+    },
+    {
+      "id": "skpillbutton-text-dark",
+      "route": "/?kit=components&only=SKPillButton",
+      "clip": "[data-specimen=\"SKPillButton/text\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKPillButtonSnapshotTests/testMediumButtonWithOnlyText@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skswitch-on",
+      "route": "/?kit=components&only=SKSwitch",
+      "clip": "[data-specimen=\"SKSwitch/states\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSwitchSnapshotTests/testIsOnandEnabledSwitch@3x.png",
+      "crop": "light",
+      "note": "iOS 26 UISwitch (SKSwitch wraps one since September 2026): 61 x 28 view, 63 x 28 track",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skswitch-on-dark",
+      "route": "/?kit=components&only=SKSwitch",
+      "clip": "[data-specimen=\"SKSwitch/states\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSwitchSnapshotTests/testIsOnandEnabledSwitch@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skswitch-off",
+      "route": "/?kit=components&only=SKSwitch",
+      "clip": "[data-specimen=\"SKSwitch/states\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSwitchSnapshotTests/testIsOffandEnabledSwitch@3x.png",
+      "crop": "light",
+      "note": "UIKit's off track #3C3C43 @30%",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skswitch-off-dark",
+      "route": "/?kit=components&only=SKSwitch",
+      "clip": "[data-specimen=\"SKSwitch/states\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSwitchSnapshotTests/testIsOffandEnabledSwitch@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skswitch-on-disabled",
+      "route": "/?kit=components&only=SKSwitch",
+      "clip": "[data-specimen=\"SKSwitch/states\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSwitchSnapshotTests/testIsOnandDisabledSwitch@3x.png",
+      "crop": "light",
+      "note": "the whole switch at Modifiers.disabledOpacity 0.35",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skswitch-off-disabled",
+      "route": "/?kit=components&only=SKSwitch",
+      "clip": "[data-specimen=\"SKSwitch/states\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSwitchSnapshotTests/testIsOffandDisabledSwitch@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "sknavtitle-title",
+      "route": "/?kit=components&only=SKNavigationTitle",
+      "clip": "[data-specimen=\"SKNavigationTitle/title\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKNavigationTitleSnapshotTests/testTitle@3x.png",
+      "crop": "light",
+      "note": "bodyBlack 17",
+      "maxDiff": 0.7
+    },
+    {
+      "id": "sknavtitle-title-dark",
+      "route": "/?kit=components&only=SKNavigationTitle",
+      "clip": "[data-specimen=\"SKNavigationTitle/title\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKNavigationTitleSnapshotTests/testTitle@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.7
+    },
+    {
+      "id": "sknavtitle-subtitle",
+      "route": "/?kit=components&only=SKNavigationTitle",
+      "clip": "[data-specimen=\"SKNavigationTitle/subtitle\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKNavigationTitleSnapshotTests/testSubtitle@3x.png",
+      "crop": "light",
+      "note": "bodyBlack 17 over smallBody 15",
+      "maxDiff": 2.1
+    },
+    {
+      "id": "sktextfield-default",
+      "route": "/?kit=components&only=SKTextField",
+      "clip": "[data-specimen=\"SKTextField/default\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTextFieldSnapshotTests/testTextFieldDefault@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "sksearchbar-empty",
+      "route": "/?kit=components&only=SKSearchBar",
+      "clip": "[data-specimen=\"SKSearchBar/empty\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSearchBarSnapshotTests/testEmptySearchBarWithOrnament@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "sksearchbar-empty-dark",
+      "route": "/?kit=components&only=SKSearchBar",
+      "clip": "[data-specimen=\"SKSearchBar/empty\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSearchBarSnapshotTests/testEmptySearchBarWithOrnament@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "sksearchbar-leading-ornament",
+      "route": "/?kit=components&only=SKSearchBar",
+      "clip": "[data-specimen=\"SKSearchBar/leadingOrnament\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSearchBarSnapshotTests/testSearchBarWithCustomLeadingOrnament@3x.png",
+      "crop": "light",
+      "note": "September 2026: leadingOrnament replaces the magnifier",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "sksearchbar-group-ornament",
+      "route": "/?kit=components&only=SKSearchBar",
+      "clip": "[data-specimen=\"SKSearchBar/leadingOrnament\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKSearchBarSnapshotTests/testSearchBarWithGroupAvatarLeadingOrnament@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "sktabbar-fit",
+      "route": "/?kit=components&only=SKTabBar",
+      "clip": "[data-specimen=\"SKTabBar/fitToBar\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTabBarSnapshotTests/testFitToBar@3x.png",
+      "crop": "light",
+      "note": "titles 15, underline",
+      "maxDiff": 3.2
+    },
+    {
+      "id": "sktabbar-small",
+      "route": "/?kit=components&only=SKTabBar",
+      "clip": "[data-specimen=\"SKTabBar/small\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTabBarSnapshotTests/testSmallContentFitAllContent@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "sktabbar-numbers",
+      "route": "/?kit=components&only=SKTabBar",
+      "clip": "[data-specimen=\"SKTabBar/numbers\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTabBarSnapshotTests/testNumbers@3x.png",
+      "crop": "light",
+      "maxDiff": 1.7
+    },
+    {
+      "id": "skgeneric-small",
+      "route": "/?kit=components&only=SKGenericEntity",
+      "clip": "[data-specimen=\"SKGenericEntity/small\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKGenericEntitySnapshotTests/testGenericEntitySmall@3x.png",
+      "crop": "light",
+      "note": "body 17",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skgeneric-small-secondary",
+      "route": "/?kit=components&only=SKGenericEntity",
+      "clip": "[data-specimen=\"SKGenericEntity/small\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKGenericEntitySnapshotTests/testGenericEntitySmallWithSecondaryText@3x.png",
+      "crop": "light",
+      "note": "body 17 over caption 13",
+      "maxDiff": 1.5
+    },
+    {
+      "id": "skgeneric-small-icon",
+      "route": "/?kit=components&only=SKGenericEntity",
+      "clip": "[data-specimen=\"SKGenericEntity/small\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKGenericEntitySnapshotTests/testGenericEntityWithIconSmall@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skgeneric-medium",
+      "route": "/?kit=components&only=SKGenericEntity",
+      "clip": "[data-specimen=\"SKGenericEntity/medium\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKGenericEntitySnapshotTests/testGenericEntityLarge@3x.png",
+      "crop": "light",
+      "maxDiff": 1.5
+    },
+    {
+      "id": "skgeneric-medium-dark",
+      "route": "/?kit=components&only=SKGenericEntity",
+      "clip": "[data-specimen=\"SKGenericEntity/medium\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKGenericEntitySnapshotTests/testGenericEntityLarge@3x.png",
+      "crop": "dark",
+      "maxDiff": 1.6
+    },
+    {
+      "id": "skmember-medium",
+      "route": "/?kit=components&only=SKMemberEntity",
+      "clip": "[data-specimen=\"SKMemberEntity/fixtures\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberEntitySnapshotTests/testMemberEntityMediumWithUserDataActive@3x.png",
+      "crop": "light",
+      "note": "with Slack's own fixture photo (steve_jobs.jpeg); the demo photo alone made this 5 % different",
+      "maxDiff": 0.7
+    },
+    {
+      "id": "skmember-medium-away",
+      "route": "/?kit=components&only=SKMemberEntity",
+      "clip": "[data-specimen=\"SKMemberEntity/fixtures\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberEntitySnapshotTests/testMemberEntityMediumWithUserDataInactive@3x.png",
+      "crop": "light",
+      "maxDiff": 0.8
+    },
+    {
+      "id": "skmember-medium-dark",
+      "route": "/?kit=components&only=SKMemberEntity",
+      "clip": "[data-specimen=\"SKMemberEntity/fixtures\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberEntitySnapshotTests/testMemberEntityMediumWithUserDataActive@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.8
+    },
+    {
+      "id": "skmember-small-secondary",
+      "route": "/?kit=components&only=SKMemberEntity",
+      "clip": "[data-specimen=\"SKMemberEntity/fixtures\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberEntitySnapshotTests/testMemberEntitySmallAlwaysVisibleSecondaryText@3x.png",
+      "crop": "light",
+      "note": "September 2026: secondaryTextVisibility .always at .small, one truncating line",
+      "maxDiff": 1.3
+    },
+    {
+      "id": "skmember-small-secondary-dark",
+      "route": "/?kit=components&only=SKMemberEntity",
+      "clip": "[data-specimen=\"SKMemberEntity/fixtures\"][data-appearance=dark] > :nth-child(3)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberEntitySnapshotTests/testMemberEntitySmallAlwaysVisibleSecondaryText@3x.png",
+      "crop": "dark",
+      "maxDiff": 1.4
+    },
+    {
+      "id": "skmember-small-secondary-deactivated",
+      "route": "/?kit=components&only=SKMemberEntity",
+      "clip": "[data-specimen=\"SKMemberEntity/fixtures\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberEntitySnapshotTests/testMemberEntitySmallAlwaysVisibleSecondaryTextDeactivated@3x.png",
+      "crop": "light",
+      "maxDiff": 1.3
+    },
+    {
+      "id": "skmember-small-secondary-deactivated-dark",
+      "route": "/?kit=components&only=SKMemberEntity",
+      "clip": "[data-specimen=\"SKMemberEntity/fixtures\"][data-appearance=dark] > :nth-child(4)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberEntitySnapshotTests/testMemberEntitySmallAlwaysVisibleSecondaryTextDeactivated@3x.png",
+      "crop": "dark",
+      "maxDiff": 1.4
+    },
+    {
+      "id": "skchannel-medium",
+      "route": "/?kit=components&only=SKChannelEntity",
+      "clip": "[data-specimen=\"SKChannelEntity/rows\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKChannelEntitySnapshotTests/testChannelEntityMediumWithSecondaryText@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skheader-medium",
+      "route": "/?kit=components&only=SKHeaderEntity",
+      "clip": "[data-specimen=\"SKHeaderEntity/tests\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKListHeaderSnapshotTests/testMediumShortTitle@3x.png",
+      "crop": "light",
+      "note": "smallBodyBold 15",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skheader-medium-secondary",
+      "route": "/?kit=components&only=SKHeaderEntity",
+      "clip": "[data-specimen=\"SKHeaderEntity/tests\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKListHeaderSnapshotTests/testMediumShortTitleWithShortSecondaryText@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skheader-small",
+      "route": "/?kit=components&only=SKHeaderEntity",
+      "clip": "[data-specimen=\"SKHeaderEntity/tests\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKListHeaderSnapshotTests/testSmallShortTitle@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skbanner-heading",
+      "route": "/?kit=components&only=SKBanner",
+      "clip": "[data-specimen=\"SKBanner/heading\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBannerSnapshotTests/testBannerRegularGenericWithHeading@3x.png",
+      "crop": "light",
+      "maxDiff": 1.9
+    },
+    {
+      "id": "skemptystate-full",
+      "route": "/?kit=components&only=SKEmptyState",
+      "clip": "[data-specimen=\"SKEmptyState/full\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKEmptyStateSnapshotTests/testEmptyStateFull@3x.png",
+      "crop": "light",
+      "note": "a full 393 x 852 screen",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skcheckbox-on",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOnandEnabledCheckbox@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6,
+      "note": "September 2026: the inner background is clear (the skcheckboxClearBackground flag is gone)"
+    },
+    {
+      "id": "skcheckbox-on-dark",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOnandEnabledCheckbox@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skcheckbox-off",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOffandEnabledCheckbox@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skcheckbox-off-dark",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOffandEnabledCheckbox@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skcheckbox-on-disabled",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOnandDisabledCheckbox@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skcheckbox-on-disabled-dark",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=dark] > :nth-child(3)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOnandDisabledCheckbox@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skcheckbox-off-disabled",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOffandDisabledCheckbox@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skcheckbox-off-disabled-dark",
+      "route": "/?kit=components&only=SKCheckbox",
+      "clip": "[data-specimen=\"SKCheckbox/states\"][data-appearance=dark] > :nth-child(4)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKCheckboxSnapshotTests/testIsOffandDisabledCheckbox@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-on",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOnAndEnabledRadioButton@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-on-dark",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOnAndEnabledRadioButton@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-off",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOffAndEnabledRadioButton@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-off-dark",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOffAndEnabledRadioButton@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-on-disabled",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOnAndDisabledRadioButton@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-on-disabled-dark",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=dark] > :nth-child(3)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOnAndDisabledRadioButton@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-off-disabled",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOffAndDisabledRadioButton@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skradio-off-disabled-dark",
+      "route": "/?kit=components&only=SKRadioButton",
+      "clip": "[data-specimen=\"SKRadioButton/states\"][data-appearance=dark] > :nth-child(4)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKRadioButtonSnapshotTests/testIsOffAndDisabledRadioButton@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skbadge-single",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/counts\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeSingleDigit@3x.png",
+      "crop": "light",
+      "maxDiff": 0.8
+    },
+    {
+      "id": "skbadge-single-dark",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/counts\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeSingleDigit@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.8,
+      "note": "important.baseInverse #D3305D in dark with design tokens f76ac0a"
+    },
+    {
+      "id": "skbadge-double",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/counts\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeDoubleDigit@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5,
+      "note": "22 with max 9 reads 9+"
+    },
+    {
+      "id": "skbadge-greater-max",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/counts\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeCountGreaterThanMaxBadgeCount@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skbadge-triple-icon",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/counts\"][data-appearance=light] > :nth-child(5)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeTripleDigitWithIcon@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skbadge-deemphasized",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/styles\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeSingleDigitDeemphasized@3x.png",
+      "crop": "light",
+      "maxDiff": 1
+    },
+    {
+      "id": "skbadge-text",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/styles\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeTextDefault@3x.png",
+      "crop": "light",
+      "maxDiff": 1
+    },
+    {
+      "id": "skbadge-text-dark",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/styles\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeTextDefault@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.9
+    },
+    {
+      "id": "skbadge-rounded",
+      "route": "/?kit=components&only=SKBadge",
+      "clip": "[data-specimen=\"SKBadge/styles\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKBadgeSnapshotTests/testBadgeRoundedRectangleShape@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skavatar-medium",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testMediumMemberAvatarMemberConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 2.6
+    },
+    {
+      "id": "skavatar-xl-active",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testExtraLargeMemberAvatarOnlinePresenceConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skavatar-xl-dnd-away",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testExtraLargeMemberAvatarOfflineDndPresenceConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skavatar-scg",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testLargeMemberAvatarSingleChannelGuestConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 2.6
+    },
+    {
+      "id": "skavatar-mcg",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(5)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testExtraLargeMemberAvatarMultiChannelGuestConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skavatar-external",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(6)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testExtraLargeMemberAvatarExternalWorkspaceConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 1.8
+    },
+    {
+      "id": "skavatar-concentric-active",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(7)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testSmallPlusMemberAvatarOnlinePresenceConcentricConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 1.7,
+      "note": "September 2026: a concentric avatar keeps its circle; presence centered on the edge (AvatarAnnotationGeometry.swift)"
+    },
+    {
+      "id": "skavatar-concentric-dnd-away",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(8)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testSmallPlusMemberAvatarOfflineDndPresenceConcentricConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 2.1
+    },
+    {
+      "id": "skavatar-concentric-slackbot",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(9)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testSmallPlusMemberAvatarSlackbotPresenceConcentricConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 1.5
+    },
+    {
+      "id": "skavatar-concentric-xl",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(10)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testExtraLargeMemberAvatarOnlinePresenceConcentricConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skavatar-slackbot",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(11)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testSlackbotAvatarConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 1.3
+    },
+    {
+      "id": "skavatar-deactivated",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=light] > :nth-child(12)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testDeactivatedMemberAvatarConfiguration@3x.png",
+      "crop": "light",
+      "maxDiff": 0.9
+    },
+    {
+      "id": "skavatar-concentric-active-dark",
+      "route": "/?kit=components&only=SKMemberAvatar",
+      "clip": "[data-specimen=\"SKMemberAvatar/fixtures\"][data-appearance=dark] > :nth-child(7)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKMemberAvatarSnapshotTests/testSmallPlusMemberAvatarOnlinePresenceConcentricConfiguration@3x.png",
+      "crop": "dark",
+      "maxDiff": 1.7
+    },
+    {
+      "id": "skws-standard",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarStandardExtraLarge@3x.png",
+      "crop": "light",
+      "maxDiff": 1.7
+    },
+    {
+      "id": "skws-mention-medium",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarMentionCountMedium@3x.png",
+      "crop": "light",
+      "maxDiff": 0.7
+    },
+    {
+      "id": "skws-mention-large",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarMentionCountLarge@3x.png",
+      "crop": "light",
+      "note": "most of the difference is the dark row's 9+ badge, which overflows its cell upward into the bottom of the light cell in Slack's 2 x 2 PNG",
+      "maxDiff": 6.7
+    },
+    {
+      "id": "skws-mention-xl",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarMentionCountExtraLarge@3x.png",
+      "crop": "light",
+      "maxDiff": 3.9
+    },
+    {
+      "id": "skws-unreads-jumbo",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(5)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarHasUnreadsJumbo@3x.png",
+      "crop": "light",
+      "maxDiff": 1.3
+    },
+    {
+      "id": "skws-pending-xl",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(6)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarPendingAuthenticationExtraLarge@3x.png",
+      "crop": "light",
+      "maxDiff": 1.8
+    },
+    {
+      "id": "skws-pending-medium",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(7)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarPendingAuthenticationMedium@3x.png",
+      "crop": "light",
+      "maxDiff": 1
+    },
+    {
+      "id": "skws-concentric-toolbar",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(8)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarHasUnreadsConcentricToolbarItem@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4,
+      "note": "September 2026: toolbarItem 32 pt, concentric, unreads dot on the edge with a 2.5 pt collar"
+    },
+    {
+      "id": "skws-concentric-xl",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(9)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarHasUnreadsConcentricExtraLarge@3x.png",
+      "crop": "light",
+      "maxDiff": 1.4
+    },
+    {
+      "id": "skws-gov-xl",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=light] > :nth-child(10)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarGovVariantExtraLarge@3x.png",
+      "crop": "light",
+      "maxDiff": 3
+    },
+    {
+      "id": "skws-concentric-toolbar-dark",
+      "route": "/?kit=components&only=SKWorkspaceAvatar",
+      "clip": "[data-specimen=\"SKWorkspaceAvatar/fixtures\"][data-appearance=dark] > :nth-child(8)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKWorkspaceAvatarSnapshotTests/testWorkspaceAvatarHasUnreadsConcentricToolbarItem@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skornament-group-verysmall",
+      "route": "/?kit=components&only=SKOrnamentBox",
+      "clip": "[data-specimen=\"SKOrnamentBox/groupAvatar\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKOrnamentBoxSnapshotTests/testOrnamentBoxGroupAvatarVerySmall@3x.png",
+      "crop": "light",
+      "note": "September 2026: the groupAvatar ornament, SKGroupAvatar's 20 pt count square",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skornament-group-small",
+      "route": "/?kit=components&only=SKOrnamentBox",
+      "clip": "[data-specimen=\"SKOrnamentBox/groupAvatar\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKOrnamentBoxSnapshotTests/testOrnamentBoxGroupAvatarSmall@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skornament-group-small-dark",
+      "route": "/?kit=components&only=SKOrnamentBox",
+      "clip": "[data-specimen=\"SKOrnamentBox/groupAvatar\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKOrnamentBoxSnapshotTests/testOrnamentBoxGroupAvatarSmall@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "reactors-edit",
+      "route": "/?chrome=screen",
+      "steps": [
+        "(() => {\n  const st = slack.app.getState(); const me = st.fx.me;\n  const users = { ...st.fx.users, [me]: { ...st.fx.users[me], realName: 'Jane Doe', name: 'Jane Doe', avatar: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', avatar2x: undefined, presence: 'away' }, UJOHNDOE: { id: 'UJOHNDOE', name: 'John Doe', realName: 'John Doe', avatar: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', presence: 'away' } };\n  const msg = { ts: '1540574177.000100', userId: 'UJOHNDOE', text: 'Hello', reactions: [ { name: 'slightly_smiling_face', users: [me, \"UJOHNDOE\"] }, { name: 'atlas', users: [me] } ] };\n  slack.app.setState((s) => ({ fx: { ...s.fx, users }, messages: { ...s.messages, C04GENERAL: [...(s.messages.C04GENERAL || []), msg] } }));\n})()",
+        "new Promise((r) => setTimeout(r, 900))",
+        "slack.app.getState().presentSheet('reactors', { conversationId: 'C04GENERAL', ts: '1540574177.000100', name: 'slightly_smiling_face' })",
+        "new Promise((r) => setTimeout(r, 900))",
+        "(() => { const s = document.createElement('style'); s.textContent = `\n  .ios-sheet-host[data-sheet=reactors] > .ios-sheet-dim { display: none }\n  .ios-sheet-host[data-sheet=reactors] > .ios-sheet { top: 0 !important; height: auto !important; border-radius: 0 !important; transform: none !important; transition: none !important; --sheet-safe-bottom: 0px !important; --safe-bottom: 0px }\n  .ios-sheet-host[data-sheet=reactors] .ios-sheet__content { padding-top: 0 !important }\n  .ios-sheet-host[data-sheet=reactors] .ios-sheet__grabber, .ios-statusbar, .ios-home-indicator, .ios-island { display: none !important }`;\n  document.head.appendChild(s) })()",
+        "new Promise((r) => setTimeout(r, 900))"
+      ],
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/Integration/Reactors/Snapshots/iOS_26/ReactorsServiceTests.ReactorsViewControllerViewTests/testViewInEditMode@3x.png",
+      "crop": "full",
+      "maxDiff": 0.5,
+      "note": "the reactors sheet's content stretched to the screen (Slack's test renders the view controller without sheet chrome, so the steps hide the grabber zone, status bar and island and drop the safe area): tabs, header, 56 pt rows with Remove on your own, the Add a reaction bar. The fixture's people get blank placeholder avatars; the custom emoji is :atlas: where Slack's has an unloaded placeholder"
+    },
+    {
+      "id": "reactors-view-only",
+      "route": "/?chrome=screen",
+      "steps": [
+        "(() => {\n  const st = slack.app.getState(); const me = st.fx.me;\n  const users = { ...st.fx.users, [me]: { ...st.fx.users[me], realName: 'Jane Doe', name: 'Jane Doe', avatar: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', avatar2x: undefined, presence: 'away' }, UJOHNDOE: { id: 'UJOHNDOE', name: 'John Doe', realName: 'John Doe', avatar: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', presence: 'away' } };\n  const msg = { ts: '1540574177.000100', userId: 'UJOHNDOE', text: 'Hello', reactions: [ { name: 'slightly_smiling_face', users: [me, \"UJOHNDOE\"] }, { name: 'atlas', users: [me] } ] };\n  slack.app.setState((s) => ({ fx: { ...s.fx, users }, messages: { ...s.messages, C04GENERAL: [...(s.messages.C04GENERAL || []), msg] } }));\n})()",
+        "new Promise((r) => setTimeout(r, 900))",
+        "slack.app.getState().presentSheet('reactors', { conversationId: 'C04GENERAL', ts: '1540574177.000100', name: 'slightly_smiling_face', viewOnly: true })",
+        "new Promise((r) => setTimeout(r, 900))",
+        "(() => { const s = document.createElement('style'); s.textContent = `\n  .ios-sheet-host[data-sheet=reactors] > .ios-sheet-dim { display: none }\n  .ios-sheet-host[data-sheet=reactors] > .ios-sheet { top: 0 !important; height: auto !important; border-radius: 0 !important; transform: none !important; transition: none !important; --sheet-safe-bottom: 0px !important; --safe-bottom: 0px }\n  .ios-sheet-host[data-sheet=reactors] .ios-sheet__content { padding-top: 0 !important }\n  .ios-sheet-host[data-sheet=reactors] .ios-sheet__grabber, .ios-statusbar, .ios-home-indicator, .ios-island { display: none !important }`;\n  document.head.appendChild(s) })()",
+        "new Promise((r) => setTimeout(r, 900))"
+      ],
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/Integration/Reactors/Snapshots/iOS_26/ReactorsServiceTests.ReactorsViewControllerViewTests/testViewInViewOnlyMode@3x.png",
+      "crop": "full",
+      "maxDiff": 0.5,
+      "note": "viewOnly: no Remove, no Add a reaction bar (ReactorsPageListModel.swift:66-98)"
+    },
+    {
+      "id": "reactors-view-only-not-reacted",
+      "route": "/?chrome=screen",
+      "steps": [
+        "(() => {\n  const st = slack.app.getState(); const me = st.fx.me;\n  const users = { ...st.fx.users, UJANEDOE: { id: 'UJANEDOE', realName: 'Jane Doe', name: 'Jane Doe', avatar: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', avatar2x: undefined, presence: 'away' }, UJOHNDOE: { id: 'UJOHNDOE', name: 'John Doe', realName: 'John Doe', avatar: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', presence: 'away' } };\n  const msg = { ts: '1540574177.000100', userId: 'UJOHNDOE', text: 'Hello', reactions: [ { name: 'slightly_smiling_face', users: [\"UJANEDOE\", \"UJOHNDOE\"] }, { name: 'atlas', users: ['UJANEDOE'] } ] };\n  slack.app.setState((s) => ({ fx: { ...s.fx, users }, messages: { ...s.messages, C04GENERAL: [...(s.messages.C04GENERAL || []), msg] } }));\n})()",
+        "new Promise((r) => setTimeout(r, 900))",
+        "slack.app.getState().presentSheet('reactors', { conversationId: 'C04GENERAL', ts: '1540574177.000100', name: 'slightly_smiling_face', viewOnly: true })",
+        "new Promise((r) => setTimeout(r, 900))",
+        "(() => { const s = document.createElement('style'); s.textContent = `\n  .ios-sheet-host[data-sheet=reactors] > .ios-sheet-dim { display: none }\n  .ios-sheet-host[data-sheet=reactors] > .ios-sheet { top: 0 !important; height: auto !important; border-radius: 0 !important; transform: none !important; transition: none !important; --sheet-safe-bottom: 0px !important; --safe-bottom: 0px }\n  .ios-sheet-host[data-sheet=reactors] .ios-sheet__content { padding-top: 0 !important }\n  .ios-sheet-host[data-sheet=reactors] .ios-sheet__grabber, .ios-statusbar, .ios-home-indicator, .ios-island { display: none !important }`;\n  document.head.appendChild(s) })()",
+        "new Promise((r) => setTimeout(r, 900))"
+      ],
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/Integration/Reactors/Snapshots/iOS_26/ReactorsServiceTests.ReactorsViewControllerViewTests/testReactWithEmojiButtonInViewOnlyMode@3x.png",
+      "crop": "full",
+      "maxDiff": 0.5,
+      "note": "viewOnly with you not among the reactors (no React with button in view-only)"
+    },
+    {
+      "id": "apps-searchview",
+      "route": "/?chrome=screen",
+      "steps": [
+        "(() => { const s = slack.app.getState(); const c = Object.values(s.fx.conversations).find((c) => c.type === 'channel'); s.push({ screen: 'conversation-apps', conversationId: c.id }) })()"
+      ],
+      "clip": ".capps__search",
+      "isolate": true,
+      "appearance": "light",
+      "png": "Modules/UIInfra/DeveloperComponents/Snapshots/iOS_26/DeveloperComponentsTests.SKSearchViewSnapshotTests/testSearchViewWithoutCancelAndWithSeparator@3x.png",
+      "crop": "light",
+      "maxDiff": 1.3,
+      "note": "SKSearchView (channels-people.md §8): the apps list search view; the 2 pt magnifier/placeholder offset is SKSearchBar's (SlackKit)"
+    },
+    {
+      "id": "browse-searchview",
+      "route": "/?chrome=screen",
+      "steps": [
+        "slack.app.getState().push({ screen: 'browse-channels' })"
+      ],
+      "clip": ".chb__search",
+      "isolate": true,
+      "appearance": "light",
+      "png": "Modules/UIInfra/DeveloperComponents/Snapshots/iOS_26/DeveloperComponentsTests.SKSearchViewSnapshotTests/testSearchViewWithoutCancelAndSeparator@3x.png",
+      "crop": "light",
+      "maxDiff": 1.3,
+      "note": "SKSearchView (channels-people.md §2.2): the channel browser search view; the 2 pt magnifier/placeholder offset is SKSearchBar's (SlackKit)"
+    },
+    {
+      "id": "apps-searchview-dark",
+      "route": "/?chrome=screen",
+      "steps": [
+        "(() => { const s = slack.app.getState(); const c = Object.values(s.fx.conversations).find((c) => c.type === 'channel'); s.push({ screen: 'conversation-apps', conversationId: c.id }) })()"
+      ],
+      "clip": ".capps__search",
+      "isolate": true,
+      "appearance": "dark",
+      "png": "Modules/UIInfra/DeveloperComponents/Snapshots/iOS_26/DeveloperComponentsTests.SKSearchViewSnapshotTests/testSearchViewWithoutCancelAndWithSeparator@3x.png",
+      "crop": "dark",
+      "maxDiff": 1.3,
+      "note": "SKSearchView (channels-people.md §8): the apps list search view; the 2 pt magnifier/placeholder offset is SKSearchBar's (SlackKit)"
+    },
+    {
+      "id": "browse-searchview-dark",
+      "route": "/?chrome=screen",
+      "steps": [
+        "slack.app.getState().push({ screen: 'browse-channels' })"
+      ],
+      "clip": ".chb__search",
+      "isolate": true,
+      "appearance": "dark",
+      "png": "Modules/UIInfra/DeveloperComponents/Snapshots/iOS_26/DeveloperComponentsTests.SKSearchViewSnapshotTests/testSearchViewWithoutCancelAndSeparator@3x.png",
+      "crop": "dark",
+      "maxDiff": 1.3,
+      "note": "SKSearchView (channels-people.md §2.2): the channel browser search view; the 2 pt magnifier/placeholder offset is SKSearchBar's (SlackKit)"
+    },
+    {
+      "id": "snackbar-one-line",
+      "route": "/?chrome=screen",
+      "steps": [
+        "document.querySelectorAll('.ios-home-indicator').forEach((x) => (x.style.display = 'none'))",
+        "(async () => { const u = performance.getEntriesByType('resource').map((e) => e.name).find((n) => n.includes('/src/app/ui/Toast.tsx')) ?? '/src/app/ui/Toast.tsx'; (await import(u)).showSnackbar('This is a Notification Test') })()",
+        "new Promise((r) => setTimeout(r, 500))"
+      ],
+      "clip": ".sk-snackbar",
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackUI/Snapshots/iOS_26/SlackUITests.SnackBarAlertViewTests/testNotifySnackBarView@3x.png",
+      "crop": [
+        0,
+        2288,
+        1179,
+        268
+      ],
+      "maxDiff": 1.0,
+      "note": "SnackBarAlertView (sheets-menus.md §5.4) via Toast.tsx showSnackbar; dev server only (imports the page's own Toast module); the home indicator is hidden (Slack's test window has none)"
+    },
+    {
+      "id": "snackbar-action",
+      "route": "/?chrome=screen",
+      "steps": [
+        "document.querySelectorAll('.ios-home-indicator').forEach((x) => (x.style.display = 'none'))",
+        "(async () => { const u = performance.getEntriesByType('resource').map((e) => e.name).find((n) => n.includes('/src/app/ui/Toast.tsx')) ?? '/src/app/ui/Toast.tsx'; (await import(u)).showSnackbar('Notification Test', { action: 'DO SOMETHING' }) })()",
+        "new Promise((r) => setTimeout(r, 500))"
+      ],
+      "clip": ".sk-snackbar",
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackUI/Snapshots/iOS_26/SlackUITests.SnackBarAlertViewTests/testNotifySnackBarViewWithAction@3x.png",
+      "crop": [
+        0,
+        2288,
+        1179,
+        268
+      ],
+      "maxDiff": 1.6
+    },
+    {
+      "id": "snackbar-multiline",
+      "route": "/?chrome=screen",
+      "steps": [
+        "document.querySelectorAll('.ios-home-indicator').forEach((x) => (x.style.display = 'none'))",
+        "(async () => { const u = performance.getEntriesByType('resource').map((e) => e.name).find((n) => n.includes('/src/app/ui/Toast.tsx')) ?? '/src/app/ui/Toast.tsx'; (await import(u)).showSnackbar('This\\nis\\na\\nmultiline\\nTest') })()",
+        "new Promise((r) => setTimeout(r, 500))"
+      ],
+      "clip": ".sk-snackbar",
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackUI/Snapshots/iOS_26/SlackUITests.SnackBarAlertViewTests/testNotifySnackBarViewMultiline@3x.png",
+      "crop": [
+        0,
+        2058,
+        1179,
+        498
+      ],
+      "maxDiff": 0.4
+    },
+    {
+      "id": "snackbar-offset",
+      "route": "/?chrome=screen",
+      "steps": [
+        "document.querySelectorAll('.ios-home-indicator').forEach((x) => (x.style.display = 'none'))",
+        "(async () => { const u = performance.getEntriesByType('resource').map((e) => e.name).find((n) => n.includes('/src/app/ui/Toast.tsx')) ?? '/src/app/ui/Toast.tsx'; (await import(u)).showSnackbar('Notification Test with offset', { offset: 100 }) })()",
+        "new Promise((r) => setTimeout(r, 500))"
+      ],
+      "clip": ".sk-snackbar",
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackUI/Snapshots/iOS_26/SlackUITests.SnackBarAlertViewTests/testNotifySnackbarWithOffset@3x.png",
+      "crop": [
+        0,
+        2090,
+        1179,
+        166
+      ],
+      "maxDiff": 1.5
+    },
+    {
+      "id": "sktoolbar-unselected",
+      "route": "/?kit=components&only=SKTextToolbar",
+      "clip": "[data-specimen=\"SKTextToolbar/fixtures\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTextToolbarSnapshotTests/testAllItemsUnselected@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "sktoolbar-selected",
+      "route": "/?kit=components&only=SKTextToolbar",
+      "clip": "[data-specimen=\"SKTextToolbar/fixtures\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTextToolbarSnapshotTests/testSelectedItem@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3,
+      "note": "September 2026: selected chrome = highlight1.surface circle, highlight1.content icon"
+    },
+    {
+      "id": "sktoolbar-emphasized",
+      "route": "/?kit=components&only=SKTextToolbar",
+      "clip": "[data-specimen=\"SKTextToolbar/fixtures\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTextToolbarSnapshotTests/testEmphasizedItemMatchesSelectedChrome@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "sktoolbar-disabled",
+      "route": "/?kit=components&only=SKTextToolbar",
+      "clip": "[data-specimen=\"SKTextToolbar/fixtures\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTextToolbarSnapshotTests/testDisabledItem@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "sktoolbar-selected-disabled",
+      "route": "/?kit=components&only=SKTextToolbar",
+      "clip": "[data-specimen=\"SKTextToolbar/fixtures\"][data-appearance=light] > :nth-child(5)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTextToolbarSnapshotTests/testSelectedAndDisabledItem@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "sktoolbar-selected-dark",
+      "route": "/?kit=components&only=SKTextToolbar",
+      "clip": "[data-specimen=\"SKTextToolbar/fixtures\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTextToolbarSnapshotTests/testSelectedItem@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "canvas-template-banner",
+      "route": "/?chrome=screen",
+      "steps": [
+        "(() => { const s = slack.app.getState(); slack.app.setState({ fx: { ...s.fx, canvases: { ...s.fx.canvases, F04LAUNCHPL: { ...s.fx.canvases.F04LAUNCHPL, isTemplate: true } } } }) })()",
+        "slack.app.getState().push({ screen: 'canvas', canvasId: 'F04LAUNCHPL' })",
+        "new Promise((r) => setTimeout(r, 1200))",
+        "(() => { const el = document.querySelector('.ios-screen .canvas__banner-text'); el.textContent = 'Template banner'; el.style.font = 'var(--sk-body)' })()"
+      ],
+      "clip": ".ios-screen .canvas__banner .sk-banner",
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/Features/Canvas/Snapshots/iOS_26/CanvasFeatureTests.CanvasViewControllerViewTests/test_view_with_templateBanner@3x.png",
+      "crop": [
+        48,
+        2338,
+        1083,
+        134
+      ],
+      "note": "the template floating banner (CanvasPresenter.swift:312-350; SKBanner .regular on indigo._50, white text, ✕). The test (CanvasViewControllerViewTests.swift:42-55) builds its own banner with Text(\"Template banner\") in SKBanner's default .body, so the step injects that text and font; production uses .smallBody",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "sktoken-workspace",
+      "route": "/?kit=components&only=SKTokenView",
+      "clip": "[data-specimen=\"SKTokenView/fixtures\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTokenViewSnapshotTests/testTokenResolvedWorkspaceOrnament@3x.png",
+      "crop": "light",
+      "note": "September 2026: the workspace ornament is a 24 pt SKWorkspaceAvatar",
+      "maxDiff": 2.3
+    },
+    {
+      "id": "sktoken-workspace-dark",
+      "route": "/?kit=components&only=SKTokenView",
+      "clip": "[data-specimen=\"SKTokenView/fixtures\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKTokenViewSnapshotTests/testTokenResolvedWorkspaceOrnament@3x.png",
+      "crop": "dark",
+      "maxDiff": 2.8
+    },
+    {
+      "id": "theme-preview-card",
+      "route": "/?chrome=screen",
+      "steps": [
+        "slack.theme.getState().setPreset('fallback')",
+        "slack.app.getState().presentSheet('theme-picker')",
+        "new Promise(r => setTimeout(r, 1200))"
+      ],
+      "clip": ".tp-card",
+      "isolate": true,
+      "device": "iphone-16",
+      "appearance": "light",
+      "png": "Modules/Features/ThemePicker/Snapshots/iOS_27/ThemePickerFeatureTests.ThemePreviewCardViewTests/testGeneralPreviewWithGradient@3x.png",
+      "crop": [
+        48,
+        48,
+        1083,
+        480
+      ],
+      "maxDiff": 2.5,
+      "note": "you-settings.md §5.4: the Themes preview card on ColorSet.defaultAubergine, against the iOS_27 baseline, which renders the avatars' UIGlassEffect capsules (iOS_26 draws them as an opaque fill; every other pixel is the same); the remaining diff is the fixture's content (workspace name \"Acme\", avatars)"
+    },
+    {
+      "id": "skthumb-alt-hidden",
+      "route": "/?kit=components&only=SKThumbnailAttachment",
+      "clip": "[data-specimen=\"SKThumbnailAttachment/fixtures\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKThumbnailAttachmentSnapshotTests/testAttachmentImageMediumAltTextBadgeHidden@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4,
+      "note": "September 2026: altTextBadgeVisibility, hidden by default"
+    },
+    {
+      "id": "skthumb-edit",
+      "route": "/?kit=components&only=SKThumbnailAttachment",
+      "clip": "[data-specimen=\"SKThumbnailAttachment/fixtures\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKThumbnailAttachmentSnapshotTests/testAttachmentImageMediumWithEditIcon@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4,
+      "note": "September 2026: EditIconBadge"
+    },
+    {
+      "id": "skthumb-edit-alt",
+      "route": "/?kit=components&only=SKThumbnailAttachment",
+      "clip": "[data-specimen=\"SKThumbnailAttachment/fixtures\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKThumbnailAttachmentSnapshotTests/testAttachmentImageMediumWithAltTextAndEditIcon@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skthumb-edit-reminder",
+      "route": "/?kit=components&only=SKThumbnailAttachment",
+      "clip": "[data-specimen=\"SKThumbnailAttachment/fixtures\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKThumbnailAttachmentSnapshotTests/testAttachmentImageMediumWithAltTextReminderAndEditIcon@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skthumb-alt",
+      "route": "/?kit=components&only=SKThumbnailAttachment",
+      "clip": "[data-specimen=\"SKThumbnailAttachment/fixtures\"][data-appearance=light] > :nth-child(5)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKThumbnailAttachmentSnapshotTests/testAttachmentImageMediumWithAltText@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4
+    },
+    {
+      "id": "skthumb-alt-reminder",
+      "route": "/?kit=components&only=SKThumbnailAttachment",
+      "clip": "[data-specimen=\"SKThumbnailAttachment/fixtures\"][data-appearance=light] > :nth-child(6)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKThumbnailAttachmentSnapshotTests/testAttachmentImageMediumWithAltTextReminder@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5
+    },
+    {
+      "id": "skexpanded-alt",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=light] > :nth-child(1)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithAltText@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skexpanded-alt-dark",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=dark] > :nth-child(1)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithAltText@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.7
+    },
+    {
+      "id": "skexpanded-alt-hidden",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=light] > :nth-child(2)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageAltTextBadgeHidden@3x.png",
+      "crop": "light",
+      "note": "September 2026: altTextBadgeVisibility .hidden",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skexpanded-alt-hidden-dark",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=dark] > :nth-child(2)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageAltTextBadgeHidden@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skexpanded-alt-reminder",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=light] > :nth-child(3)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithAltTextReminder@3x.png",
+      "crop": "light",
+      "note": "altTextBadgeVisibility .visibleAlways (June: allowAltTextReminder)",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skexpanded-alt-reminder-dark",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=dark] > :nth-child(3)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithAltTextReminder@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.7
+    },
+    {
+      "id": "skexpanded-clear",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=light] > :nth-child(4)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithClearBorderAndBackground@3x.png",
+      "crop": "light",
+      "note": "September 2026: borderColor / backgroundColor .clear",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skexpanded-clear-dark",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=dark] > :nth-child(4)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithClearBorderAndBackground@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skexpanded-square",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=light] > :nth-child(5)",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithSquareCorners@3x.png",
+      "crop": "light",
+      "note": "September 2026: cornerRadius .standard (12)",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skexpanded-square-dark",
+      "route": "/?kit=components&only=SKExpandedAttachment",
+      "clip": "[data-specimen=\"SKExpandedAttachment/fixtures\"][data-appearance=dark] > :nth-child(5)",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKExpandedAttachmentSnapshotTests/testAttachmentImageWithSquareCorners@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "skdot-default",
+      "route": "/?kit=components&only=SKDot",
+      "clip": "[data-specimen=\"SKDot/default\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKDotSnapshotTests/testDefaultColor@3x.png",
+      "crop": "light",
+      "note": "September 2026: new SKDot, 12 pt in 16",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skdot-default-dark",
+      "route": "/?kit=components&only=SKDot",
+      "clip": "[data-specimen=\"SKDot/default\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKDotSnapshotTests/testDefaultColor@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skdot-custom",
+      "route": "/?kit=components&only=SKDot",
+      "clip": "[data-specimen=\"SKDot/custom\"][data-appearance=light]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKDotSnapshotTests/testCustomColor@3x.png",
+      "crop": "light",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "skdot-custom-dark",
+      "route": "/?kit=components&only=SKDot",
+      "clip": "[data-specimen=\"SKDot/custom\"][data-appearance=dark]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/SlackKit/Snapshots/iOS_26/SlackKitTests.SKDotSnapshotTests/testCustomColor@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.3
+    },
+    {
+      "id": "bk-task-expanded",
+      "route": "/?kit=blocks&only=fx-task-expanded&surface=message",
+      "clip": ".ios-screen[data-appearance=light] [data-specimen=\"fx-task-expanded/message\"]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKTaskBlockSnapshotTests/testExpandedState_withDetailsAndOutput@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5,
+      "note": "Sept task card: no border, 8 pt padding, Lato 17 content_secondary title, 2 pt pipe (gallery fixture fx-task-expanded)"
+    },
+    {
+      "id": "bk-task-expanded-dark",
+      "route": "/?kit=blocks&only=fx-task-expanded&surface=message",
+      "clip": ".ios-screen[data-appearance=dark] [data-specimen=\"fx-task-expanded/message\"]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKTaskBlockSnapshotTests/testExpandedState_withDetailsAndOutput@3x.png",
+      "crop": "dark",
+      "maxDiff": 1.5
+    },
+    {
+      "id": "bk-task-collapsed",
+      "route": "/?kit=blocks&only=fx-task-collapsed&surface=message",
+      "clip": ".ios-screen[data-appearance=light] [data-specimen=\"fx-task-collapsed/message\"]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKTaskBlockSnapshotTests/testCollapsedState_complete@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5,
+      "note": "collapsed, caret_down, check_circle_filled content_secondary"
+    },
+    {
+      "id": "bk-plan-expanded",
+      "route": "/?kit=blocks&only=fx-plan-expanded&surface=message",
+      "clip": ".ios-screen[data-appearance=light] [data-specimen=\"fx-plan-expanded/message\"]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKPlanBlockSnapshotTests/testExpandedState_tasksWithOutput@3x.png",
+      "crop": "light",
+      "maxDiff": 0.6,
+      "note": "Sept plan: dot ornament for complete tasks, bold task titles; 216.67 pt with pixel-rounded labels"
+    },
+    {
+      "id": "bk-plan-expanded-dark",
+      "route": "/?kit=blocks&only=fx-plan-expanded&surface=message",
+      "clip": ".ios-screen[data-appearance=dark] [data-specimen=\"fx-plan-expanded/message\"]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKPlanBlockSnapshotTests/testExpandedState_tasksWithOutput@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.6
+    },
+    {
+      "id": "bk-plan-collapsed",
+      "route": "/?kit=blocks&only=fx-plan-collapsed&surface=message",
+      "clip": ".ios-screen[data-appearance=light] [data-specimen=\"fx-plan-collapsed/message\"]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKPlanBlockSnapshotTests/testCollapsedState_allComplete@3x.png",
+      "crop": "light",
+      "maxDiff": 0.4,
+      "note": "collapsed plan header"
+    },
+    {
+      "id": "bk-header",
+      "route": "/?kit=blocks&only=fx-header&surface=message",
+      "clip": ".ios-screen[data-appearance=light] [data-specimen=\"fx-header/message\"]",
+      "appearance": "light",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKHeaderBlockSnapshotTests/testHeaderBlock@3x.png",
+      "crop": "light",
+      "maxDiff": 0.5,
+      "note": "header with no level = level 2, Lato Black 22 (Sept); 12 pt top inset as in the test"
+    },
+    {
+      "id": "bk-header-dark",
+      "route": "/?kit=blocks&only=fx-header&surface=message",
+      "clip": ".ios-screen[data-appearance=dark] [data-specimen=\"fx-header/message\"]",
+      "appearance": "dark",
+      "png": "Modules/UIInfra/BlockKitComponents/Snapshots/iOS_26/BlockKitComponentsTests.BKHeaderBlockSnapshotTests/testHeaderBlock@3x.png",
+      "crop": "dark",
+      "maxDiff": 0.8
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+/* A huddle's card in a conversation (spec search-slackbot-huddles.md §3.10) with MKMessageView's anatomy
+   (messages.md §1.1-§1.4): insets 8 / 16 / 8, a 36 pt ornament 12 pt from the column at x 64, the header row 4 pt
+   apart, the body 4 pt under it, content items 8 pt apart. */
+
+.huddle-card {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--huddle-card-bg, transparent);
+}
+/* live: the whole row is base_highlight_2, pressed darkened 10 % (MKCoreMessageProperties.swift:112-163) */
+.huddle-card.is-live {
+  --huddle-card-bg: var(--dt_color_base_highlight_2);
+}
+.huddle-card.is-pressed {
+  --huddle-card-bg: var(--dt_color_base_tertiary);
+}
+.huddle-card.is-live.is-pressed {
+  --huddle-card-bg: rgb(from var(--dt_color_base_highlight_2) calc(r * 0.9) calc(g * 0.9) calc(b * 0.9));
+}
+/* the headphones in an SKOrnamentBox .large: 36 pt, radius 9, the icon 20 pt (MessageFormattingHuddleUtility.swift
+   avatar(for:); SKOrnamentBox.swift:478-484) */
+.huddle-card__ornament {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+}
+.huddle-card__column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.huddle-card__header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 20.67px;
+}
+.huddle-card__title {
+  /* the author line: Lato Black 17, content_primary (MKCoreMessageProperties.swift:184-191) */
+  font: var(--sk-body-black);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+  min-width: 0;
+}
+/* LIVE: text style, sk_true_white on highlight2.baseInverse; MISSED: important.content on important.base
+   (HuddleMessageTransformationPath.swift generateBadge; colors passed to SKBadge) */
+.huddle-card__badge.sk-badge {
+  flex: none;
+  font: var(--sk-micro-bold);
+}
+/* `.ios-app button { font: inherit; color: inherit }` (app.css) outranks SKButton's own font and color outside sheets */
+.huddle-card .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.huddle-card .sk-button.is-pressed,
+.huddle-card .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}
+.huddle-card__time {
+  /* micro 12, content_tertiary */
+  flex: none;
+  font: var(--sk-micro);
+  color: var(--dt_color_content_tertiary);
+}
+.huddle-card__body {
+  /* body 17 in contentSecondary (September 2026; June sk_foreground_max_solid): MessageFormattingHuddleUtility.swift:108-141,
+     HuddleMessageTransformationPath.swift:306 */
+  margin-top: 4px;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.huddle-card__body b {
+  font-weight: 700;
+}
+/* "Join huddle": SKButton .primary (.medium), the content column's width up to 398 (HuddleMessageEmbeddableViewController.swift:17) */
+.huddle-card__join {
+  margin-top: 8px;
+  max-width: 398px;
+}
+.huddle-card__join .sk-button {
+  width: 100%;
+}
+.huddle-card__footer {
+  margin-top: 8px;
+}
+.huddle-card__footer:empty {
+  display: none;
+}

@@ -1,0 +1,216 @@
+/* The conversation header menu (spec sheets-menus.md §6.2; slack-objc main @ 14b3cbaf). CTMV =
+   HM/MenuFeature/ConversationTabsMenuView.swift, TIV = ConversationTitleInfoView
+   (Modules/UIInfra/NavigationController/Implementation/ConversationNavigationTitleView.swift). Everything that morphs runs
+   on the smooth spring: --cm-speed is 0.4 s (medium), 0.2 s (fast) when the menu closes to open something, 0 while swiping. */
+
+/* iOS 26: the scrim is clear (black 50 % only before iOS 26); it takes the taps and swipes that close the menu
+   (CTMV:32-37,181-188,610-615,632-634) */
+.cm-scrim {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+
+/* the card: from the title pill (its frame, capsule corners and glass) to the top safe area, 8 pt from the sides, 20 pt
+   corners (CTMV:39-57,191-245,404-445,542-608): a non-interactive UIGlassEffect whose corners go from a capsule to a fixed
+   20 pt (:229-245,419-423). Liquid Glass has no values in Slack's source: the pill's own glass (nav.css) turns into the
+   larger surface UIKit's menus use (ios.css --ios-platter); while open, dark mode adds a 1 pt outlineTertiary border
+   (borderWidth 1 open, 0 closed; clear in light: :442,618-624). */
+.cm-card {
+  position: absolute;
+  overflow: hidden;
+  transform-origin: 50% 0;
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  backdrop-filter: blur(30px) saturate(1.8);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-rim),
+    var(--glass-shadow);
+  transition-property: left, top, width, height, border-radius, background-color, box-shadow, transform;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+.cm-scrim.is-open .cm-card {
+  background: var(--ios-platter);
+  box-shadow:
+    inset 0 0 0 1px var(--ios-platter-rim),
+    var(--ios-platter-shadow);
+}
+.ios-screen[data-appearance='dark'] .cm-scrim.is-open .cm-card {
+  box-shadow:
+    inset 0 0 0 1px var(--dt_color_outline_tertiary),
+    var(--ios-platter-shadow);
+}
+
+/* ---- the title: the pill's layout when collapsed, the expanded one when open (TIV:451-541) */
+.cm-head {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  transition-property: height, padding-right;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+/* the ornament slot: 36 (a page icon), 44 + 4 (a DM's avatar), 52 open (the close button) (TIV:461-468,939-970) */
+.cm-head__ornament {
+  position: relative;
+  flex: none;
+  align-self: stretch;
+  transition-property: width, margin-right;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+.cm-head__page {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+  transition-property: opacity, transform;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+/* the close button: centered in its slot, 8 pt from the top; ornaments swap at 0.5 scale (TIV:644-671,971-993) */
+.cm-head__close {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  margin-left: -20px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition-property: opacity, transform;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+.cm-scrim.is-open .cm-head__page {
+  opacity: 0;
+  transform: scale(0.5);
+}
+.cm-scrim.is-open .cm-head__close {
+  opacity: 1;
+  transform: none;
+}
+.cm-head__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* name: Lato Black 15 (.smallBodyBlack), contentPrimary, one line (ConversationHeaderPresentationObject.swift:301-306) */
+.cm-head__name {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font: var(--sk-small-body-black);
+  color: var(--dt_color_content_primary);
+}
+/* the "#" / lock before it appears when open: from 0.75, fading in (TIV:879-937) */
+.cm-head__prefix {
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.75);
+  transition-property: width, margin-right, opacity, transform;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+.cm-scrim.is-open .cm-head__prefix {
+  opacity: 1;
+  transform: none;
+}
+.cm-head__label {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* subtitle: Lato 13 (.caption), contentSecondary; the collapsed and expanded ones cross-fade in 0.1 s; a status emoji is
+   12 pt, 5 pt before the text (TIV:473-477,838-877) */
+.cm-head__subtitle {
+  display: grid;
+  min-width: 0;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.cm-head__sub {
+  grid-area: 1 / 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 0.1s;
+}
+.cm-head__sub.is-expanded,
+.cm-scrim.is-open .cm-head__sub.is-collapsed {
+  opacity: 0;
+}
+.cm-scrim.is-open .cm-head__sub.is-expanded {
+  opacity: 1;
+}
+.cm-head__sub-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cm-head__status {
+  flex: none;
+  display: block;
+}
+
+/* the "…" button: 8 pt from the top, 6 pt from the right, growing from 0.1 as it fades in (CTMV:39-51,386-489,606-628) */
+.cm-more {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  opacity: 0;
+  transform: scale(0.1);
+  transition-property: opacity, transform;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+.cm-scrim.is-open .cm-more {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- the list: fades in with the card; clear background; at most 70 % of the screen, then it scrolls (CTMV:54-57,440) */
+.cm-list {
+  overflow: hidden auto;
+  scrollbar-width: none;
+  opacity: 0;
+  transition-property: opacity, height;
+  transition-duration: var(--cm-speed, 400ms);
+  transition-timing-function: var(--sk-spring-smooth);
+}
+.cm-scrim.is-open .cm-list {
+  opacity: 1;
+}
+.cm-buttons {
+  display: flex;
+  gap: 8px;
+  padding: 4px 16px;
+}
+.cm-buttons > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.cm-blank {
+  height: 8px;
+}
+/* the current page: selected (the list's highlight, baseTertiary, stays on without the bounce) and .bodyBold
+   (ConversationTabsMenuPresenter.swift:141-166; SKListCollectionViewCell.swift:186-230) */
+.cm-row.is-current .sk-row__bg {
+  background: var(--dt_color_base_tertiary);
+}
+.cm-row.is-current .sk-row__title {
+  font: var(--sk-body-bold);
+}
+/* accessory text: .body, contentSecondary (SKEntityContentView.swift:62-63) */
+.cm-accessory {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}

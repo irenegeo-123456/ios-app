@@ -1,0 +1,389 @@
+/* iOS 26 system chrome as Slack configures it: Liquid Glass buttons and capsules, navigation bars and the floating tab
+   bar. UIKit draws the glass (not in Slack's source); sizes and colors here are measured on real iOS 26 Slack
+   screenshots (reference/ios/specs/measurements.md); Slack's own settings (fonts, tints) are cited from
+   shell-navigation.md. */
+
+/* ------------------------------------------------------------------------------------------------ bar region */
+/* iOS 26's UINavigationBar is 54 pt under the status bar, its 44 pt glass controls at the top of it: every screen with
+   a bar starts its content at --navbar-bottom (status bar 62 + 54 = 116 on the Pro and Pro Max). Measured on real
+   iOS 26 Slack screenshots (reference/device/IMG_2246…2250, iPhone 17 Pro Max: Home's header decoration ends at 116,
+   lists start there; glass buttons y 62–106) and in Slack's iOS 26 bar snapshots (162 px = 54 pt bars,
+   shell-navigation.md §3.2). Use `padding-top: var(--navbar-bottom)`, never `var(--safe-top) + 44px`. */
+.ios-screen {
+  --navbar-h: 54px;
+  --navbar-bottom: calc(var(--safe-top) + var(--navbar-h));
+}
+
+/* ---------------------------------------------------------------------------------------------------- glass */
+/* --glass-edge is the glass's rim (inset shadows), --glass-backdrop what it does to the content behind it. */
+.ios-screen {
+  --glass-fill: rgba(255, 255, 255, 0.78);
+  --glass-backdrop: blur(14px) saturate(1.6);
+  --glass-rim: rgba(0, 0, 0, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --glass-edge: inset 0 0 0 1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --glass-shadow: 0 6px 24px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --glass-pill: rgba(0, 0, 0, 0.07);
+  --glass-ink: var(--dt_color_content_primary);
+}
+.ios-screen[data-appearance='dark'] {
+  /* glass drawn elsewhere (banners, alerts, sheets, menus): a denser material */
+  --glass-fill: rgba(33, 36, 40, 0.86);
+  --glass-rim: rgba(122, 140, 168, 0.42);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-edge: inset 0 0 0 1px rgba(122, 140, 168, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  /* tab bar selected pill, measured (67,71,78) */
+  --glass-pill: rgba(67, 71, 78, 1);
+  /* UIKit's label color on the dark bars: (242,244,250) in the sRGB copies of the device screenshots (measurements.md D;
+     A's #f1f4f9 was read off the Display P3 original) */
+  --glass-ink: #f2f4fa;
+}
+/* The bars' glass in dark mode (navigation bars, the tab bar), measured on real iOS 26 Slack screenshots
+   (reference/device/IMG_2246–2250, sRGB): over the list background (25,28,32) it's (33,37,42), and content behind it
+   shows through (white text reads ≈ (85,91,105)): a ~76 % tint of (36,40,46) over lightly blurred content. Its rim fades
+   over 1 pt, (66,75,87) → (58,65,76) → (48,54,63) from the edge in: one color, (122,140,168), at 37 / 27 / 17 % over the
+   fill, drawn as three inset rings 1/3, 2/3 and 1 pt deep. */
+.ios-screen[data-appearance='dark'] :is(.ios-navbar, .ios-tabbar) {
+  --glass-fill: rgba(36, 40, 46, 0.76);
+  --glass-backdrop: blur(4px) saturate(1.3);
+  --glass-edge: inset 0 0 0 0.333px rgba(122, 140, 168, 0.137), inset 0 0 0 0.667px rgba(122, 140, 168, 0.12), inset 0 0 0 1px rgba(122, 140, 168, 0.17);
+  --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+.glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  backdrop-filter: var(--glass-backdrop);
+  box-shadow:
+    var(--glass-edge),
+    var(--glass-shadow);
+  color: var(--glass-ink);
+}
+/* Over the dark themed header the glass lifts the header's own color instead of whitening it (vibrancy): measured on
+   the aubergine header (67,19,72), its fill is the header × 1.22 (82,22,89) and its rim a saturated, lighter version of
+   it, (182,34,201) → (155,30,171) → (126,27,139) (IMG_2246, IMG_2249, IMG_2250): the header's hue at +14 % saturation and
+   +32 % lightness, 60 / 39 / 37 % per ring. Where the header is darker (its right side, (45,8,48)) the trailing capsule
+   still reads (71,14,72): modeled as 60 % of the header color over the backdrop brightened 1.55 (= × 1.22 where the
+   backdrop is the header color itself). The same physics in light mode (the header is dark there too). */
+.glass--on-dark {
+  --glass-fill: rgb(from var(--theme_backgroundGradient1) r g b / 0.6);
+  --glass-backdrop: blur(3px) brightness(1.55);
+  --glass-on-dark-rim: hsl(from var(--theme_backgroundGradient1) h calc(s + 14) calc(l + 32));
+  --glass-edge:
+    inset 0 0 0 0.333px rgb(from var(--glass-on-dark-rim) r g b / 0.605), inset 0 0 0 0.667px rgb(from var(--glass-on-dark-rim) r g b / 0.393),
+    inset 0 0 0 1px rgb(from var(--glass-on-dark-rim) r g b / 0.374);
+  --glass-shadow: 0 0 0 transparent;
+  --glass-ink: var(--theme_contentInversePrimary);
+  --glass-rim: rgba(255, 255, 255, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.12);
+}
+
+.glass-button {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 0;
+  border-radius: 22px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.glass-button.is-pressed,
+.glass-group__item.is-pressed {
+  transform: scale(0.94);
+}
+/* Adjacent bar items sharing one capsule (UIKit groups items no fixed space splits, SKNavigationItem.swift:364-366):
+   the capsule has no padding of its own and 8 pt between items; an icon or avatar item is a 44 pt slot, a title item
+   its text plus 12 pt a side (6 here + 6 on the text). Measured on Slack's June 2026 iOS 26 bar snapshots (the
+   September ones draw no glass), SKBarButtonItemTests @3x: testIconButtons (three icons in 16.0–163.0 pt, centers 52
+   apart), testTitleButtons and testSystemEditButton (titles 12.3 pt in from the capsule's edges, 32 apart),
+   testAllTogether ([spinner][Hello][user] from rightItems [user, title, spinner]); and on devices: two icons in 96 × 44
+   (measurements.md A), Home's [filter][avatar] at x 324.0–420.3 (D). */
+.glass-group {
+  height: 44px;
+  flex: none;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.glass-group__item {
+  height: 44px;
+  min-width: 44px;
+  border: 0;
+  background: none;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: inherit;
+  transition: transform 0.2s;
+}
+
+/* ------------------------------------------------------------------------------------------ navigation bar */
+.ios-navbar {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--navbar-bottom);
+  pointer-events: none;
+}
+.ios-navbar__edge {
+  /* iOS 26's soft scroll edge: content fades under the bar once it scrolls there */
+  position: absolute;
+  inset: 0 0 -16px;
+  background: linear-gradient(to bottom, var(--dt_color_base_primary) 55%, color-mix(in srgb, var(--dt_color_base_primary) 70%, transparent) 78%, transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.ios-navbar.is-scrolled .ios-navbar__edge {
+  opacity: 1;
+}
+.ios-navbar__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--safe-top);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  /* separate glass groups are 12 pt apart (UIKit; SKBarButtonItemTests iOS 26, measurements.md), and so are the title
+     capsules from them (reference/device/IMG_2246–2248: the back or workspace circle ends at 64, the title starts at 76) */
+  gap: 12px;
+}
+.ios-screen[data-device='iphone-17-pro-max'] .ios-navbar__bar {
+  padding: 0 20px;
+}
+.ios-navbar__bar > * {
+  pointer-events: auto;
+}
+.ios-navbar__leading,
+.ios-navbar__trailing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+}
+.ios-navbar__trailing {
+  margin-left: auto;
+}
+.ios-navbar__title {
+  position: absolute;
+  left: 76px;
+  right: 76px;
+  top: 0;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: auto;
+}
+.ios-navbar__title-text {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.ios-navbar__subtitle {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.glass-button--back {
+  color: var(--glass-ink);
+}
+/* The profile item with a status emoji (SKBarButtonAvatarItem.swift:24-28, 160-166): the 22 pt emoji and the 28 pt
+   (smallPlus) avatar 8 pt apart, Spacing.large (12) before, (36 − 28) / 2 = 4 after: 74 × 44. Without a status the
+   avatar sits in a 44 pt slot (a circle on its own). */
+.glass-button.is-status,
+.glass-group__item.is-status {
+  width: auto;
+  padding: 0 4px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.glass-button--back svg {
+  margin-left: -2px;
+}
+
+/* A tab root's bar: leading title in SKFont.title (Lato Black 22), theme.contentInversePrimary over the gradient */
+.ios-navbar__root-title {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  transition: opacity 0.1s linear;
+}
+.ios-navbar--root.is-on-dark .ios-navbar__root-title {
+  color: var(--theme_contentInversePrimary);
+}
+
+/* ---------------------------------------------------------------------------------------------- tab bar */
+.ios-tabbar {
+  position: absolute;
+  left: 21px;
+  right: 21px;
+  bottom: 21px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.ios-screen[data-device='iphone-se'] .ios-tabbar {
+  bottom: 8px;
+}
+.ios-tabbar > * {
+  pointer-events: auto;
+}
+.ios-tabbar__capsule {
+  position: relative;
+  flex: 1;
+  height: 62px;
+  border-radius: 31px;
+  display: flex;
+  padding: 0 8px;
+}
+.ios-tabbar__item {
+  position: relative;
+  flex: 1;
+  border: 0;
+  background: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--glass-ink);
+}
+.ios-tabbar__item.is-selected {
+  /* iOS 26: theme.baseInverseSecondaryNonSidebar (CompactRootTabBarController.swift:551) */
+  color: var(--theme_baseInverseSecondaryNonSidebar);
+}
+/* UIKit draws the selected tint with vibrancy on the dark glass: measured (240,195,255) for aubergine's #cfa1de
+   (reference/device/IMG_2246–2250), the tint plus ≈ (33,34,33) */
+.ios-screen[data-appearance='dark'] .ios-tabbar__item.is-selected {
+  color: rgb(from var(--theme_baseInverseSecondaryNonSidebar) calc(r + 33) calc(g + 34) calc(b + 33));
+}
+.ios-tabbar__pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: -3.65px;
+  right: -3.65px;
+  border-radius: 27px;
+  background: var(--glass-pill);
+}
+.ios-tabbar__icon {
+  position: relative;
+  margin-top: 11.5px;
+  height: 25px;
+}
+.ios-tabbar__badge {
+  /* "●" in the system font 9 pt, theme.baseInverseImportant, clear background (spec §1.4) */
+  position: absolute;
+  top: -5px;
+  right: -9px;
+  font: 9px/1 -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--theme_baseInverseImportant);
+}
+.ios-tabbar__label {
+  position: relative;
+  margin-top: 1px;
+  font: 700 11px/1.2 Lato;
+}
+.ios-tabbar__item.is-selected .ios-tabbar__label {
+  font-weight: 900;
+}
+.ios-tabbar__search {
+  position: relative;
+  flex: none;
+  width: 62px;
+  height: 62px;
+  border: 0;
+  border-radius: 31px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.ios-tabbar__search.is-selected {
+  color: var(--theme_baseInverseSecondaryNonSidebar);
+}
+.ios-tabbar__search.is-selected::before {
+  /* the 49 pt circle behind the selected Search glyph: the tint at searchTabSelectedBackgroundColor's alpha */
+  content: '';
+  position: absolute;
+  inset: 6.5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.065;
+}
+[data-appearance='dark'] .ios-tabbar__search.is-selected::before {
+  opacity: 0.125;
+}
+
+/* ------------------------------------------------------------------------------------------ compose FAB */
+.compose-fab {
+  /* SKIconButton .medium 56 pt, glass; centered on the Search button, 16 pt above the tab bar (spec home.md §10.1) */
+  position: absolute;
+  z-index: 39;
+  right: calc(21px + 31px - 28px);
+  bottom: calc(21px + 62px + 16px);
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 28px;
+  display: grid;
+  place-items: center;
+  background: var(--theme_fabBackground);
+  color: var(--theme_fabIcon);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s;
+}
+.compose-fab.is-pressed {
+  transform: scale(0.94);
+  filter: brightness(0.7);
+}
+
+/* ------------------------------------------------------------------------------------ root header gradient */
+/* The iOS 26 PrimaryNavigationHeader decoration behind a tab root's bar (shell-navigation.md §2.2): 0.5 × the list's
+   height, its bottom edge at the top of the content (put it first inside the list's .ios-scroll, which starts at
+   --navbar-bottom), a radial gradient from the bottom-leading corner (g1 inside 100 pt, g2 by 500 pt); it fades out
+   once the list has scrolled 32 pt (add .is-faded). */
+.root-header-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--navbar-bottom) - var(--screen-h) * 0.5);
+  height: calc(var(--screen-h) * 0.5);
+  background: radial-gradient(circle at 0% 100%, var(--theme_backgroundGradient1) 100px, var(--theme_backgroundGradient2) 500px);
+  transition: opacity 0.25s ease-out;
+  pointer-events: none;
+}
+.root-header-gradient.is-faded {
+  opacity: 0;
+}

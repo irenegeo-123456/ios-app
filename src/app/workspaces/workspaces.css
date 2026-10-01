@@ -1,0 +1,99 @@
+/* The workspace switcher drawer (shell-navigation.md §5.2-§5.5; values cited in WorkspacesDrawer.tsx). */
+
+.ws-switcher {
+  position: absolute;
+  inset: 0;
+}
+.ws-dim {
+  /* DoublePanelView .grey: black α 0.4 over the tab UI, alpha following the progress (DoublePanelView.swift:61-70) */
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity var(--ws-dur) var(--sk-spring-smooth);
+}
+.ios-overlay.is-open .ws-dim {
+  opacity: 1;
+}
+.ios-overlay.is-closing .ws-dim {
+  opacity: 0;
+}
+.ws-drawer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--ws-width);
+  display: flex;
+  flex-direction: column;
+  /* contentView: basePrimary, radius 30 continuous on the right corners, clipped (WorkspacesViewController.swift:210-232) */
+  background: var(--dt_color_base_primary);
+  border-radius: 0 30px 30px 0;
+  overflow: hidden;
+  /* view.layer shadow: black, offset (1, 2), opacity 0.12, radius 4 (:234-237) */
+  box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.12);
+  /* the leading edge slides −width → 0; a 0.3 s spring with damping 1, no overshoot (DoublePanelView.swift:168, 180-188) */
+  transform: translateX(calc(-100% - 12px));
+  transition: transform var(--ws-dur) var(--sk-spring-smooth);
+  touch-action: pan-y;
+}
+.ios-overlay.is-open .ws-drawer {
+  transform: none;
+}
+.ios-overlay.is-closing .ws-drawer {
+  transform: translateX(calc(-100% - 12px));
+}
+
+.ws-header {
+  /* HomeNavigationBar: a 32 pt row at safe top + 4 (at least 32 from the top), 16 pt sides, 8 pt below
+     (WorkspacesViewController.swift:85-101, HomeNavigationBar.swift:27-38, 139-173) */
+  flex: none;
+  padding: max(32px, calc(var(--safe-top) + 4px)) 16px 8px;
+  background: var(--dt_color_base_primary);
+}
+.ws-header__title {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  /* workspaces "Workspaces": Lato Black 22, contentPrimary (:88-98) */
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ws-list {
+  flex: 1;
+  min-height: 0;
+}
+.ws-separator {
+  /* 1 px outlineTertiary, full width (:109-114): one device pixel of layout, drawn on top of a 1 pt box
+     (src/styles/hairline.css) */
+  flex: none;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.ws-options {
+  /* not scrollable, 3 × 44 pt, its bottom at the safe-area bottom (:116-121, 264-268) */
+  flex: none;
+  padding-bottom: var(--safe-bottom);
+}
+.ws-avatar {
+  position: relative;
+  display: block;
+  width: 56px;
+  height: 56px;
+}
+.ws-avatar__ring {
+  /* .active: a 3 pt contentPrimary ring with a 3 pt gap, radius 14 + 6 = 20 (SKWorkspaceAvatar.swift:276-280, 614-644;
+     measured in testWorkspaceAvatarActiveLarge@3x.png) */
+  position: absolute;
+  inset: -6px;
+  border: 3px solid var(--dt_color_content_primary);
+  border-radius: 20px;
+  pointer-events: none;
+}
+.ws-more {
+  display: inline-flex;
+}

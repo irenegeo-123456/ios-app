@@ -1,0 +1,8 @@
+/* Settings section headers: SKHeaderEntity's title and secondary line are SKLabels with numberOfLines 0, so they wrap
+   (SKLabelPresentationObject.swift:51, SKHeaderEntity.swift:325-336). */
+.settings-header .sk-header-entity__title,
+.settings-header .sk-header-entity__secondary {
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+}

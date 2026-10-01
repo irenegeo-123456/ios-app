@@ -1,0 +1,109 @@
+/* Inviting people to the workspace (spec channels-people.md §5). */
+
+/* ---- "Invite people to join your team": an SKDialog in a legacy bottom sheet, basePrimary, the default margins 24 on
+   all sides (SKDialog.swift:255; +10 on top only with bottomsheetMigration, :326); the sheet adds its 16 pt grabber zone
+   above and the bottom safe area below (.contentHeight, sheets-menus.md §0.1) */
+.ivw {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+/* subtitleBold (Lato Bold 20), centered (ITW/InviteToWorkspacePresenter.swift:83-92) */
+.ivw__title {
+  font: var(--sk-subtitle-bold);
+  color: var(--dt_color_content_primary);
+  text-align: center;
+}
+/* full-width .large buttons: 16 pt between two buttons, 20 pt after anything else (SKDialog.swift:233-246,269-272) */
+.ivw__button {
+  margin-top: 16px;
+  width: 100%;
+}
+.ivw__button--first {
+  margin-top: 20px;
+}
+
+/* ---- Add by Email: a form sheet, basePrimary (IP/InvitePickerViewController.swift:155) */
+.ive {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+/* the plain navigation title, Lato Bold 17 (UINavigationBar+SlackStyles.swift:83-84) */
+.ive__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.ive__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 60px;
+}
+/* a one-pixel outlineTertiary rule under the field (IP/InvitePickerViewController.swift:155-176): one device pixel of
+   layout, the line an inset shadow (docs/conventions.md, "Hairlines") */
+.ive__rule {
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+
+/* ---- the confirmation, pushed into the same navigation controller */
+.ive--sent {
+  animation: ive-push 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes ive-push {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.ive-sent {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* the bar, then 16 pt (IC/InviteConfirmationViewController.swift:24, :101-103) */
+  padding-top: calc(60px + 16px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+/* a 60 pt circle, the fill at 15 %, the icon 19 pt in (22 pt) (IC/InviteConfirmationViewController.swift:18-26,112-127) */
+.ive-sent__status {
+  position: relative;
+  align-self: center;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+}
+.ive-sent__circle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--sk_lilypad_green);
+  opacity: 0.15;
+}
+.ive-sent__icon {
+  position: relative;
+}
+/* 16 pt, the title in .title (Lato Black 22), centered; 36 pt to the list (:20-25, :68-74) */
+.ive-sent__title {
+  margin: 16px 16px 36px;
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  text-align: center;
+}
+/* Done: 16 pt from the sides and above the bottom safe area (:23, :106-107) */
+.ive-sent__done {
+  flex: none;
+  padding: 0 16px calc(16px + var(--sheet-safe-bottom, var(--safe-bottom, 0px)));
+}
+.ive-sent__done > .sk-button {
+  width: 100%;
+}

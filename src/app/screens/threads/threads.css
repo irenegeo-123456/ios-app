@@ -1,0 +1,109 @@
+/* All threads (spec dms-activity.md §4). Messages are MKMessageViews (src/messagekit). */
+
+.threads__list {
+  position: relative;
+  /* list and view background base_primary */
+  background: var(--dt_color_base_primary);
+  padding-top: calc(var(--navbar-bottom));
+}
+/* the tab bar floats over the list (iOS 26): clear it */
+.threads__bottom-space {
+  height: calc(21px + 62px + 16px);
+}
+.threads__subtitle {
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_secondary);
+}
+
+/* SKHeaderEntity .medium: 8 extra + 12 / 16 / 12 / 16, the title (the caller's bodyBold 17) 4 pt above the subtitle
+   (smallBody 15 content_secondary) (SKHeaderEntity.swift:84-86, :300, :458-474) */
+.threads__header {
+  padding: calc(8px + 12px) 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: opacity 0.15s;
+}
+.threads__header.is-pressed {
+  opacity: 0.4;
+}
+.threads__header-title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.threads__header-subtitle {
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* icon spans in the name: the font's ascender, centered on the line (Attachment.swift:28-41) */
+.threads__name-icon {
+  display: inline-block !important;
+  width: 0.987em !important;
+  height: 0.987em !important;
+  vertical-align: -0.106em;
+  margin-right: 2px;
+}
+
+/* "N more replies": SKGenericEntity .medium indented with the message (left 64, right 16, 10 top and bottom), body 17
+   as a link in highlight1.content, 1 line (AllThreadsPresenter.swift:172-179) */
+.threads__more {
+  padding: 10px 16px 10px 64px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_highlight_1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.threads__more.is-pressed {
+  opacity: 0.6;
+}
+
+/* SKButtonEntity .wrapContent(indentedForMessageAlignment: true): 10 / 16 padding + 48 extra on the left, 8 pt apart,
+   center aligned (SKButtonEntity.swift:25, :143-158, :212-221) */
+.threads__buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 10px 64px;
+}
+
+/* the .emphasized section footer: 12 pt of base_secondary with 1 px outline_tertiary hairlines (SKListFooterView.swift:20,
+   :63-67) */
+.threads__band {
+  height: 12px;
+  background: var(--dt_color_base_secondary);
+  box-shadow:
+    inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary),
+    inset 0 calc(-1 * var(--hairline)) 0 var(--dt_color_outline_tertiary);
+}
+
+.threads__empty {
+  padding-top: 30px;
+}
+
+/* app.css's `.ios-app button { font: inherit; color: inherit }` outranks SKButton's own font and color outside sheets
+   (src/slackkit/buttons.css), so they're restated, as compose.css does */
+.threads .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.threads .sk-button.is-pressed,
+.threads .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}
+
+/* "Back to Top" (ElevatorPillViewController.swift:73-78): its leading edge 65 pt from the trailing edge, 16 pt above the
+   bottom of the safe area (the floating tab bar's top) */
+.threads__back-to-top.sk-pill-button {
+  position: absolute;
+  z-index: 39;
+  left: calc(100% - 65px);
+  bottom: calc(21px + 62px + 16px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}

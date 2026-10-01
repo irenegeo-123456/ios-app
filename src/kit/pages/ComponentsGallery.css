@@ -1,0 +1,194 @@
+/* Whole-pixel line heights keep every preview surface on the pixel grid, so screenshots of a specimen line up with
+   Slack's @3x snapshot PNGs. */
+.kit-components .kit-page__head h1 {
+  line-height: 34px;
+}
+.kit-components .kit-page__head p,
+.kit-components .kit-page__tools {
+  line-height: 22px;
+}
+.kit-components .kit-page__tools label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+}
+
+/* ?kit=components: the SlackKit gallery. Each specimen renders on two 393 pt preview surfaces (.ios-screen with
+   data-appearance light / dark, so tokens, type and theme resolve), side by side like the light-over-dark halves of
+   Slack's snapshot PNGs. */
+
+.kit-gallery {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.kit-gallery__toc {
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  padding-bottom: 24px;
+}
+.kit-gallery__toc h2 {
+  margin: 14px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sim-ink-2);
+}
+.kit-gallery__toc a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  padding: 1px 0;
+}
+.kit-gallery__toc a:hover {
+  color: var(--sim-accent);
+}
+.kit-gallery__filter {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  margin-bottom: 6px;
+}
+.kit-gallery__group {
+  margin: 8px 0 18px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sim-ink-2);
+}
+.kit-c {
+  margin: 0 0 56px;
+  scroll-margin-top: 16px;
+}
+.kit-c__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.kit-c__name {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 700;
+}
+.kit-c__swift {
+  font: 12px/16px ui-monospace, 'SF Mono', Menlo, monospace;
+  color: var(--sim-ink-2);
+}
+.kit-c__about {
+  margin: 0 0 14px;
+  max-width: 820px;
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--sim-ink-2);
+}
+.kit-code {
+  position: relative;
+  max-width: 820px;
+  margin: 0 0 16px;
+}
+.kit-code pre {
+  margin: 0;
+  padding: 10px 70px 10px 12px;
+  border-radius: 8px;
+  background: #1d1d1f;
+  color: #f5f5f7;
+  font: 12px/19px ui-monospace, 'SF Mono', Menlo, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.kit-code button {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font: 11px var(--sim-font);
+  color: #f5f5f7;
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  border-radius: 5px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.kit-code button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+.kit-variants {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.kit-variant {
+  display: grid;
+  grid-template-columns: 190px auto auto;
+  gap: 12px;
+  align-items: start;
+  justify-content: start;
+}
+.kit-variant__label {
+  padding-top: 4px;
+  font-size: 12.5px;
+  line-height: 18px;
+}
+.kit-variant__label small {
+  display: block;
+  margin-top: 2px;
+  font: 10.5px/14px ui-monospace, 'SF Mono', Menlo, monospace;
+  color: var(--sim-ink-2);
+  word-break: break-all;
+}
+/* The preview surfaces: an .ios-screen of 393 pt, height from its content (the app's .ios-screen is a fixed size). */
+.ios-screen.kit-surface {
+  width: 393px;
+  height: auto;
+  overflow: visible;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  display: flow-root;
+}
+.kit-page.is-dark .ios-screen.kit-surface {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.kit-surface__pad {
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.kit-surface__pad.is-fill {
+  padding: 16px 0;
+  display: block;
+}
+.kit-surface__pad.is-flush {
+  padding: 0;
+  display: block;
+}
+.kit-specimen {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  vertical-align: top;
+  max-width: 100%;
+}
+.kit-surface__pad.is-fill > .kit-specimen,
+.kit-surface__pad.is-flush > .kit-specimen {
+  display: block;
+  width: 100%;
+}
+.kit-gallery__empty {
+  color: var(--sim-ink-2);
+  font-size: 14px;
+}

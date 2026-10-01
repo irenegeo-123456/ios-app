@@ -1,0 +1,847 @@
+/* MessageKit (Modules/UIInfra/MessageKit): the message row, its content (text, files, unfurls, reactions), the thread
+   reply bar, dividers, the thread root and its toolbar. Values from reference/ios/specs/messages.md (§ numbers below),
+   which cite the Swift; colors are iOS tokens (--dt_color_*). Sept (slack-objc-latest @ 14b3cbaf): MessageKit and its
+   transformation layer no longer use legacy sk_* colors; every one became a CoreColorSet token (spec messages.md header).
+   Class names avoid the ones MKMessagePreview.css uses (mk-preview, mk-reacji-*, mk-compact, mk-expanded, mk-unfurl…). */
+
+/* ---------------------------------------------------------------------------------------------- row (§1.1) */
+.mk-message {
+  position: relative;
+  /* insets 8 top (4 when grouped) / 16 sides / 8 bottom (MKMessageView.swift:55-56, 121-127, 539-542) */
+  padding: 8px 16px;
+  /* background styles fill the whole row (MKCoreMessageProperties.swift:137-177); none = the list's */
+  background: var(--mk-row-bg, transparent);
+  /* body text: content_primary #1d1c1d / #f8f8f8 (MessageViewPresentationObjectFactory.swift:59 [Sept]; June
+     sk_primary_foreground, dark #d1d2d3); the device draws (248, 248, 248) (reference/device/IMG_2247) */
+  color: var(--dt_color_content_primary);
+  font: var(--sk-body);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.mk-message.is-grouped {
+  padding-top: 4px;
+}
+/* pressed: the full row, no inset, no radius, no bounce, no animation (SKEntityBackgroundView.swift:69-95; the
+   transcript turns bounce off, MessageTranscriptPresenter.swift:267-272); styled rows darken 10 % (:143-169) */
+.mk-message.is-pressed {
+  background: var(--mk-row-pressed, var(--dt_color_base_tertiary));
+}
+.mk-message--pinned,
+.mk-message--highlighted,
+.mk-message--broadcast {
+  --mk-row-bg: var(--dt_color_base_highlight_3);
+  --mk-row-pressed: rgb(from var(--dt_color_base_highlight_3) calc(r * 0.9) calc(g * 0.9) calc(b * 0.9));
+}
+.mk-message--savedForLater,
+.mk-message--slackbotResponse {
+  --mk-row-bg: var(--dt_color_base_highlight_1);
+  --mk-row-pressed: rgb(from var(--dt_color_base_highlight_1) calc(r * 0.9) calc(g * 0.9) calc(b * 0.9));
+}
+.mk-message--huddle {
+  --mk-row-bg: var(--dt_color_base_highlight_2);
+  --mk-row-pressed: rgb(from var(--dt_color_base_highlight_2) calc(r * 0.9) calc(g * 0.9) calc(b * 0.9));
+}
+.mk-message--ephemeral {
+  --mk-row-bg: var(--dt_color_base_secondary);
+  --mk-row-pressed: rgb(from var(--dt_color_base_secondary) calc(r * 0.9) calc(g * 0.9) calc(b * 0.9));
+}
+/* focused (jumped-to) row: surface_highlight_3 #ffc600@0.18 / #a07300@0.18 (SKEntityBackgroundView.swift:111-114 [Sept];
+   June sk_pale_yellow #f2c744@0.2) */
+.mk-message.is-focused {
+  background: var(--dt_color_surface_highlight_3);
+  transition: background-color 0.3s;
+}
+
+/* pre-header: 12.48 pt icon (caption line × 0.8) whose right edge meets the avatar's, 12 pt to a caption label, 8 pt
+   above the avatar row; without an icon the label starts at the text column (MKMessageView.swift:60, 209-241, 417-419;
+   MKPreHeaderHorizontalStack.swift:16-18, 103) */
+.mk-preheader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding-left: calc(36px - 12.48px);
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+}
+.mk-preheader.is-iconless {
+  padding-left: 48px;
+}
+.mk-preheader__icon {
+  flex: none;
+  width: 12.48px !important;
+  height: 12.48px !important;
+}
+.mk-preheader__text {
+  min-width: 0;
+}
+.mk-preheader b {
+  font-weight: 700;
+}
+
+.mk-message__main {
+  display: flex;
+  align-items: flex-start; /* avatar and column top-aligned (MKOuterHorizontalStack.swift:188-190) */
+  gap: 12px; /* avatar → column (MKOuterHorizontalStack.swift:219-221) */
+}
+.mk-message__main.is-centered {
+  align-items: center; /* avatar + one item and no header: centered (MKMessageView.swift:338-341) */
+}
+/* grouped rows keep the 64 pt text column: 36 + 12 of leading padding (MKMessageView.swift:209-224) */
+.mk-message.is-grouped .mk-message__main {
+  padding-left: 48px;
+}
+.mk-message__avatar {
+  flex: none;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: block;
+}
+/* pressed avatar: alpha 0.6 (MKTappableOrnamentView.swift:14, 40) */
+.mk-message__avatar.is-pressed {
+  opacity: 0.6;
+}
+.mk-message__column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* header row: name ·4· badge ·4· time, centered on each other (MKPrimaryContentStackView.swift:51-114;
+   MKMessageView.swift:372-389) */
+.mk-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+/* name: Lato Black 17 (.bodyBlack), content_primary, wraps (MKCoreMessageProperties.swift:220-227, 265-272) */
+.mk-header__name {
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.mk-header__name.is-pressed {
+  opacity: 0.6;
+}
+.mk-header__name .rt-emoji {
+  margin-left: 0.25em;
+}
+/* timestamp: Lato 12 (.micro), content_tertiary, 1 line (MKCoreMessageProperties.swift:249-255) */
+.mk-header__time {
+  flex: none;
+  font: var(--sk-micro);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+}
+/* APP / WORKFLOW badge: SKBadge, content_secondary on surface_primary (BadgeMapper.swift:22-70 [Sept]; June
+   sk_foreground_max_solid on sk_foreground_low_solid) */
+.mk-header__badge {
+  background: var(--dt_color_surface_primary);
+  color: var(--dt_color_content_secondary);
+}
+/* huddle LIVE / MISSED badges: white on highlight2.baseInverse (dark #177e56 since design-tokens f76ac0a), important
+   content on important base (HuddleMessageTransformationPath.swift:213-230 [Sept]) */
+.mk-header__badge--live {
+  background: var(--dt_color_base_inverse_highlight_2);
+  color: var(--dt_color_constants_white);
+}
+.mk-header__badge--missed {
+  background: var(--dt_color_base_important);
+  color: var(--dt_color_content_important);
+}
+
+/* broadcast "mustache": max 2 lines, 8 pt before the content; "Replied to a thread:" content_secondary, the parent
+   content_highlight_1 (BroadcastMessageMapper.swift:17-22 [Sept]; June sk_foreground_max_solid / sk_highlight) */
+.mk-mustache {
+  margin-bottom: 8px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.mk-mustache__parent {
+  font-weight: 700;
+  color: var(--dt_color_content_highlight_1);
+}
+/* "View newer replies": Lato 17, content_highlight_1, 1 line (MKMessageView.swift:301-308, 407-415) */
+.mk-newer-replies {
+  margin-top: 8px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_highlight_1);
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+/* ---------------------------------------------------------------------------------- content stack (§2) */
+/* 8 pt between rendered items (MKMessageContentView.swift:17, 294); 4 pt under the name when the message starts with a
+   file or unfurl instead of text (MKMessageView.swift:271-273) */
+.mk-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.mk-content.starts-with-attachment {
+  margin-top: 4px;
+}
+.mk-content:empty {
+  display: none;
+}
+/* message text: the first BlockKit block's 4 pt top inset (Utils.swift:24-53; RichTextBlock+BKContainerBlockConvertible.swift:38-41) */
+.mk-text {
+  padding-top: 4px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary); /* MessageViewPresentationObjectFactory.swift:59 [Sept] */
+}
+/* ephemeral, system and redacted bodies (join/leave, huddles): content_secondary #454447 / #b9babd
+   (DefaultTransformationPath.swift:892-896 [Sept]; June sk_foreground_max_solid) */
+.mk-text.is-muted {
+  color: var(--dt_color_content_secondary);
+}
+/* A message with blocks shows the blocks instead of its text (TextMapper.swift:172-195); until the Block Kit renderer
+   draws something the text stays as the fallback. */
+.mk-content:has(> .mk-blocks:not(:empty)) > .mk-text--fallback {
+  display: none;
+}
+.mk-blocks:empty {
+  display: none;
+}
+
+/* ------------------------------------------------------------------------------------- reactions (§6) */
+/* left-aligned, 8 pt between pills and rows (SKReacjiBar.swift:25-28) */
+.mk-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+/* pill: 30 tall (22 + 4 + 4), 8 side padding, capsule, 2 pt between items, surface_primary (SKReacjiPill.swift:36-56) */
+.mk-reactions .mk-reaction {
+  position: relative;
+  flex: none;
+  height: 30px;
+  max-width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--dt_color_surface_primary);
+  color: var(--dt_color_content_primary);
+  overflow: hidden;
+  /* press: scale 0.94, smooth spring, 0.2 s down / 0.4 s up, the color change in the same animation
+     (SKReacjiPill.swift:43, 330-340; UIView+BounceMode.swift:21-35); select border: spring 0.25 s (:292-306) */
+  transition:
+    transform 0.4s var(--sk-spring-smooth),
+    background-color 0.4s var(--sk-spring-smooth),
+    box-shadow 0.25s var(--sk-spring-snappy);
+}
+.mk-reactions .mk-reaction.is-pressed {
+  transform: scale(0.94);
+  background: var(--dt_color_surface_secondary);
+  transition-duration: 0.2s;
+}
+/* you reacted: surface_highlight_1, a 2 pt outline_highlight_1 border inside the bounds, content_highlight_1 count */
+.mk-reactions .mk-reaction.is-selected {
+  background: var(--dt_color_surface_highlight_1);
+  box-shadow: inset 0 0 0 2px var(--dt_color_outline_highlight_1);
+  color: var(--dt_color_content_highlight_1);
+}
+.mk-reactions .mk-reaction.is-selected.is-pressed {
+  background: rgb(from var(--dt_color_surface_highlight_1) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8) / calc(alpha * 0.8 + 0.2));
+}
+/* each emoji a 22 × 22 frame; native emoji are drawn with the system font fitted to the box (ink ≈ 17 × 19 measured in
+   testReacjiPill, i.e. a 19 pt image), custom emoji images fill it (SKReacjiPill.swift:37, 179; SKEmoji.swift:181-206) */
+.mk-reaction__emoji {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+.mk-reaction__emoji img {
+  width: 19px !important;
+  height: 19px !important;
+  display: block;
+}
+.mk-reaction__emoji.is-custom img {
+  width: 22px !important;
+  height: 22px !important;
+}
+/* count: Lato Bold 13, padding 0/2, min height 22, 1 line (SKReacjiPill.swift:39, 48, 196-207) */
+.mk-reaction__count {
+  position: relative;
+  flex: none;
+  padding: 0 2px;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--sk-caption-bold);
+  white-space: nowrap;
+}
+.mk-reaction__count.is-bumped {
+  animation: mk-count-in 0.431s var(--sk-spring-bouncy);
+}
+@keyframes mk-count-in {
+  from {
+    transform: translateY(calc(100% + 2.5px));
+    opacity: 0;
+  }
+}
+/* your new pill: alpha 0 → 1, scale 0.7 → 1, bouncy spring 0.431 s (ReacjiAnimationHelpers.swift:26, 46-97) */
+.mk-reactions .mk-reaction.is-new {
+  animation: mk-pill-in 0.431s var(--sk-spring-bouncy);
+}
+@keyframes mk-pill-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+.mk-reaction--add .mk-reaction__emoji {
+  color: var(--dt_color_content_primary);
+}
+/* the add pill fades in 0.3 s after 0.1 s the first time (ReacjiAnimationHelpers.swift:14-17, 33-43) */
+.mk-reactions .mk-reaction--add.is-new {
+  animation: mk-fade-in 0.3s ease-in-out 0.1s both;
+}
+@keyframes mk-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-reactions .mk-reaction,
+  .mk-reactions .mk-reaction.is-new,
+  .mk-reaction__count.is-bumped {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------------- thread reply bar (§7) */
+/* [pile] 8 [replies 8 time], vertically centered, 8 pt under the content (MKRepliesInfoView.swift:21-24, 92-136) */
+.mk-replies {
+  position: relative;
+  align-self: flex-start;
+  max-width: 100%;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.mk-replies.is-first {
+  margin-top: 0;
+}
+/* pressed: base_tertiary 4 pt beyond the bar on every side, radius 7 + 4 = 11; instant on, 0.15 s fade out
+   (MKRepliesInfoView.swift:26-31; ContainerControl.swift:27-38, 70-146) */
+.mk-replies::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 11px;
+  background: var(--dt_color_base_tertiary);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.mk-replies.is-pressed::before {
+  opacity: 1;
+  transition: none;
+}
+/* up to 5 avatars, 28 × 28, 7 apart, no overlap (MKRepliesInfoView.swift:154-164; SKAvatarPile.swift:112-119) */
+.mk-replies__pile {
+  position: relative;
+  flex: none;
+  display: flex;
+  gap: 7px;
+}
+.mk-replies__row {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--sk-small-body);
+}
+/* "3 replies": Lato 15, content_highlight_1 #1264a3 / #2ba5ce, never truncates (RepliesInfoMapper.swift:22 [Sept]; June
+   sk_highlight, dark #1d9bd1; the device draws #2ba4ce once its Display P3 PNG is converted to sRGB, IMG_2247); the
+   time: Lato 15, content_tertiary, truncates */
+.mk-replies__count {
+  flex: none;
+  color: var(--dt_color_content_highlight_1);
+  white-space: nowrap;
+}
+.mk-replies__time {
+  min-width: 0;
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------------------------ file attachments (§4) */
+/* items 8 pt apart both ways (SKAttachmentBar.swift:38-40) */
+.mk-files {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+/* a single image or video (SKExpandedAttachment): radius 15, 1 pt outline_tertiary border, base_secondary placeholder,
+   aspect fill; pressed alpha 0.6 (SKExpandedAttachment.swift:70-75, 88-97, 120-131, 236-238, 508-510) */
+.mk-image {
+  position: relative;
+  flex: none;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 15px;
+  overflow: hidden;
+  background: var(--dt_color_base_secondary);
+}
+.mk-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mk-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.mk-image.is-pressed,
+.mk-file.is-pressed {
+  opacity: 0.6;
+}
+/* file card (SKCompactAttachment): full width, 12 padding, radius 15, 1 pt outline_tertiary, base_primary; a 36 pt
+   file-type tile, 8 pt to Lato Bold 15 title / 2 / Lato 13 subtitle; max height 300 (SKCompactAttachment.swift:72-93, 578-633) */
+.mk-file {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 0;
+  border-radius: 15px;
+  overflow: hidden;
+  background: var(--dt_color_base_primary);
+  text-align: left;
+}
+.mk-file::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.mk-file__row {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  min-width: 0;
+}
+/* the file-type tile: 36 × 36, radius 9, the type's _50 color, a white ~20 pt glyph (AttachmentOrnament.swift:25, 103-110) */
+.mk-file__tile {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--dt_color_surface_primary);
+  color: var(--sk_true_white);
+}
+.mk-file__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mk-file__title {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mk-file__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* with a preview (a PDF's first page): a 1 px outline_tertiary divider, then the image full-bleed, as tall as the width ×
+   its height / width but at most 300 (maxAbsoluteHeight), aspect-fill centered (SKCompactAttachment.swift:79, 247-249,
+   341-350, 473-477, 644-646; testFileWithPreviewImage) */
+/* the divider, dividerHeight = UIUtilities.onePixel() (SKCompactAttachment.swift:80): Chrome widens sub-pixel borders and
+   boxes to 1 CSS px, so it's a 1 px line scaled to one device pixel at any DPR (src/styles/hairline.css) */
+.mk-file__divider {
+  flex: none;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  transform: scaleY(var(--hairline-scale));
+  transform-origin: 0 0;
+  background: var(--dt_color_outline_tertiary);
+}
+.mk-file__preview {
+  flex: none;
+  max-height: 300px;
+  overflow: hidden;
+}
+.mk-file__preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* several images: the media carousel. "N attachments" Lato 13 content_secondary (MediaCarouselEmbeddablePresenter.swift:79
+   [Sept]; June sk_foreground_max_solid), 6 pt, a 196 pt row of 260 (landscape) or 164 (portrait) wide items 8 apart that
+   bleeds 80 pt past the column edges (MediaCarouselEmbeddableViewController.swift:16-23, 91-110) */
+.mk-carousel {
+  align-self: stretch;
+  min-width: 0;
+}
+.mk-carousel__label {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  margin-bottom: 6px;
+}
+.mk-carousel__row {
+  display: flex;
+  gap: 8px;
+  height: 196px;
+  margin: 0 -80px;
+  padding: 0 80px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.mk-carousel__row::-webkit-scrollbar {
+  display: none;
+}
+.mk-carousel__row::after {
+  /* the trailing content inset (UICollectionView contentInset.right = 80) */
+  content: '';
+  flex: none;
+  width: 72px;
+}
+
+/* ----------------------------------------------------------------------------- unfurls and attachments (§5) */
+/* pretext: Lato 17 content_primary, 4 pt above the pipe (MKMessageUnfurlContent.swift:21-24, 61-83, 109-112) */
+.mk-attachment__pretext {
+  margin-bottom: 4px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+/* the pipe: a 4 pt bar, fully rounded, full height; content inset 4 top, 12 left, 4 bottom (SKPipeDecorator.swift:11-14,
+   57-97); the attachment's color, else outline_tertiary (UnfurlMapper.swift:626-632, 184 [Sept]; June sk_foreground_low_solid) */
+.mk-attachment__pipe {
+  position: relative;
+  padding: 4px 0 4px 12px;
+}
+.mk-attachment__pipe::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--mk-pipe, var(--dt_color_outline_tertiary));
+}
+/* the body: 4 pt between header, title, text, fields, image and footer (MKUnfurlView.swift:20-29, 82-189) */
+.mk-attachment__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+/* header: 16 pt icon (radius 4) · 4 · Lato Bold 17, 1 line; the author name content_primary, its subname and a
+   "Service | Author" line content_tertiary (MKUnfurlView.swift:187-195; UnfurlHeaderMapper.swift:129-132, 176-186 [Sept];
+   June sk_primary_foreground / sk_foreground_high_solid) */
+.mk-attachment__header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.mk-attachment__header.is-service-author {
+  color: var(--dt_color_content_tertiary);
+}
+.mk-attachment__header-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mk-attachment__subname {
+  font-weight: 400;
+  color: var(--dt_color_content_tertiary);
+}
+.mk-attachment__icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+}
+/* title: Lato Bold 17 content_primary, a link in content_highlight_1 when it has a URL (UnfurlTitleMapper.swift:27-39) */
+.mk-attachment__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: break-word;
+}
+.mk-attachment__title.is-link {
+  color: var(--dt_color_content_highlight_1);
+}
+/* text: like message text (content_primary [Sept]), folded at 14 lines with "Show more" (UnfurlMapper.swift:26, 806-813) */
+.mk-attachment__text {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.mk-attachment__text.is-folded .rt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--mk-fold, 14);
+  overflow: hidden;
+}
+.mk-attachment__body .mk-attachment__more {
+  align-self: flex-start;
+  font: var(--sk-body);
+  color: var(--dt_color_content_highlight_1);
+}
+/* fields: short ones pair in two equal columns 4 apart; title Lato Bold 17, value Lato 17, 4 between rows and between
+   title and value (MKFieldsView.swift:16-41, 279-283) */
+.mk-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.mk-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mk-field.is-long {
+  grid-column: 1 / -1;
+}
+.mk-field__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.mk-field__value {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+/* footer: 16 pt icon · 4 · Lato 13 content_secondary, wraps (MKUnfurlView.swift:238-246) */
+.mk-attachment__footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.mk-attachment__footer .mk-attachment__icon {
+  margin-top: calc((15.6px - 16px) / 2);
+}
+.mk-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* legacy attachments then link cards, 8 apart (MKMessageContentView.swift:18, 317-350) */
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------------------- ornament boxes */
+/* icon ornaments: a 36 pt SKOrnamentBox, radius 9 (SKOrnamentBox.swift:25, 532-538, 618-639) */
+.mk-ornament {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------------------------------------------------------------------------------- huddle join button */
+/* "Join huddle": full width SKButton .primary: highlight2.baseInverse #007a5a / #177e56, pressed darkened 20 %, white
+   Lato Bold 15, radius 12, padding 10/12 (HuddleMessageEmbeddablePresenter.swift:30; SKButton+Types.swift:166-167,
+   189-190 [Sept]; June sk_lilypad_green #007a5a in both appearances) */
+.mk-content .mk-join-huddle {
+  align-self: stretch;
+  max-width: 398px;
+  min-height: 38px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--dt_color_base_inverse_highlight_2);
+  color: var(--dt_color_constants_white);
+  font: var(--sk-small-body-bold);
+}
+.mk-content .mk-join-huddle.is-pressed {
+  background: rgb(from var(--dt_color_base_inverse_highlight_2) calc(r * 0.8) calc(g * 0.8) calc(b * 0.8));
+}
+
+/* ------------------------------------------------------------------------------------------ dividers (§8) */
+/* 5 pt · labels · 5 pt · 1 px line · 5 pt; labels inset 12 both sides, the line 12 on the left only
+   (MKDivider.swift:21-25, 96-146) */
+.mk-divider {
+  padding: 5px 0;
+  background: var(--dt_color_base_primary); /* the list's background (ListThemeOptions.swift:65-69 [Sept]) */
+}
+.mk-divider.is-bare {
+  padding: 0;
+}
+.mk-divider__labels {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+  margin-bottom: 5px;
+}
+/* date: Lato Black 17 content_primary, left (MKDivider.swift:209-218) */
+.mk-divider__date {
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+}
+/* "NEW": Lato Bold 13, content_important, right (MKDivider.swift:186-188, 220-230) */
+.mk-divider__new {
+  margin-left: auto;
+  font: var(--sk-caption-bold);
+  color: var(--dt_color_content_important);
+}
+/* one physical pixel, outline_important at the read marker, else outline_tertiary (MKDivider.swift:22, 241-249): a 1 px
+   line scaled to one device pixel, since Chrome paints boxes under 1 px a whole px tall (src/styles/hairline.css) */
+.mk-divider__line {
+  margin-left: 12px;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  transform: scaleY(var(--hairline-scale));
+  transform-origin: 0 0;
+  background: var(--dt_color_outline_tertiary);
+}
+.mk-divider.is-new .mk-divider__line {
+  background: var(--dt_color_outline_important);
+}
+
+/* ------------------------------------------------------------------------------------ thread root (§10.7) */
+/* 12 pt top/bottom, items 12 apart with 12 pt sides; 36 pt avatar at (12, 12), name block at x 60 (Lato Black 17, 4
+   lines) with the time under it (Lato 12 content_tertiary); body full width at x 12 (MKRootMessageView.swift:24-30, 106-169) */
+.mk-root {
+  position: relative;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--mk-row-bg, var(--dt_color_base_primary));
+  color: var(--dt_color_content_primary); /* the body: MessageViewPresentationObjectFactory.swift:59 [Sept] */
+  font: var(--sk-body);
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* pressed: base_secondary (MKRootMessageView.swift:92, 181 [Sept]) */
+.mk-root.is-pressed {
+  background: var(--mk-row-pressed, var(--dt_color_base_secondary));
+}
+/* focused: surface_highlight_3 (MKRootMessageView.swift:184-185 [Sept]; June sk_pale_yellow) */
+.mk-root.is-focused {
+  background: var(--dt_color_surface_highlight_3);
+}
+.mk-root__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0 12px;
+}
+.mk-root__names {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.mk-root__name {
+  align-self: flex-start;
+  font: var(--sk-body-black);
+  color: var(--dt_color_content_primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+.mk-root__name.is-pressed {
+  opacity: 0.6;
+}
+.mk-root__time {
+  font: var(--sk-micro);
+  color: var(--dt_color_content_tertiary);
+}
+.mk-root__content {
+  padding: 0 12px;
+}
+
+/* ------------------------------------------------------------------------ thread toolbar (§10.7 item 3) */
+/* MKMessageActionToolbar: title button left (12 pt padding), icon buttons right with an 8 pt trailing inset; medium
+   default-style SKButtons: Lato Bold 15 content_secondary, 20 pt icons, 38 / 40 tall (MKMessageActionToolbar.swift:79-190;
+   ThreadRootMessagePlugin.swift:314-399; SKButton+Types.swift:249-383) */
+.mk-toolbar {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+  background: var(--dt_color_base_primary);
+}
+.mk-toolbar .mk-toolbar__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_secondary);
+}
+.mk-toolbar .mk-toolbar__title:disabled {
+  opacity: 1;
+}
+.mk-toolbar__spacer {
+  flex: 1;
+}
+.mk-toolbar .mk-toolbar__button {
+  width: 44px;
+  height: 40px;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--mk-toolbar-tint, var(--dt_color_content_secondary));
+}
+/* default-style buttons don't bounce; pressed = the title color at 80 % (SKButton+Types.swift:236-243) */
+.mk-toolbar .mk-toolbar__button.is-pressed,
+.mk-toolbar .mk-toolbar__title.is-pressed {
+  opacity: 0.8;
+}

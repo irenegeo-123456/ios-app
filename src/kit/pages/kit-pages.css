@@ -1,0 +1,247 @@
+/* Kit pages (?kit=…): plain Mac-styled pages around the Slack components they show. */
+.kit-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 32px 40px 60px;
+  font-family: var(--sim-font);
+  color: var(--sim-ink);
+  background: #f5f5f7;
+  overflow: auto;
+  height: 100vh;
+}
+.kit-page.is-dark {
+  background: #1c1c1e;
+  color: #f5f5f7;
+}
+.kit-page__head h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+.kit-page__head p {
+  margin: 0 0 16px;
+  color: var(--sim-ink-2);
+}
+.kit-page__tools {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.kit-page__tools input[type='text'],
+.kit-page__tools input:not([type]) {
+  font: inherit;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  width: 280px;
+}
+.kit-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+.kit-icons__cell {
+  font: 11px var(--sim-font);
+  color: inherit;
+  background: rgba(127, 127, 127, 0.08);
+  border: 0;
+  border-radius: 10px;
+  padding: 14px 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.kit-icons__cell span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kit-icons__cell:hover {
+  background: rgba(10, 132, 255, 0.14);
+}
+.kit-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+.kit-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.12), 0 6px 20px -8px rgba(0, 0, 0, 0.2);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.kit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.14), 0 12px 30px -10px rgba(0, 0, 0, 0.3);
+}
+.kit-card__preview {
+  position: relative;
+  height: 300px;
+  background: #e9e9ee;
+  overflow: hidden;
+}
+.kit-card__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+/* A live preview: the prototype's screen at the card's width (the app scales the screen to fit its window), top part
+   shown, not interactive. */
+.kit-card__preview iframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 402 / 874;
+  border: 0;
+  pointer-events: none;
+}
+.kit-card__broken {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: #c4541d;
+}
+.kit-card__body {
+  padding: 14px 16px 16px;
+}
+.kit-card__title {
+  font-weight: 700;
+  font-size: 15px;
+}
+.kit-card__desc {
+  margin-top: 4px;
+  color: #444;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.kit-card__meta {
+  margin-top: 8px;
+  color: #888;
+  font-size: 12px;
+}
+.kit-card__problems {
+  margin-top: 8px;
+  color: #c4541d;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ?kit=assets */
+.kit-page__intro {
+  color: #616061;
+}
+.kit-segments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.kit-segments button {
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 16px;
+  padding: 5px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+.kit-segments button[aria-selected='true'] {
+  background: #1d1c1d;
+  border-color: #1d1c1d;
+  color: #fff;
+}
+.kit-assets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.kit-assets--rows {
+  grid-template-columns: 1fr;
+}
+.kit-asset {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  background: #fff;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  min-width: 0;
+}
+.kit-asset:hover {
+  border-color: #1264a3;
+}
+.kit-asset img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.kit-asset--persona img,
+.kit-asset--illustrated img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+.kit-asset--file-preview img,
+.kit-asset--thumbnail img {
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+}
+.kit-asset code {
+  font-size: 11px;
+  color: #616061;
+  word-break: break-all;
+}
+.kit-asset--row {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+}
+.kit-asset__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.kit-asset__initial {
+  width: 72px;
+  height: 72px;
+  flex: none;
+  border-radius: 14px;
+  background: #1d1c1d;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font: 700 30px Lato, sans-serif;
+}
+.kit-copied {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: #1d1c1d;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  max-width: 80vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,47 @@
+/* SKFont, Slack iOS's type ramp (Modules/Data/Font/Implementation/SKFont.swift; sizes and weights in
+   UIFont+LegacySupport.swift:20-227). Lines are Lato's natural 1.2 em (hhea metrics, see src/styles/fonts.css), which
+   is what a UILabel draws without a paragraph style. Components that set a line height say so. These are the
+   default Dynamic Type size ("Large"); iOS scales them up to the caps in the comments.
+
+   Use a class (<span className="sk-body-bold">) or the matching custom property (font: var(--sk-body-bold)). */
+
+.ios-screen {
+  --sk-headline: 900 28px/1.2 Lato; /* max 58 */
+  --sk-title: 900 22px/1.2 Lato; /* max 56 */
+  --sk-subtitle: 900 20px/1.2 Lato; /* max 55 */
+  --sk-subtitle-bold: 700 20px/1.2 Lato;
+  --sk-subtitle-regular: 400 20px/1.2 Lato;
+  --sk-body: 400 17px/1.2 Lato; /* max 53 */
+  --sk-body-bold: 700 17px/1.2 Lato;
+  --sk-body-black: 900 17px/1.2 Lato;
+  --sk-small-body: 400 15px/1.2 Lato; /* max 49 */
+  --sk-small-body-bold: 700 15px/1.2 Lato;
+  --sk-small-body-black: 900 15px/1.2 Lato;
+  --sk-caption: 400 13px/1.2 Lato; /* max 44 */
+  --sk-caption-bold: 700 13px/1.2 Lato;
+  --sk-caption-black: 900 13px/1.2 Lato;
+  --sk-micro: 400 12px/1.2 Lato; /* max 43 */
+  --sk-micro-bold: 700 12px/1.2 Lato;
+  /* SKFont.logging: 12 pt monospace (Menlo on iOS) */
+  --sk-logging: 400 12px/1.2 Menlo, 'SF Mono', ui-monospace, monospace;
+  /* iOS system font, for the few places Slack uses it (badges, some system controls) */
+  --sf: -apple-system, 'SF Pro Text', 'SF Pro', system-ui, sans-serif;
+}
+
+.sk-headline { font: var(--sk-headline); }
+.sk-title { font: var(--sk-title); }
+.sk-subtitle { font: var(--sk-subtitle); }
+.sk-subtitle-bold { font: var(--sk-subtitle-bold); }
+.sk-subtitle-regular { font: var(--sk-subtitle-regular); }
+.sk-body { font: var(--sk-body); }
+.sk-body-bold { font: var(--sk-body-bold); }
+.sk-body-black { font: var(--sk-body-black); }
+.sk-small-body { font: var(--sk-small-body); }
+.sk-small-body-bold { font: var(--sk-small-body-bold); }
+.sk-small-body-black { font: var(--sk-small-body-black); }
+.sk-caption { font: var(--sk-caption); }
+.sk-caption-bold { font: var(--sk-caption-bold); }
+.sk-caption-black { font: var(--sk-caption-black); }
+.sk-micro { font: var(--sk-micro); }
+.sk-micro-bold { font: var(--sk-micro-bold); }
+.sk-logging { font: var(--sk-logging); }

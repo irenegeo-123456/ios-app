@@ -1,0 +1,109 @@
+/* Message actions (spec sheets-menus.md §1). The sheet is basePrimary (MA/MessageActionsViewController.swift:56). */
+.ma-sheet {
+  background: var(--dt_color_base_primary);
+}
+/* the 8 pt blank header (SKList.swift:2076-2081, SKListFooterView.swift:19) */
+.ma-blank {
+  height: 8px;
+}
+
+/* ---- quick reactions: 48 pt row, 12 pt insets, 48 pt circles justified edge to edge (QR/QuickReactionsView.swift:24,
+   43-56, 118-129; EmojiGridViewVerticalFlowLayout.swift:127-142) */
+.ma-reactions {
+  height: 48px;
+  padding: 0 12px;
+  display: flex;
+  justify-content: space-between;
+}
+.ma-reaction {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: none;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.ma-reaction > * {
+  grid-area: 1 / 1;
+}
+.ma-reaction__circle {
+  /* ReactionAppearance.Default().backgroundColor = message_rendering_code_block_fill: #1d1c1d 4 % / #d1d2d3 13 %
+     (QR/Views/QuickReactionsBaseCell.swift:25, ReactionAppearance.swift:27, SKLegacyColors.swift:27-29,90,112,342) */
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--sk_code_block_fill);
+  transition:
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    background-color 0.4s;
+}
+/* pressed: outlineSecondary (September 2026; June sk_foreground_mid, #1d1c1d / #d1d2d3 at 30 %), the circle scales to
+   0.8 — spring damping 1.0, 0.2 s down, 0.4 s back (QR/Views/QuickReactionsBaseCell.swift:12-16,58-66) */
+.ma-reaction.is-pressed .ma-reaction__circle {
+  transform: scale(0.8);
+  background: var(--dt_color_outline_secondary);
+  transition-duration: 0.2s;
+}
+.ma-reaction .ios-emoji {
+  position: relative;
+}
+/* the add-reaction glyph: 24 pt, contentPrimary (September 2026; June sk_primary_foreground)
+   (QR/Views/QuickReactionsShowMoreCell.swift:21-29) */
+.ma-reaction__add {
+  position: relative;
+  color: var(--dt_color_content_primary);
+}
+
+/* ---- Reply · Forward · Save: SKButtonEntity .fillWidthEqually, 8 apart, padding 10 / 16 (MA/MessageActionsPresenter.swift:191-203) */
+.ma-buttons {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+}
+.ma-buttons > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- rows: S generic rows, contentPrimary; the delete row in important.content (MA/MessageActionsPresenter.swift:684-693) */
+.ma-sheet .sk-row {
+  --row-color: var(--dt_color_content_primary);
+}
+.ma-sheet .sk-row.ma-row--destructive {
+  --row-color: var(--dt_color_content_important);
+}
+.ma-sheet .sk-row__title {
+  white-space: normal;
+}
+
+/* ---- the More Actions header: SKHeaderEntity .medium with a 20 pt ellipsis ornament, the title in body 17
+   contentPrimary and a caret_down_full in contentTertiary turned −90° while collapsed; 12 + 20 + 12 = 44 pt
+   (MA/MessageActionsPresenter.swift:98-114, SKHeaderEntity.swift:82-88,707-728) */
+.ios-app .ma-more {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+.ma-more__title {
+  flex: 1;
+}
+.ma-more__caret {
+  color: var(--dt_color_content_tertiary);
+  transition: transform 0.25s;
+}
+.ma-more__caret.is-collapsed {
+  transform: rotate(-90deg);
+}
+.ma-more:active > * {
+  opacity: 0.5;
+}

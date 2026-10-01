@@ -1,0 +1,101 @@
+/* Edit Channel (EC/EditChannelViewController.swift): a .grouped UITableView on primary.baseSecondary, cells on
+   primary.basePrimary (EditChannelNameCell.swift:39, 87; EditChannelTopicCell.swift:34, 88; EditChannelDescriptionCell.swift:
+   36, 97) between primary.outlineTertiary separators; section headers Lato 14 primary.contentSecondary;
+   the name footer Lato 14 contentSecondary, 10 pt down, 15 pt in (sk_raspberry_red when invalid); name row 44 pt, topic
+   and description 200 pt with the text 10 / 15 pt in (EditChannelTopicCell.swift:70). Colors per September 2026
+   (EditChannelViewController.swift:58, 154-160, 309, 330; June used sk_foreground_min_solid / low_solid / max_solid). */
+.ec {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_secondary);
+}
+.ec__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 60px;
+  padding-bottom: calc(var(--kb-height, 0px) + var(--sheet-safe-bottom, var(--safe-bottom, 0px)));
+}
+/* UIKit's grouped section header: the label 16 pt in, sitting on the section's top separator */
+.ec-header {
+  padding: 22px 15px 7px;
+  font: 400 14px/17px Lato;
+  color: var(--dt_color_content_secondary);
+}
+.ec-cell {
+  box-sizing: border-box;
+  background: var(--dt_color_base_primary);
+  /* the grouped table's separators, one device pixel each (src/styles/hairline.css) */
+  box-shadow:
+    inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary),
+    inset 0 calc(-1 * var(--hairline)) 0 var(--dt_color_outline_tertiary);
+}
+.ec-cell--name {
+  height: 44px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* the "#" (or lock): contentTertiary (EditChannelNameCell.swift:26; June sk_foreground_high) */
+.ec-cell__hash {
+  flex: none;
+  display: flex;
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+}
+.ec-cell__input,
+.ec-cell__area {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  font: var(--sk-body);
+  /* contentPrimary (EditChannelNameCell.swift:40; June sk_primary_foreground) */
+  color: var(--dt_color_content_primary);
+  caret-color: var(--sk_highlight);
+}
+.ec-cell__input::placeholder,
+.ec-cell__area::placeholder {
+  color: var(--sk_foreground_high_solid);
+  opacity: 1;
+}
+/* SKIconButton close_filled, 20 pt, contentSecondary, 8 pt after the field (EditChannelNameCell.swift:52, 129-133; June
+   sk_foreground_max_solid) */
+.ec-cell__clear {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_secondary);
+}
+.ec-cell--text {
+  height: 200px;
+  padding: 10px 15px;
+  display: flex;
+}
+.ec-cell__area {
+  resize: none;
+  height: 100%;
+}
+.ec-footer {
+  padding: 10px 15px 0;
+  min-height: 45px;
+  box-sizing: border-box;
+  font: 400 14px/17px Lato;
+  color: var(--dt_color_content_secondary);
+}
+.ec-footer.is-error {
+  color: var(--sk_raspberry_red);
+}
+.ec__end {
+  height: 24px;
+}

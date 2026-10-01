@@ -1,0 +1,107 @@
+/* SKTokenView and SKTokenBar. Spec: slackkit-components.md › SKTokenView, SKTokenBar; SKTokenView.swift:54-60,
+   :160-300, :486-560. */
+
+.sk-token {
+  /* the tile is as tall as the text wrapper: Lato Bold 17 (20.67 on the pixel grid) + 6 + 6, or + 2 + 2 inline */
+  --tk-h: calc(20.6667px + 12px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* Spacing.medium; 4 inline */
+  flex: none;
+  max-width: 100%;
+  box-sizing: border-box;
+  height: var(--tk-h);
+  border-radius: 8px; /* Constants.largerCornerRadius */
+  overflow: hidden; /* masksToBounds */
+  background: var(--tk-bg);
+  color: var(--tk-text);
+  vertical-align: middle;
+}
+.sk-token.is-inline {
+  --tk-h: calc(20.6667px + 4px);
+  gap: 4px;
+}
+.sk-token.no-text {
+  height: auto;
+}
+.sk-token__ornament {
+  flex: none;
+  width: var(--tk-h);
+  height: var(--tk-h);
+  display: grid;
+  place-items: center;
+  background: var(--tk-ornament-bg);
+  overflow: hidden;
+}
+.sk-token__ornament.is-alone {
+  /* no text: the ornament's own size plus its insets (6, spinner 7; inline 2 / 3) */
+  width: auto;
+  height: auto;
+  padding: var(--tk-pad);
+}
+.sk-token__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.sk-token__text {
+  min-width: 0;
+  font: var(--sk-body-bold);
+  line-height: 20.6667px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sk-token__accessory {
+  flex: none;
+}
+.sk-token__dismiss {
+  /* .svgClose 20 pt in the icon color; a 44 × 44 tap target centered on it (:143-151) */
+  position: relative;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  cursor: default;
+}
+.sk-token__dismiss::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+
+/* ------------------------------------------------------------------------------------------------ SKTokenBar */
+.sk-token-bar {
+  position: relative;
+  width: 100%;
+}
+.sk-token-bar__rows {
+  /* 8 pt between tokens and between rows (SKTokenBar.swift:45-46) */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sk-token-bar__measure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
+}
+.sk-token-bar__placeholder {
+  /* SKFont.body in primary.contentTertiary since September 2026 (SKTokenBar.swift:178, :214; June sk_foreground_high_solid) */
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

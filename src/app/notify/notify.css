@@ -1,0 +1,92 @@
+/* iOS 26 notification banner (system UI: nothing here is in Slack's source). A glass platter 8 pt from the screen
+   edges, 38 pt communication avatar with the app icon badge, SF text: title semibold 15, body 15, "now" 13. */
+.ios-banner {
+  /* denser than the bars' glass: banners stay legible over the themed header */
+  --glass-fill: rgba(250, 250, 252, 0.9);
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  z-index: 950;
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px 13px;
+  border-radius: 24px;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  letter-spacing: -0.2px;
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  backdrop-filter: blur(24px) saturate(1.8);
+  transform: translateY(calc(-100% - 80px));
+  transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.05);
+  touch-action: none;
+  cursor: default;
+  user-select: none;
+}
+.ios-screen[data-appearance='dark'] .ios-banner {
+  --glass-fill: rgba(34, 34, 38, 0.9);
+}
+.ios-banner.is-visible {
+  transform: translateY(0);
+}
+.ios-banner__icon {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  align-self: center;
+}
+.ios-banner__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.ios-banner__app {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+}
+.ios-banner__badge {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1.5px var(--glass-fill);
+}
+.ios-banner__text {
+  min-width: 0;
+  flex: 1;
+  font-size: 15px;
+  line-height: 20px;
+}
+.ios-banner__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.ios-banner__title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ios-banner__subtitle {
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ios-banner__time {
+  flex: none;
+  font-size: 13px;
+  opacity: 0.55;
+}
+.ios-banner__body {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -1,0 +1,64 @@
+/* SKToast. Spec: slackkit-components.md › SKToast; SKToast.swift:200-330, Consts :367-393. */
+
+.sk-toast-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  pointer-events: none; /* it doesn't take touches */
+}
+.sk-toast {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-height: 320px; /* Consts.maxHeight */
+  padding: 20px; /* horizontal and vertical padding */
+  border-radius: 16px; /* Consts.cornerRadius */
+  background: var(--sk_toast_background);
+  /* shadowColor contentPrimary, opacity 0.1, radius 7, offset (4, 4) */
+  box-shadow: 4px 4px 14px rgb(from var(--dt_color_content_primary) r g b / 0.1);
+  overflow: hidden;
+  /* appears from scale 0.9 / alpha 0 with the snappy/medium spring, and leaves the same way (:200-232) */
+  scale: 0.9;
+  opacity: 0;
+  transition:
+    scale 0.368s var(--sk-spring-snappy),
+    opacity 0.368s var(--sk-spring-snappy);
+}
+.sk-toast.is-shown {
+  scale: 1;
+  opacity: 1;
+}
+.sk-toast.is-offset {
+  /* centered on `verticalOffset` */
+  position: absolute;
+  left: 50%;
+  translate: -50% -50%;
+}
+.sk-toast__message {
+  /* UIFont.body (Lato 17), white, centered, word-wrapped with no line limit, shadow contentPrimary @33 % at (0, 1) */
+  font: var(--sk-body);
+  color: var(--dt_color_constants_white);
+  text-align: center;
+  text-shadow: 0 1px 0 rgb(from var(--dt_color_content_primary) r g b / 0.33);
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+.sk-toast__image {
+  display: block;
+  max-width: 100%;
+}
+.sk-toast__icon {
+  /* ContentStyle.icon: the SKIcon's frame is its size, 10 pt above the message like an image (SKToast.swift:118-121) */
+  display: block;
+}
+.sk-toast__activity {
+  /* Consts.activityWidth / activityHeight */
+  width: 100px;
+  height: 100px;
+  display: grid;
+  place-items: center;
+}

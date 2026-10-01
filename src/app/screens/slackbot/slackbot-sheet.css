@@ -1,0 +1,7 @@
+/* Inside a sheet there's no status bar: the bar region starts at the sheet's top edge. */
+.slackbot-sheet {
+  position: absolute;
+  inset: 0;
+  --safe-top: 0px;
+  --navbar-bottom: var(--navbar-h, 54px);
+}

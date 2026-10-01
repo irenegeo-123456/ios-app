@@ -1,0 +1,59 @@
+/* The conversation's Files page (spec channels-people.md §7), on basePrimary (MG/MediaGalleryViewController.swift:60;
+   June .sk_primary_background, the same values). */
+.cfiles {
+  background: var(--dt_color_base_primary);
+}
+.cfiles__list {
+  padding-top: calc(var(--navbar-bottom));
+}
+/* the empty rows' text in contentSecondary, 2 lines (MG/MediaGalleryPresenter.swift:47-54) */
+.cfiles__empty-text {
+  color: var(--dt_color_content_secondary);
+}
+/* the month headers: smallBodyBold in contentPrimary, not .small's contentSecondary (MG/MediaGalleryPresenter.swift:179-182) */
+.cfiles__month {
+  color: var(--dt_color_content_primary);
+}
+/* 3 square tiles a row, edge to edge: (width − 4) / 3 wide, so the flow layout's justification leaves 2 pt between
+   columns; rows 1 pt apart; 1 pt above and below a section (MG/MediaGalleryLayoutDelegate.swift:13,72-101;
+   MediaGalleryViewController.swift:52-54) */
+.cfiles__grid {
+  display: grid;
+  grid-template-columns: repeat(3, calc((100% - 4px) / 3));
+  column-gap: 2px;
+  row-gap: 1px;
+  padding: 1px 0;
+}
+.ios-app .cfiles__tile {
+  position: relative;
+  aspect-ratio: 1;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--dt_color_base_tertiary);
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
+}
+.cfiles__tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* pressed: scale 0.94, alpha 0.6 (MediaGalleryCollectionImageViewCell.swift:17-18,77-89) */
+.ios-app .cfiles__tile.is-pressed {
+  transform: scale(0.94);
+  opacity: 0.6;
+}
+/* the video badge: min(8, the proportional radius − the badge's 8) = 8 pt from the left and bottom, also on the
+   square .plain tiles (SKThumbnailAttachment.swift:69-72,438-440) */
+.cfiles__duration {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+}
+.cfiles__end {
+  /* clear of the floating tab bar (21 + 62 pt, measurements.md) */
+  height: calc(21px + 62px + 24px);
+}

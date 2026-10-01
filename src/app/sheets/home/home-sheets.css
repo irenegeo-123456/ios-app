@@ -1,0 +1,206 @@
+/* Home's sheets (spec home.md §7.6, §10.1). */
+
+/* ---- the compose button's creation menu (CreationEntryPointsView.swift, CE): a glass card growing out of the
+   56 pt button whose bottom-right corner it shares, 24 pt from the screen's sides, 32 pt corners (a circle when
+   collapsed), on the snappy spring (0.368 s); its content fades in over the same time. The button sits 16 pt above
+   the tab bar (21 + 62 pt, measurements.md), centered on the Search button. */
+.cr-overlay {
+  position: absolute;
+  inset: 0;
+}
+.cr-card {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: calc(21px + 62px + 16px);
+  /* 12 top, the rows, 8, the 48 pt button, 12 bottom (CE:428-431,507-510) */
+  padding: 12px 0;
+  border-radius: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  background: rgba(250, 250, 250, 0.84);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  backdrop-filter: blur(30px) saturate(1.8);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 10px 44px rgba(0, 0, 0, 0.13);
+  /* from the button: a 56 pt circle at the card's bottom-right corner */
+  clip-path: inset(calc(100% - 56px) 0 0 calc(100% - 56px) round 28px);
+  transition: clip-path 0.4s var(--sk-spring-smooth, cubic-bezier(0.32, 0.72, 0, 1));
+}
+[data-appearance='dark'] .cr-card {
+  background: rgba(30, 30, 31, 0.86);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 10px 44px rgba(0, 0, 0, 0.45);
+}
+.ios-overlay.is-open .cr-card {
+  clip-path: inset(0 0 0 0 round 32px);
+  transition: clip-path 0.368s var(--sk-spring-snappy, cubic-bezier(0.3, 1.05, 0.5, 1));
+}
+.cr-list,
+.cr-message {
+  opacity: 0;
+  transition: opacity 0.177s;
+}
+.ios-overlay.is-open .cr-list,
+.ios-overlay.is-open .cr-message {
+  opacity: 1;
+  transition: opacity 0.368s;
+}
+.cr-list {
+  display: flex;
+  flex-direction: column;
+  transform-origin: 50% 100%;
+}
+/* SKGenericEntity .medium: padding 10 / 16, a 36 pt box 12 pt before the text; ~56 pt tall (SKEntityBaseView.swift:60-66) */
+.ios-app .cr-row {
+  position: relative;
+  border: 0;
+  background: none;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+/* iOS 26 uses the concentric highlight: inset 8, radius = height / 2 − 8 (SKEntityBackgroundView.swift:44,73-75) */
+.cr-row__bg {
+  position: absolute;
+  inset: 0 8px;
+  border-radius: 20px;
+}
+.cr-row.is-pressed .cr-row__bg {
+  background: var(--dt_color_base_tertiary);
+}
+.cr-row__box {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--theme_surfaceSecondary);
+  color: var(--theme_contentPrimary);
+}
+.cr-row__text {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.cr-row__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.cr-row__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.ios-app .cr-message {
+  margin: 0 12px;
+  height: 48px;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  background: var(--theme_baseInverseSecondary);
+  color: var(--theme_fabIcon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font: var(--sk-body-bold);
+}
+.ios-app .cr-message.is-pressed {
+  transform: scale(0.96);
+}
+
+/* ---- Customize Home */
+.ch {
+  background: var(--dt_color_base_primary);
+  padding-top: 8px;
+}
+.ch-header {
+  padding: 20px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ch-header__title {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.ch-header__subtitle {
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_secondary);
+}
+.ch-list {
+  position: relative;
+}
+/* S rows: 10 / 16 insets, 24 pt ornament, 12 pt gaps; max(24, label, the 40 pt button) + 20 = 60 pt (STC research) */
+.ch-row {
+  position: relative;
+  height: 60px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--dt_color_base_primary);
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ch-row.is-lifted {
+  z-index: 2;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+.ch-row__bg {
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+}
+/* the tap highlight is baseSecondary (research: SyntheticTileCustomization) */
+.ch-row.is-pressed .ch-row__bg {
+  background: var(--dt_color_base_secondary);
+}
+.ch-row__ornament {
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+.ch-row__title {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ch-row__switch {
+  position: relative;
+  display: flex;
+}
+.ios-app .ch-row__more {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin-left: -12px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+}
+.ios-app .ch-row__more:active {
+  opacity: 0.75;
+}

@@ -1,0 +1,75 @@
+/* A channel you aren't in: the join drawer in the composer's place (spec channels-people.md §3.2). */
+
+/* Where the composer floats (src/app/composer/composer.css .cmp): 12 pt above the tab bar's top (21 + 62 pt,
+   measurements.md), or above the keyboard; the drawer's card is pinned 12 pt above the drawer's bottom
+   (ConversationBottomDrawerViewController.swift:102). */
+.chp-drawer {
+  --chp-dock: calc(21px + 62px);
+  position: absolute;
+  z-index: 25;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--chp-dock) + 12px);
+  pointer-events: none;
+  transition: bottom 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+.ios-screen[data-device='iphone-se'] .chp-drawer {
+  --chp-dock: calc(8px + 62px);
+}
+.ios-tab:has(> .ios-tabbar-host.is-hidden) .chp-drawer {
+  --chp-dock: var(--safe-bottom);
+}
+.ios-app.has-keyboard .chp-drawer {
+  bottom: calc(var(--kb-height) + 12px);
+}
+/* the Liquid Glass card: 16 pt from the sides, radius 16 + 16 = 32 (ConversationBottomDrawerViewController.swift:91-103;
+   ContextBarView.swift:30); the SKDialog's iOS 26 margins 20 / 24 / 20 / 24 (ConversationBottomDrawerPlugin.swift:376-378) */
+.chp-card {
+  margin: 0 16px;
+  border-radius: 32px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+/* "#name": bodyBold, contentPrimary, centered, wrapping (ConversationBottomDrawerPlugin.swift:494-503) */
+.chp-card__name {
+  border: 0;
+  padding: 0;
+  background: none;
+  max-width: 100%;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  text-align: center;
+  overflow-wrap: anywhere;
+  transition: opacity 0.15s;
+}
+/* the purpose: smallBody at its fixed size (no Dynamic Type), contentSecondary, centered, 2 lines; 4 pt below the
+   name (SKDialog labelSpacing, SKDialog.swift:272) (ConversationBottomDrawerPlugin.swift:474-479) */
+.chp-card__purpose {
+  margin-top: 4px;
+  border: 0;
+  padding: 0;
+  background: none;
+  max-width: 100%;
+  font: 400 15px/1.2 Lato;
+  color: var(--dt_color_content_secondary);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  transition: opacity 0.15s;
+}
+/* tapping them fades to 0.6 (the tappable label) */
+.chp-card__name.is-pressed,
+.chp-card__purpose.is-pressed {
+  opacity: 0.6;
+}
+/* 20 pt to the button (interComponentSpacing, SKDialog.swift:276), full width */
+.chp-card__join {
+  margin-top: 20px;
+  align-self: stretch;
+}

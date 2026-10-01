@@ -1,0 +1,21 @@
+/* Search in a conversation (spec channels-people.md §9). */
+
+/* the find bar: the list's top drawer, right under the nav bar, full width, margin 0 (FIC/FindInChannelPlugin.swift:
+   339-351; ListDrawerView.swift:499-503); the Search area's .find-in-channel insets the field 16 pt
+   (FIC/FindInChannelViewController.swift:44-51) */
+.sic .find-in-channel {
+  position: absolute;
+  z-index: 31;
+  left: 0;
+  right: 0;
+  top: calc(var(--navbar-bottom));
+}
+/* the keyboard bar's count: a disabled SKButton title, Lato Bold 17 in contentSecondary (SKButton+Types.swift:255-256;
+   SKButton.swift:249-251); "Show All" Lato Bold 17 in systemBlue (SKInputAccessoryView.swift:153-160) */
+.sic .find-in-channel__count {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_secondary);
+}
+.ios-app .sic .find-in-channel__show-all {
+  font: var(--sk-body-bold);
+}

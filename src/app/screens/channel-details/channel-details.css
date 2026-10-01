@@ -1,0 +1,205 @@
+/* Channel and DM details (spec sheets-menus.md §4). Background basePrimary (CD/ConversationDetailsViewController.swift:57-59;
+   June .sk_primary_background, the same hex). Colors per the September 2026 source (14b3cbaf), which moved this screen
+   off the legacy sk_ colors. */
+.cd {
+  background: var(--dt_color_base_primary);
+}
+.cd__list {
+  padding-top: calc(var(--navbar-bottom));
+}
+.cd__end {
+  height: calc(21px + 62px + 24px);
+}
+.cd-blank {
+  height: 8px;
+}
+/* the nav title fades in once the list has scrolled past 50 pt */
+.cd-nav-title {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.cd-nav-title.is-shown {
+  opacity: 1;
+}
+
+/* ---- header row: padding 12 / 16 / 8, lines 2 pt apart; the name in .title (Lato Black 22) contentPrimary, the icon too,
+   up to 3 lines (CD/Views/ConversationDetailsHeaderView.swift:23-27, 51-65, 242-276; June sk_primary_foreground) */
+.cd-header {
+  position: relative;
+  padding: 12px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.cd-header__name {
+  position: relative;
+  font: var(--sk-title);
+  color: var(--dt_color_content_primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.cd-header__icon {
+  display: inline-block !important;
+  vertical-align: -3px;
+}
+/* a DM: 56 pt avatar (radius 14) with presence, 8 pt, the name, then title and @name in body contentSecondary
+   (ConversationDetailsHeaderView.swift:314, 323); pressed surfacePrimary (:31-32; June sk_foreground_max_solid and
+   sk_foreground_soft) */
+.cd-header--person {
+  gap: 2px;
+}
+.cd-header--person > .sk-avatar {
+  position: relative;
+  margin-bottom: 6px;
+}
+.cd-header__bg {
+  position: absolute;
+  inset: 0;
+}
+.cd-header--person.is-pressed .cd-header__bg {
+  background: var(--dt_color_surface_primary);
+}
+.cd-header__meta {
+  position: relative;
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}
+
+/* text rows: S rows, body 17 contentSecondary with the bold lead in contentPrimary (CDP:567-631, 811-844); the link rows
+   (Add Topic…, View Full Profile) highlight1.content (:653-692, 790-809). June: sk_foreground_max_solid,
+   sk_primary_foreground, sk_highlight. */
+.cd-text {
+  padding: 10px 16px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  overflow-wrap: anywhere;
+}
+.cd-text b {
+  font-weight: 700;
+  color: var(--dt_color_content_primary);
+}
+.cd-text--link {
+  color: var(--dt_color_content_highlight_1);
+}
+.cd-text--link:active {
+  opacity: 0.5;
+}
+
+/* ---- members strip: SKMemberCollectionEntity, insets 0 / 16 / 0 / 16, 16 between items; each cell 4 pt top padding,
+   the 56 pt avatar, 8 pt, the name (SKMemberCollectionEntity.swift:25-29, 387-398, 546-572): 104 pt with two-line names,
+   as in SlackKitTests.SKMemberCollectionEntitySnapshotTests/testMultiMemberConfiguration@3x.png */
+.cd-strip {
+  display: flex;
+  gap: 16px;
+  padding: 4px 16px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cd-strip::-webkit-scrollbar {
+  display: none;
+}
+.ios-app .cd-strip__item {
+  flex: none;
+  width: 56px;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  text-align: left;
+}
+.cd-strip__item.is-pressed {
+  opacity: 0.6;
+}
+/* the name: smallBody contentPrimary, centered, up to 2 lines (SKMemberCollectionEntity.swift:394-397, 491) */
+.cd-strip__name {
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_primary);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+/* captions (empty members, managers, the creator line): caption contentSecondary, the name bold highlight1.content
+   (CDP:1047-1066, 1117-1133, 1688-1705) */
+.cd-caption {
+  padding: 4px 16px 12px;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.cd-caption--creator {
+  padding-top: 12px;
+}
+.cd-link {
+  font-weight: 700;
+  color: var(--dt_color_content_highlight_1);
+}
+
+/* ---- rows with a subtitle (S generic rows: body 17, the secondary text in caption 13 contentSecondary) */
+.cd .cd-row {
+  --row-color: var(--dt_color_content_primary);
+}
+.cd .cd-row .sk-row__content {
+  align-items: center;
+}
+.cd-row__text {
+  display: flex;
+  flex-direction: column;
+  white-space: normal;
+}
+.cd-row__title {
+  font: var(--sk-body);
+}
+.cd-row__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}
+.cd-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 16px;
+}
+.cd-buttons:empty {
+  display: none;
+}
+.cd-buttons > .sk-button {
+  width: 100%;
+}
+
+/* ---- member list: the search view, then a 1 px rule of outlineTertiary (ML/ConversationMemberListViewController.swift:25-53,
+   79-98, the color :87; June sk_primary_foreground at 25 %) */
+.cdm-search {
+  padding: 8px 16px;
+}
+.cdm-rule {
+  /* one device pixel (src/styles/hairline.css) */
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.cdm-empty {
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  text-align: center;
+}
+/* the members list's "Add": Slack's own title bar button, an SKButton .systemDefault .barButton = Lato Bold 17 in
+   highlight1.content (SKButton+Types.swift:206-207, 255-256), 12 pt in from its capsule's edges (nav.css) */
+.cdm-add {
+  padding: 0 6px;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_highlight_1);
+}

@@ -1,0 +1,532 @@
+/* MKMessagePreview (Modules/UIInfra/MessageKit/Implementation/MKMessagePreview.swift) and the SlackKit pieces it lays out
+   in previews. Values from reference/ios/specs/dms-activity.md §1.1–1.9, which cite the Swift; checked against the 32
+   MessageKitTests.MKMessagePreviewSnapshotTests PNGs. */
+
+.mk-preview {
+  position: relative;
+  /* edgeLayoutMargins 10/16/10/16 (MKMessagePreview.swift:53) */
+  padding: 10px 16px;
+  /* the list cell's background unless a background style tints the row (:129) */
+  background: var(--mk-preview-bg, transparent);
+  /* the pressed highlight: the style's pressed color, else the list's row highlight base_tertiary (SKList.swift:145) */
+  --mk-preview-pressed: var(--dt_color_base_tertiary);
+  /* SKListCollectionViewCell bounce: scale (L − 8) / L, smooth spring, fast down / medium up (UIView+BounceMode.swift) */
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.mk-preview.is-pressed {
+  transform: scale(calc((var(--screen-w) - 8px) / var(--screen-w)));
+  transition-duration: 0.2s;
+}
+/* SKEntityBackgroundView .rounded: inset 4 pt left and right, radius 12, continuous (SKEntityBackgroundView.swift:43-73) */
+.mk-preview__bg {
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+  pointer-events: none;
+}
+.mk-preview.is-pressed > .mk-preview__bg {
+  background: var(--mk-preview-pressed);
+}
+/* focused (deep-link target): surface_highlight_3 (SKEntityBackgroundView.swift:111-114 [Sept]; June sk_pale_yellow) */
+.mk-preview.is-focused > .mk-preview__bg {
+  background: var(--dt_color_surface_highlight_3);
+}
+
+/* Background styles (MKCoreMessageProperties.swift:137-201): base colors; pressed = darken(0.1), failed light = lighten(0.85) */
+.mk-preview--failed {
+  --mk-preview-bg: var(--dt_color_base_important);
+  --mk-preview-pressed: color-mix(in srgb, var(--dt_color_base_important) 15%, var(--sk_true_white));
+}
+[data-appearance='dark'] .mk-preview--failed {
+  --mk-preview-pressed: color-mix(in srgb, var(--dt_color_base_important) 90%, var(--sk_true_black));
+}
+.mk-preview--pinned,
+.mk-preview--highlighted,
+.mk-preview--broadcast {
+  --mk-preview-bg: var(--dt_color_base_highlight_3);
+  --mk-preview-pressed: color-mix(in srgb, var(--dt_color_base_highlight_3) 90%, var(--sk_true_black));
+}
+.mk-preview--slackbotResponse,
+.mk-preview--savedForLater {
+  --mk-preview-bg: var(--dt_color_base_highlight_1);
+  --mk-preview-pressed: color-mix(in srgb, var(--dt_color_base_highlight_1) 90%, var(--sk_true_black));
+}
+.mk-preview--huddle {
+  --mk-preview-bg: var(--dt_color_base_highlight_2);
+  --mk-preview-pressed: color-mix(in srgb, var(--dt_color_base_highlight_2) 90%, var(--sk_true_black));
+}
+.mk-preview--ephemeral {
+  --mk-preview-bg: var(--dt_color_base_secondary);
+  --mk-preview-pressed: color-mix(in srgb, var(--dt_color_base_secondary) 90%, var(--sk_true_black));
+}
+
+/* UIKit sizes a label to the pixel grid: its text height rounded up to 1/3 pt, the text centered in it (SKLabel
+   sizeThatFits, UIUtilities.roundToScreenScale). Lato's 1.2 em lines come out 20.67 pt at 17 pt and 14.67 at 12, as
+   every MKMessagePreview snapshot measures (testMessagePreviewBasic: 10 + 20.67 + 10). The rounding is exact for one
+   line and within 0.2 pt for more. */
+.mk-label {
+  padding-block: calc((round(up, 1lh - 0.001px, 1px / 3) - 1lh) / 2);
+}
+
+/* The outer vertical stack: 8 pt between items (mediumStackViewSpacing, :55, :255) */
+.mk-preview__stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mk-preview__pill {
+  display: flex;
+}
+/* Eyebrow: captionBold 13, highlight1.content, 1 line (:308-313) */
+.mk-preview__eyebrow {
+  font: var(--sk-caption-bold);
+  color: var(--dt_color_content_highlight_1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* MKTopContentStackView: header, timestamp, dot, badge; 8 pt apart, top aligned (MKTopContentStackView.swift:19, :119) */
+.mk-preview__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+/* header: micro 12 content_secondary fallback, 1 line, truncates first (low compression resistance) (:292-298) */
+.mk-preview__header {
+  flex: 1 1 0;
+  min-width: 0;
+  font: var(--sk-micro);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* timestamp: micro 12 content_tertiary, 1 line, never truncated (MKCoreMessageProperties.swift:249-255) */
+.mk-preview__timestamp {
+  flex: none;
+  font: var(--sk-micro);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+}
+.mk-preview__badge {
+  flex: none;
+  display: flex;
+}
+
+/* MKOuterHorizontalStack: ornament + 12 + column, top aligned (MKOuterHorizontalStack.swift:160, :220) */
+.mk-preview__main {
+  display: flex;
+  align-items: flex-start;
+}
+.mk-preview__ornament {
+  flex: none;
+  display: flex;
+  margin-right: 12px;
+}
+.mk-preview__column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Sept: an ornament with no name centers against a column no taller than itself (MKOuterHorizontalStack.swift:64-116) */
+.mk-preview__main.is-centered {
+  align-items: center;
+}
+/* Sept: with no header and no name the timestamp is the outer row's third item, 12 pt after the column
+   (MKOuterHorizontalStack.swift:142-160, stackViewSpacing :219-221) */
+.mk-preview__outer-timestamp {
+  margin-left: 12px;
+}
+
+/* MKPrimaryContentStackView: name (hugs, low compression resistance), decoration, spacer, then timestamp · dot · badge;
+   8 pt apart (MKMessagePreview.swift:364; MKPrimaryContentStackView.swift:113, :270-273) */
+.mk-preview__primary-row {
+  display: flex;
+  align-items: flex-start;
+}
+.mk-preview__primary-row.is-center {
+  align-items: center;
+}
+/* primary text: bodyBold 17 content_primary fallback, 4 lines (MKCoreMessageProperties.swift:220-227, :265-272) */
+.mk-preview__primary {
+  flex: 0 1 auto;
+  min-width: 0;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.mk-preview__decoration {
+  flex: none;
+  display: flex;
+  margin-left: 8px;
+}
+/* the spacer takes the leftover width with no spacing after it, so the trailing items sit at the right edge */
+.mk-preview__trailing {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-left: auto;
+  padding-left: 8px;
+}
+.mk-preview__primary-row.is-center .mk-preview__trailing {
+  align-items: center;
+}
+
+/* Mustache: caption 13, 1 line (:331-333); the caller passes its color */
+.mk-preview__mustache {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* MKMessageContentView: 8 pt between its rows (MKMessageContentView.swift:17, :294) */
+.mk-preview__content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+/* the text and a trailing accessory, 8 pt apart, top aligned; the text takes the width (MKMessageContentView.swift:438-451) */
+.mk-preview__body-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+/* body: the caller's baseFont / baseTextColor (defaults body 17, content_primary: MessageViewPresentationObjectFactory.swift:58-59
+   [Sept]; June sk_primary_foreground), 2 lines;
+   unfurl text in a preview takes the same (UnfurlMapper convertBlocks, messageStyling.baseFont) */
+.mk-preview__body {
+  flex: 1;
+  min-width: 0;
+  font: var(--mk-body-font, var(--sk-body));
+  color: var(--mk-body-color, var(--dt_color_content_primary));
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+/* -webkit-line-clamp only clips at the box, and Chrome starts a line's backgrounds (mention pills, inline code) about
+   1 px above its line box (its rounded ascent), so the first hidden line's pills show as a sliver under the last visible
+   one. UILabel draws nothing past its last line: clip the last line's bottom 1.2 px of leading (below its descenders). */
+.mk-preview__body,
+.mk-preview__mustache {
+  clip-path: inset(0 0 1.2px 0);
+}
+.mk-preview__body-accessory {
+  flex: none;
+  display: flex;
+  color: var(--dt_color_content_secondary);
+}
+/* Footer: smallBody 15, highlight1.content (:300-306) */
+.mk-preview__footer {
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_highlight_1);
+}
+
+/* MKDotView = SKDot (MKMessagePreview.swift:563 [Sept]): a 12 pt circle (radius 6) centered in a 16 × 16 box, default
+   important.baseInverse #e01e5a / #d3305d (SKDot.swift:21-30; June sk_raspberry_red #e01e5a in both appearances) */
+.mk-dot {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+}
+.mk-dot i {
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--dt_color_base_inverse_important);
+}
+
+/* ------------------------------------------------------------------------------------------------------ ornaments */
+.mk-image-ornament {
+  flex: none;
+  display: block;
+  overflow: hidden;
+  background: var(--dt_color_base_tertiary);
+}
+.mk-image-ornament img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.mk-emoji-ornament {
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+/* SKMemberAvatar .memberWithIcon: rounded photo with a notch, the icon tinted content_primary, no fill behind it */
+.mk-avatar-icon {
+  position: relative;
+  flex: none;
+  display: block;
+}
+.mk-avatar-icon__image {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--dt_color_base_tertiary);
+  display: grid;
+  place-items: center;
+}
+.mk-avatar-icon__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.mk-avatar-icon__initials {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+
+/* ------------------------------------------------------------------------------------------------------ reactions */
+/* SKReacjiBar: pills 8 pt apart, rows 8 pt apart (SKReacjiBar.swift:26-27) */
+.mk-reacji-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+/* SKReacjiPill: insets 4/8, 22 pt emoji, 2 pt spacing, captionBold 13 label with 2 pt side insets, 30 pt, capsule;
+   surface_primary; selected: highlight1 surface, 2 pt highlight1 outline, highlight1 text (SKReacjiPill.swift:36-56) */
+.mk-reacji-pill {
+  flex: none;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 4px 8px;
+  border-radius: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--dt_color_surface_primary);
+  color: var(--dt_color_content_primary);
+  transition: transform 0.2s;
+}
+.mk-reacji-pill.is-pressed {
+  /* pressed: surface_secondary, bounce to 0.94 (:43, :312-334) */
+  background: var(--dt_color_surface_secondary);
+  transform: scale(0.94);
+}
+.mk-reacji-pill.is-selected {
+  background: var(--dt_color_surface_highlight_1);
+  box-shadow: inset 0 0 0 2px var(--dt_color_outline_highlight_1);
+  color: var(--dt_color_content_highlight_1);
+}
+.mk-reacji-pill__emoji {
+  flex: none;
+}
+.mk-reacji-pill__label {
+  padding: 0 2px;
+  font: var(--sk-caption-bold);
+  white-space: nowrap;
+}
+.mk-reacji-pill--add {
+  color: var(--dt_color_content_primary);
+}
+
+/* ---------------------------------------------------------------------------------------------------- attachments */
+/* SKThumbnailAttachment .small: 64 pt, radius min(20, 0.225 × 64) = 14.4, 1 pt outline_tertiary, base_primary
+   (SKThumbnailAttachment.swift:72-106); 8 pt apart (SKAttachmentBar.swift:39-40) */
+.mk-thumbs {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+.mk-thumb {
+  position: relative;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 14.4px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+}
+.mk-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* the border draws over the image */
+.mk-thumb--image::after,
+.mk-thumb--video::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+}
+/* the "+N" overflow tile: bodyBold 17, content_secondary (:576-586) */
+.mk-thumb--overflow {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_secondary);
+}
+/* VideoDurationBadge: sk_black @ 70 %, radius 8, insets 2/4, white play icon (VideoDurationBadge.swift:42-55) */
+.mk-video-badge__label {
+  /* .small: captionBold 13, white (VideoDurationBadge.swift:125-143, :179-202) */
+  font: var(--sk-caption-bold);
+}
+.mk-video-badge {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--sk_black) 70%, transparent);
+  color: var(--sk_true_white);
+}
+/* SKExpandedAttachment: radius 15, 1 pt outline_tertiary, base_secondary; 5/8 of the width without a known size
+   (SKExpandedAttachment.swift:69-85) */
+.mk-files-single {
+  container-type: inline-size;
+}
+.mk-expanded {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* 5/8 of the width, on the pixel grid (measured 195.33 at 313 in testMessagePreviewWithExpandedAttachment) */
+  height: round(down, 62.5cqw, 1px / 3);
+  border-radius: 15px;
+  overflow: hidden;
+  background: var(--dt_color_base_secondary);
+}
+.mk-expanded img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.mk-expanded::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+}
+/* SKCompactAttachment: padding 12, a 36 pt file-type tile 8 pt from the text, title/subtitle 2 pt apart, radius 15,
+   1 pt outline_tertiary, base_primary (SKCompactAttachment.swift:71-88, :578-633) */
+.mk-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 15px;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  min-width: 0;
+}
+.mk-compact__tile {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+}
+.mk-compact__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mk-compact__title {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mk-compact__subtitle {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* MKMessageUnfurlContent: SKPipeDecorator, a 4 pt pipe (radius 2, outline_tertiary) and the content inset 4 / 12 / 4
+   (SKPipeDecorator.swift:11-14, :60-68); MKUnfurlView's items 4 pt apart (MKUnfurlView.swift:21) */
+.mk-unfurl {
+  position: relative;
+  min-width: 0;
+  padding: 4px 0 4px 12px;
+}
+.mk-unfurl__pipe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--dt_color_outline_tertiary);
+}
+.mk-unfurl__content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* header: a .verySmall (16 pt, radius 4) image + 4 + bodyBold content_primary, 1 line, centered (MKUnfurlView.swift:228-236) */
+.mk-unfurl__header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.mk-unfurl__header-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.mk-unfurl__header-text {
+  min-width: 0;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* title: bodyBold content_primary, unlimited lines (:207-209) */
+.mk-unfurl__title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+.mk-unfurl__text {
+  font: var(--mk-body-font, var(--sk-body));
+  color: var(--mk-body-color, var(--dt_color_content_primary));
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+/* footer: caption content_secondary (:197-205) */
+.mk-unfurl__footer {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+}

@@ -1,0 +1,170 @@
+/* SKTextField, SKSearchBar, SKSearchBarButton, ClearButton. Spec: slackkit-components.md › Text inputs; Constants at
+   SKTextField.swift:26-52, configure :219-386, container :650-700. */
+
+.sk-text-field {
+  position: relative;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 12px; /* Constants.largerCornerRadius (:31, :114-116) */
+  background: var(--tf-bg);
+  /* 1 pt border inside the bounds */
+  box-shadow: inset 0 0 0 1px var(--tf-border);
+  overflow: hidden; /* the container masks to its rounded corners */
+  font: var(--sk-body); /* Constants.font .body (:51) */
+  color: var(--tf-text);
+}
+.sk-text-field.no-border {
+  /* a .clear border color means no border and radius 0 (:254-261) */
+  border-radius: 0;
+  box-shadow: none;
+}
+.sk-text-field.has-shadow {
+  /* shadow black, opacity 0.08, radius 3, y offset 1 (:34-41) */
+  overflow: visible;
+  box-shadow:
+    inset 0 0 0 1px var(--tf-border),
+    0 1px 6px rgb(0 0 0 / 0.08);
+}
+.sk-text-field.is-button {
+  cursor: default;
+}
+.sk-text-field.is-button.is-pressed {
+  background: var(--tf-bg-selected);
+}
+.sk-text-field__input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  border-radius: inherit;
+  appearance: none;
+  background: transparent;
+  font: inherit;
+  line-height: 22px;
+  color: inherit;
+  text-overflow: ellipsis;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.sk-text-field__input:disabled {
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+.sk-text-field__line {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sk-text-field__text,
+.sk-text-field__placeholder-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sk-text-field__placeholder-text,
+.sk-text-field__placeholder {
+  color: var(--tf-placeholder);
+}
+.sk-text-field__overlay {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  line-height: 22px;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.sk-text-field__ghost-typed {
+  color: transparent;
+}
+.sk-text-field__ornament {
+  /* at the left inset, vertically centered on the text (:476-481) */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+}
+.sk-text-field__trailing {
+  /* the clear button, spinner and secure toggle share the spot at the right inset (:483-490) */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+}
+
+/* ------------------------------------------------------------------------------------------------ ClearButton */
+.sk-clear-button {
+  /* 20 × 20, close_circle_filled pinned to the bounds (ClearButton.swift:57, :95-102) */
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: var(--clear-normal);
+  cursor: default;
+}
+.sk-clear-button.is-pressed {
+  color: var(--clear-highlighted);
+}
+
+/* ------------------------------------------------------------------------------------------------ SKSearchBar */
+/* September 2026 (SKSearchBar.swift:21-369): a horizontal stack of the field and the cancel control, 12 pt apart
+   (Constants.stackViewSpacing); the control springs in from scale 0.5 and alpha 0 while the field gives up its width
+   (UISpringTimingParameters dampingRatio 0.78, response 0.45, :225-268; drawn with the snappy spring here). */
+.sk-search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.sk-search-bar > .sk-text-field,
+.sk-search-bar__glass {
+  flex: 1;
+  min-width: 0;
+}
+.sk-search-bar__glass {
+  /* UIGlassEffect(style: .regular), interactive, a capsule around the field (:174-189). The material is UIKit's; this is
+     the kit's glass (the app's --glass-* variables, src/app/nav/nav.css, with their light values as fallbacks). */
+  border-radius: 999px;
+  background: var(--glass-fill, rgba(255, 255, 255, 0.78));
+  -webkit-backdrop-filter: var(--glass-backdrop, blur(14px) saturate(1.6));
+  backdrop-filter: var(--glass-backdrop, blur(14px) saturate(1.6));
+  box-shadow:
+    var(--glass-edge, inset 0 0 0 1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9)),
+    var(--glass-shadow, 0 6px 24px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+.sk-search-bar__glass > .sk-text-field {
+  border-radius: inherit;
+}
+.sk-search-bar__cancel {
+  display: flex;
+  flex: none;
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+  transition:
+    max-width 0.45s var(--sk-spring-snappy),
+    margin-left 0.45s var(--sk-spring-snappy),
+    opacity 0.45s var(--sk-spring-snappy),
+    transform 0.45s var(--sk-spring-snappy);
+}
+.sk-search-bar__cancel.is-shown {
+  max-width: 120px;
+  margin-left: 12px;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}

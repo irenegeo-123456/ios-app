@@ -1,0 +1,42 @@
+/* Hairlines: one device pixel, as iOS draws them (1 / UIScreen.scale pt: SKListFooter's onePixel line, row separators,
+   the composer's outline, sheet and menu separators).
+
+   Don't draw them with `height: 0.333px` or `border: 0.333px`. Chrome on macOS lays pages out in CSS px (it doesn't use
+   zoom-for-DSF there) and snaps box sizes and border widths to whole CSS px, so those come out 1 pt thick: 3 device
+   pixels at @3x, 2 at @2x (measured in headless Chrome at DPR 1, 2 and 3, at y offsets 0 to 0.75; docs/conventions.md,
+   "Hairlines"). An inset box-shadow isn't snapped: one --hairline deep, it paints exactly one device pixel at full
+   strength at every DPR and position.
+
+     box-shadow: inset 0 calc(-1 * var(--hairline)) 0 <color>     the box's bottom edge   (.hairline-bottom)
+     box-shadow: inset 0 var(--hairline) 0 <color>                its top edge            (.hairline-top)
+     box-shadow: inset 0 0 0 var(--hairline) <color>              all round, radius too   (.hairline-ring)
+
+   A standalone line (a divider element) is a 1 px box with the bottom-edge shadow: `height: 1px` + `.hairline-bottom`.
+   --hairline-scale is the same pixel as a factor, for `transform: scaleY(var(--hairline-scale))` on a 1 px line. */
+
+:root {
+  --hairline: 1px;
+  --hairline-scale: 1;
+}
+@media (min-resolution: 1.5dppx) {
+  :root {
+    --hairline: 0.5px;
+    --hairline-scale: 0.5;
+  }
+}
+@media (min-resolution: 2.5dppx) {
+  :root {
+    --hairline: calc(1px / 3);
+    --hairline-scale: calc(1 / 3);
+  }
+}
+
+.hairline-bottom {
+  box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--hairline-color, var(--dt_color_outline_tertiary));
+}
+.hairline-top {
+  box-shadow: inset 0 var(--hairline) 0 var(--hairline-color, var(--dt_color_outline_tertiary));
+}
+.hairline-ring {
+  box-shadow: inset 0 0 0 var(--hairline) var(--hairline-color, var(--dt_color_outline_tertiary));
+}

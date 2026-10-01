@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="darkreader-lock" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Slack for iOS · Simulator</title>
+    <link rel="icon" href="/kit/slack-mark.svg" />
+    <!-- A host that serves the kit from a folder can send deep links here as ?__route=<path>: put the path back first. -->
+    <script>
+      ;(function () {
+        var route = new URLSearchParams(location.search).get('__route')
+        if (route === null) return
+        var url = new URL(route.replace(/^\/+/, ''), location.origin + '%BASE_URL%')
+        history.replaceState(null, '', url.pathname + url.search + location.hash)
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

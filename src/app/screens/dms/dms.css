@@ -1,0 +1,134 @@
+/* The DMs tab (spec dms-activity.md §2). The header gradient (.root-header-gradient) is shared by the tab roots:
+   nav.css. Rows are MKMessagePreviews (src/messagekit). */
+
+.dms__list {
+  position: relative;
+  /* list and view background sk_primary_background (ListThemeOptions.ia4Phone; DMPresenter.swift:76) */
+  background: var(--sk_primary_background);
+}
+/* the first section's .default header: 8 pt (SKList.swift:2015-2016; SKListFooterView.swift:19) */
+.dms__first-header {
+  height: 8px;
+}
+/* .blankDivider section footer: 8 pt (SKListFooterView.swift:19) */
+.dms-blank-footer {
+  height: 8px;
+}
+/* clear the floating tab bar and the compose button, as Home does */
+.dms__bottom-space {
+  height: calc(21px + 62px + 16px + 56px + 24px);
+}
+.dms__status-emoji {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------------------------- people carousel */
+/* SKMemberCollectionEntity: insets 8 / 16 / 0 / 16 with Liquid Glass headers (DMPresentationObjectFactory.swift:594),
+   16 pt between items (SKMemberCollectionEntity.swift:23-27), top aligned */
+.dms-faces {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 8px 16px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.dms-faces::-webkit-scrollbar {
+  display: none;
+}
+/* an item: 4 pt top padding, the 56 pt avatar, 8 pt, the name (SKMemberCollectionEntity.swift:384-395, :538-569) */
+.dms-face {
+  flex: none;
+  width: 56px;
+  padding: 4px 0 0;
+  border: 0;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+/* pressed: the item dims to 0.4 (:626-629) */
+.dms-face.is-pressed {
+  opacity: 0.4;
+}
+/* name: smallBody 15 content_primary, centered, 2 lines, wrapping inside words when they don't fit ("SlackBo / t") */
+.dms-face__name {
+  width: 100%;
+  font: var(--sk-small-body);
+  color: var(--dt_color_content_primary);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------------------------ SKGenericEntity .medium row */
+/* padding 10 / 16, a 36 pt ornament, 12 pt to the text; primary body 17 content_primary, secondary caption 13
+   content_secondary, 0 pt apart (SKEntityBaseView.swift:60-66; SKEntityContentView.swift:50-62) */
+.dms-generic-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.dms-generic-row.is-pressed {
+  /* the row bounce, as SKListCollectionViewCell does it */
+  transform: scale(calc((var(--screen-w) - 8px) / var(--screen-w)));
+  transition-duration: 0.2s;
+}
+.dms-generic-row__bg {
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+  pointer-events: none;
+}
+.dms-generic-row.is-pressed .dms-generic-row__bg {
+  background: var(--dt_color_base_tertiary);
+}
+.dms-generic-row > .sk-ornament {
+  position: relative;
+}
+.dms-generic-row__text {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dms-generic-row__primary {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  padding-block: calc((round(up, 1lh - 0.001px, 1px / 3) - 1lh) / 2);
+}
+.dms-generic-row__secondary {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  padding-block: calc((round(up, 1lh - 0.001px, 1px / 3) - 1lh) / 2);
+}
+
+/* ------------------------------------------------------------------------------------------------ empty state */
+/* SKPaddedEmptyStateDeprecated: 30 pt of top padding (SKPaddedEmptyState.swift:16-17, :37) */
+.dms-empty {
+  padding-top: 30px;
+}
+.dms-empty .sk-empty-state__title {
+  white-space: pre-line;
+}
+
+/* app.css's `.ios-app button { font: inherit; color: inherit }` outranks SKButton's own font and color outside sheets
+   (src/slackkit/buttons.css), so they're restated, as compose.css does */
+.dms .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.dms .sk-button.is-pressed,
+.dms .sk-button.is-selected {
+  color: var(--btn-title-pressed);
+}

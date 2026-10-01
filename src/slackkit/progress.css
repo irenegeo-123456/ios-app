@@ -1,0 +1,148 @@
+/* SKSpinner, SKCircularProgressIndicator, SKProgressBar, SKLoadingBar. Spec: slackkit-components.md (each component's
+   section); sources cited inline. */
+
+/* ------------------------------------------------------------------------------------------------ SKSpinner */
+.sk-spinner {
+  display: inline-block;
+  flex: none;
+  line-height: 0;
+  vertical-align: middle;
+}
+.sk-spinner svg {
+  display: block;
+  overflow: visible;
+}
+.sk-spinner__arc {
+  /* the arc starts at 12 o'clock (SKSpinner.swift:96-119) */
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transform-box: view-box;
+}
+.sk-spinner__arc.is-spinning {
+  /* rotation 2π every 1.25 s with (0.5, 0.35, 0.5, 0.35); strokeEnd 0.30 → 0.25 over 0.625 s, ease-in-out,
+     autoreversing (SKSpinner.swift:50-80) */
+  stroke-dasharray: 0.3 1;
+  animation:
+    sk-spinner-rotate 1.25s cubic-bezier(0.5, 0.35, 0.5, 0.35) infinite,
+    sk-spinner-stroke 0.625s ease-in-out infinite alternate;
+}
+@keyframes sk-spinner-rotate {
+  from {
+    transform: rotate(-90deg);
+  }
+  to {
+    transform: rotate(270deg);
+  }
+}
+@keyframes sk-spinner-stroke {
+  from {
+    stroke-dasharray: 0.3 1;
+  }
+  to {
+    stroke-dasharray: 0.25 1;
+  }
+}
+
+/* -------------------------------------------------------------------------------------------- SKProgressBar */
+.sk-progress-bar {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.sk-progress-bar__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+.sk-progress-bar__fill.is-animated {
+  /* UIProgressView.setProgress(_:animated:) */
+  transition: width 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------------------------- SKLoadingBar */
+.sk-loading-bar {
+  position: relative;
+  width: 100%;
+  flex: none;
+  --lb-track: var(--dt_color_base_tertiary);
+  --lb-segment: var(--dt_color_palettes_lagoon_40);
+}
+.sk-loading-bar--lightOnDark {
+  /* always-light colors (SKLoadingBar.swift:211-219) */
+  --lb-track: rgb(from var(--sk-gray-0-light) r g b / 0.2);
+  --lb-segment: var(--sk-gray-0-light);
+}
+.sk-loading-bar__track {
+  /* square cap (:124) */
+  position: absolute;
+  inset: 0;
+  background: var(--lb-track);
+}
+.sk-loading-bar__segment {
+  /* round cap (:132): the ends reach half the line width past the path */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 100%;
+  border-radius: 999px;
+  background: var(--lb-segment);
+  animation:
+    sk-loading-bar-end 1.1s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite,
+    sk-loading-bar-start 1.1s linear infinite;
+}
+@keyframes sk-loading-bar-end {
+  /* strokeEnd 0 → 1.01 over 1.1 s */
+  from {
+    right: 100%;
+  }
+  to {
+    right: -1%;
+  }
+}
+@keyframes sk-loading-bar-start {
+  /* strokeStart 0 → 1.05, beginning at 0.22 s, over 0.99 s; the 1.1 s group cuts it at 0.88 s in (≈ 0.99 of the way) */
+  0%,
+  20% {
+    left: 0%;
+    animation-timing-function: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+  }
+  100% {
+    left: 104%;
+  }
+}
+.sk-loading-bar__flash {
+  /* highlight2.baseInverse, fades in 0.7 s then out 1.0 s (:138-139, :78-113) */
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--dt_color_base_inverse_highlight_2);
+  opacity: 0;
+}
+.sk-loading-bar.is-complete .sk-loading-bar__track,
+.sk-loading-bar.is-complete .sk-loading-bar__segment {
+  animation: sk-loading-bar-fade-out 0.3s forwards;
+}
+.sk-loading-bar.is-complete .sk-loading-bar__flash {
+  animation: sk-loading-bar-flash 1.7s linear forwards;
+}
+.sk-loading-bar.is-hidden > * {
+  visibility: hidden;
+}
+@keyframes sk-loading-bar-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes sk-loading-bar-flash {
+  0% {
+    opacity: 0;
+  }
+  41.2% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

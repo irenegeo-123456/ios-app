@@ -1,0 +1,141 @@
+/* New Message (spec composer.md §19; Modules/Features/ComposeMessage). The composer itself: src/app/composer. */
+
+.compose {
+  /* basePrimary (ComposeMessageViewController.swift:34) */
+  background: var(--dt_color_base_primary);
+}
+.compose__body {
+  position: absolute;
+  inset: 0;
+  /* the "To:" field is the list's top drawer, under the navigation bar */
+  padding-top: calc(var(--navbar-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------------------------------------------------------------------------ the "To:" field */
+/* 16 pt side insets, 8 pt from the prefix to the tokens, basePrimary; one line = 2 × 4 + 40 = 48 pt, growing with
+   wrapped tokens to 4 × 48 = 192 (ComposeMessageDestinationPickerPresentable.swift:24-94); tokens are 32.67 pt
+   SKTokenViews on the text's lines (TokenTextAttachment.swift:38-46, TokenSearchInputStyle.swift:13-20) */
+.compose__to {
+  position: relative;
+  flex: none;
+  min-height: 48px;
+  max-height: 192px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 7.5px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 1.2px;
+  background: var(--dt_color_base_primary);
+  cursor: text;
+}
+/* its bottom hairline, 1 pixel, outlineTertiary (ComposeMessageDestinationPicker.swift:114-120, :414-430) */
+.compose__to::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+/* "To: " in Lato 17, sk_light_gray #868686 (prefixTextColor, :35) */
+.compose__prefix {
+  font: var(--sk-body);
+  color: var(--sk_light_gray);
+  line-height: 32.67px;
+}
+.compose__input {
+  flex: 1;
+  /* the field is a text view (TokenTextView): typing continues right after the last token */
+  min-width: 40px;
+  height: 32.67px;
+  border: 0;
+  outline: none;
+  background: none;
+  /* typed text Lato 17 contentPrimary; the placeholder contentTertiary, 4 pt in (ComposeMessageDestinationPicker.swift:426) */
+  padding: 0 0 0 4px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  caret-color: var(--ios-blue, #0088ff);
+}
+.compose__input::placeholder {
+  color: var(--dt_color_content_tertiary);
+}
+
+/* ---------------------------------------------------------------------------------------------- the list */
+.compose__list {
+  flex: 1;
+  min-height: 0;
+  background: var(--dt_color_base_primary);
+}
+/* the destination's messages, under the "To:" field */
+.compose__transcript {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+/* the list keeps its last row above the composer (the keyboard, or the safe area, + 12 + the composer's height) */
+.compose__list-end {
+  height: calc(max(var(--kb-height, 0px), var(--safe-bottom)) + 12px + var(--composer-height, 60px) + 8px);
+}
+.compose__name {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.compose__secondary {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.compose .sk-row__inline {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.compose__app {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+}
+/* "No matches found. Try an email?": contentTertiary, a question in a surfacePrimary ornament box, size .medium
+   (ComposeMessageListCellProvider.swift:80-95) */
+.compose__empty .sk-row__title {
+  color: var(--dt_color_content_tertiary);
+}
+.compose__empty .sk-row__ornament {
+  width: 36px;
+  height: 36px;
+}
+.compose__empty-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--dt_color_surface_primary);
+  color: var(--dt_color_content_tertiary);
+}
+
+/* ------------------------------------------------------------------------------------------ navigation bar */
+/* the automatic close button: SF Symbols xmark tinted contentPrimary (UIViewController+CloseButton.swift:61-76) */
+.compose .compose__close {
+  color: var(--dt_color_content_primary);
+}
+.compose__drafts {
+  padding: 0 12px;
+}
+/* app.css's `.ios-app button` reset outranks SKButton's own font and color outside sheets: restated */
+.compose .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}

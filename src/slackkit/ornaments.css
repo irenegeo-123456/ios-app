@@ -1,0 +1,191 @@
+/* SKOrnamentBox, SKAvatarPile, SKHuddleFacePile, SKDecoratedIcon, SKColorSwatch, SKGroupAvatar. Spec:
+   slackkit-components.md › Avatars and ornaments; Swift cited inline. */
+
+/* ------------------------------------------------------------------------------------------- SKOrnamentBox */
+.sk-ornament {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden; /* masksToBounds for everything but emoji (SKOrnamentBox.swift:264-392) */
+  vertical-align: middle;
+}
+.sk-ornament.has-avatar {
+  overflow: visible;
+}
+.sk-ornament__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.sk-ornament__rainbow {
+  /* the rainbow_stories_border image over the box (Border.rainbow) */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------- SKGroupAvatar */
+.sk-group-avatar-pair {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+.sk-group-avatar-pair__top {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.sk-group-avatar-pair__top > .sk-avatar {
+  display: block;
+}
+.sk-avatar.sk-group-avatar-pair__bottom {
+  position: absolute;
+}
+
+/* -------------------------------------------------------------------------------------------- SKAvatarPile */
+.sk-avatar-pile {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+.sk-avatar-pile > span {
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.sk-avatar-pile__image {
+  /* SKImageView: aspect fill, the baseTertiary placeholder */
+  background: var(--dt_color_base_tertiary);
+}
+.sk-avatar-pile__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sk-avatar-pile__icon {
+  display: grid;
+  place-items: center;
+}
+.sk-avatar-pile__overflow {
+  /* OverflowView: baseTertiary, contentTertiary text, centered (SKAvatarPile.swift:258-297) */
+  display: grid;
+  place-items: center;
+  background: var(--dt_color_base_tertiary);
+  color: var(--dt_color_content_tertiary);
+}
+
+/* ---------------------------------------------------------------------------------------- SKHuddleFacePile */
+.sk-face-pile {
+  display: inline-flex;
+  align-items: stretch;
+  flex: none;
+  vertical-align: middle;
+}
+.sk-face-pile.is-interactive {
+  cursor: default;
+}
+.sk-face-pile__item {
+  position: relative;
+  display: flex;
+}
+.sk-face-pile__badge {
+  /* stretched to the row's height by the stack's .fill alignment */
+  box-sizing: border-box;
+}
+.sk-face-pile__custom {
+  /* an SKOrnamentBox on baseTertiary, a circle as tall as the row (:221-229, :153-155) */
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--dt_color_base_tertiary);
+}
+.sk-face-pile__face {
+  position: relative;
+  display: block;
+  border-radius: 50%; /* cornerRadius = the pile's height / 2 */
+  overflow: hidden;
+  background: var(--dt_color_base_tertiary);
+}
+.sk-face-pile__face img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sk-face-pile__face i {
+  /* the 1 pt layer border, drawn over the photo */
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+/* ----------------------------------------------------------------------------------------- SKDecoratedIcon */
+.sk-decorated-icon {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+.sk-decorated-icon__layer {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.sk-decorated-icon__dot {
+  position: absolute;
+  border-radius: 50%;
+}
+.sk-decorated-icon__badge {
+  position: absolute;
+  border-radius: 2px; /* decoratingIconBackgroundCornerRadius */
+}
+
+/* ------------------------------------------------------------------------------------------- SKColorSwatch */
+.sk-color-swatch {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  overflow: hidden; /* masksToBounds */
+  vertical-align: middle;
+}
+.sk-color-swatch::after {
+  /* the 1 pt outlinePrimary layer border, over the color (SKColorSwatch.swift:30-31) */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_primary);
+}
+.sk-color-swatch__checkerboard,
+.sk-color-swatch__color {
+  position: absolute;
+  inset: 0;
+}
+.sk-color-swatch__checkerboard {
+  /* 3 pt tiles, white then sk_soft_gray, the top-left tile white (CheckerboardView, :168-212) */
+  background: conic-gradient(var(--sk_soft_gray) 0 25%, var(--dt_color_constants_white) 0 50%, var(--sk_soft_gray) 0 75%, var(--dt_color_constants_white) 0) 0 0 / 6px 6px;
+}
+
+/* ------------------------------------------------------------------------------------------------- SKEmoji */
+.sk-emoji {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  vertical-align: middle;
+}
+.sk-emoji > .ios-emoji {
+  display: block;
+}

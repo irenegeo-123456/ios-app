@@ -1,0 +1,19 @@
+/* More (spec shell-navigation.md §4.2). The header gradient (.root-header-gradient) is shared by the tab roots: nav.css. */
+
+.more__list {
+  position: relative;
+  /* the list is listThemeOptions.listBackgroundColor = sk_primary_background (TabBarOverflowPagePresenter.swift:40-45) */
+  background: var(--sk_primary_background);
+}
+.more__bottom-space {
+  /* clear of the floating tab bar: 21 pt from the bottom, 62 pt tall (measurements.md), plus the list's own 8 pt rhythm */
+  height: calc(21px + 62px + 16px);
+}
+.more__status-emoji {
+  display: block;
+}
+/* A count badge in the list theme's style (listThemeOptions.badgeStyle): theme.baseInverseImportant / contentInverseImportant */
+.more-badge {
+  --badge-bg: var(--theme_baseInverseImportant);
+  --badge-fg: var(--theme_contentInverseImportant);
+}

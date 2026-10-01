@@ -1,0 +1,434 @@
+/* The simulator around the phone. None of this is Slack UI: it's Simulator.app's window and a prototype panel, drawn
+   with the Mac's system font. Slack's UI lives inside .ios-screen and is styled by src/app. */
+
+:root {
+  --sim-font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  --sim-bg: radial-gradient(1200px 800px at 30% 20%, #eef0f5 0%, #dfe3ea 55%, #d4d9e1 100%);
+  --sim-ink: #1d1d1f;
+  --sim-ink-2: #6e6e73;
+  --sim-line: rgba(0, 0, 0, 0.1);
+  --sim-card: rgba(255, 255, 255, 0.72);
+  --sim-accent: #0a84ff;
+}
+html[data-sim-appearance='dark'] {
+  --sim-bg: radial-gradient(1200px 800px at 30% 20%, #2c2d31 0%, #1d1e21 55%, #151618 100%);
+  --sim-ink: #f5f5f7;
+  --sim-ink-2: #a1a1a6;
+  --sim-line: rgba(255, 255, 255, 0.12);
+  --sim-card: rgba(44, 44, 48, 0.72);
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+body {
+  font-family: var(--sim-font);
+  color: var(--sim-ink);
+  background: var(--sim-bg);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+html[data-kit-page] body {
+  overflow: auto;
+}
+html[data-sim-chrome='screen'] body {
+  background: #000;
+}
+
+.sim-page {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sim-stage {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+.sim-page--screen .sim-stage {
+  gap: 0;
+}
+.sim-scaled {
+  position: relative;
+  flex: none;
+}
+.sim-window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+/* ---------------------------------------------------------------------------------------------- title bar */
+.sim-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px 8px 14px;
+  box-sizing: border-box;
+}
+.sim-titlebar__lights {
+  display: flex;
+  gap: 8px;
+}
+.sim-titlebar__lights i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+}
+.sim-titlebar__lights i:nth-child(2) {
+  background: #febc2e;
+}
+.sim-titlebar__lights i:nth-child(3) {
+  background: #28c840;
+}
+.sim-titlebar__title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+}
+.sim-titlebar__title strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.sim-titlebar__title span {
+  font-size: 11px;
+  color: var(--sim-ink-2);
+}
+.sim-titlebar__tools {
+  display: flex;
+  gap: 2px;
+}
+.sim-titlebar__tools button {
+  width: 30px;
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--sim-ink-2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.sim-titlebar__tools button:hover {
+  background: var(--sim-line);
+  color: var(--sim-ink);
+}
+
+/* ----------------------------------------------------------------------------------------------- the phone */
+.ios-device {
+  position: relative;
+}
+.ios-device__frame {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--frame) 88%, #fff) 0%, var(--frame) 30%, var(--edge) 70%, color-mix(in srgb, var(--frame) 80%, #fff) 100%);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.35),
+    0 30px 60px -12px rgba(0, 0, 0, 0.35),
+    0 18px 36px -18px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+.ios-device__bezel {
+  position: absolute;
+  background: #050505;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ios-device__btn {
+  position: absolute;
+  width: 4px;
+  background: linear-gradient(90deg, var(--edge), var(--frame));
+  border-radius: 2px;
+}
+.ios-device__btn--left {
+  left: -3px;
+}
+.ios-device__btn--right {
+  right: -3px;
+  background: linear-gradient(270deg, var(--edge), var(--frame));
+}
+.ios-device__btn--camera {
+  width: 3px;
+  right: -2px;
+  opacity: 0.8;
+}
+.ios-device__home-button {
+  margin-top: 14px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid #2a2a2c;
+  background: #0b0b0c;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.ios-device__home-button:active {
+  background: #151516;
+}
+.ios-device__earpiece {
+  position: absolute;
+  top: 44px;
+  width: 64px;
+  height: 6px;
+  border-radius: 3px;
+  background: #1c1c1e;
+}
+
+/* The display. One CSS px is one point. */
+.ios-screen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  flex: none;
+  background: var(--dt_color_base_primary);
+  color: var(--dt_color_content_primary);
+  font-family: 'Lato', var(--sim-font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+  text-size-adjust: none;
+}
+.ios-screen *,
+.ios-screen *::before,
+.ios-screen *::after {
+  box-sizing: border-box;
+}
+.ios-screen__app {
+  position: absolute;
+  inset: 0;
+}
+
+.ios-statusbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  pointer-events: none;
+  transition: color 0.25s;
+}
+.ios-statusbar__time {
+  position: absolute;
+  text-align: center;
+  font: 600 17px/22px -apple-system, 'SF Pro Text', 'SF Pro', system-ui, sans-serif;
+  letter-spacing: -0.43px;
+  font-feature-settings: 'tnum' 0;
+}
+.ios-statusbar__glyphs {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 13px;
+}
+.ios-island {
+  position: absolute;
+  z-index: 1001;
+  top: 11px;
+  left: 50%;
+  width: 126px;
+  height: 37px;
+  margin-left: -63px;
+  border-radius: 19px;
+  background: #000;
+  pointer-events: none;
+}
+.ios-home-indicator {
+  position: absolute;
+  z-index: 1002;
+  bottom: 8px;
+  left: 50%;
+  width: 139px;
+  height: 5px;
+  margin-left: -69.5px;
+  border-radius: 3px;
+  pointer-events: none;
+  transition: background-color 0.25s;
+}
+.ios-home-indicator--dark {
+  background: #000;
+}
+.ios-home-indicator--light {
+  background: #fff;
+}
+
+/* ------------------------------------------------------------------------------------------- side panel */
+.sim-panel-slot {
+  flex: none;
+  display: flex;
+}
+.sim-panel {
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 18px 18px 22px;
+  border-radius: 18px;
+  background: var(--sim-card);
+  backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow:
+    0 0 0 0.5px var(--sim-line),
+    0 12px 40px -12px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+}
+.sim-panel__eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--sim-ink-2);
+}
+.sim-panel__title {
+  margin-top: 6px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.sim-panel__subtitle {
+  margin-top: 2px;
+  color: var(--sim-ink-2);
+  line-height: 1.35;
+}
+.sim-panel__section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 0.5px solid var(--sim-line);
+}
+.sim-panel__section h3 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--sim-ink-2);
+}
+.sim-panel__scenes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sim-btn {
+  font: inherit;
+  text-align: left;
+  border: 0;
+  border-radius: 9px;
+  padding: 8px 10px;
+  background: var(--sim-line);
+  color: var(--sim-ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sim-btn:hover {
+  background: color-mix(in srgb, var(--sim-accent) 14%, transparent);
+}
+.sim-btn__num {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--sim-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+.sim-select {
+  width: 100%;
+  font: inherit;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 0.5px solid var(--sim-line);
+  background: var(--sim-card);
+  color: var(--sim-ink);
+}
+.sim-swatches {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.sim-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.25);
+}
+.sim-swatch.is-selected {
+  outline: 2px solid var(--sim-accent);
+  outline-offset: 2px;
+}
+.sim-seg {
+  display: flex;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--sim-line);
+}
+.sim-seg button {
+  flex: 1;
+  font: inherit;
+  border: 0;
+  border-radius: 7px;
+  padding: 5px 0;
+  background: none;
+  color: var(--sim-ink);
+  cursor: pointer;
+}
+.sim-seg button.is-selected {
+  background: var(--sim-card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+}
+.sim-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.sim-panel__links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sim-panel__links a {
+  color: var(--sim-accent);
+  text-decoration: none;
+}
+.sim-panel__links a:hover {
+  text-decoration: underline;
+}
+.sim-panel__switcher {
+  margin-top: 12px;
+}
+.sim-panel__theme {
+  margin-top: 10px;
+}
+.sim-panel__problems h3 {
+  color: #c4541d;
+}
+.sim-panel__problems ul {
+  margin: 0;
+  padding-left: 16px;
+  line-height: 1.4;
+}
+.sim-panel__problems li + li {
+  margin-top: 6px;
+}

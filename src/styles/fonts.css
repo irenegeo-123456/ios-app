@@ -1,0 +1,25 @@
+/* Lato, the faces Slack's iOS app bundles (Modules/Data/Font/ResourceBundle/Font/Lato, Lato 2.007), converted
+   losslessly to WOFF by tools/ios/harvest.mjs. FontStyle.swift names them Lato-Light … Lato-Black; weights follow
+   the files' OS/2 classes.
+
+   Vertical metrics, calibrated against Slack's snapshot PNGs (the measurements are in docs/conventions.md, "Text
+   baselines"). The faces' hhea table has ascender 1974, descender -426, line gap 0 on a 2000-unit em; UIKit lines
+   are ascender + descender = 1.2 em and a UILabel draws its first baseline round(3 × 0.987 × size) device pixels
+   below its top (12 pt: 12, 13: 12.67, 15: 14.67, 17: 16.67, 22: 21.67, measured on SKButton, SKNavigationTitle and
+   SKGenericEntity snapshots).
+   - ascent-override 98.7 % is the hhea ascender.
+   - descent-override is 16.5 %, not the hhea 21.3 %, on purpose. Blink rounds the ascent and the descent to whole CSS
+     px and floors the half-leading, and Chrome paints baselines on whole CSS px. With 21.3 % the content box (17 + 4 =
+     21 px at 17 pt) overflows the 1.2 em line, the leading floors to -1 and every line at 9, 12, 13, 14, 17, 18, 22,
+     24 and 28 pt sat 1 pt high (0.67 pt above iOS). With 16.5 % the box fits the line at every size from 9 to 34 pt,
+     so the baseline sits exactly `size` px below the line top: the whole pixel nearest iOS (0 to +0.33 pt).
+   Line boxes don't change (line-height comes from type.css); only the inline content box (mention backgrounds,
+   line-height: normal) is 1.15 em instead of 1.2 em. */
+@font-face { font-family: 'Lato'; font-weight: 300; font-style: normal; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-Light.woff') format('woff'); }
+@font-face { font-family: 'Lato'; font-weight: 400; font-style: normal; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-Regular.woff') format('woff'); }
+@font-face { font-family: 'Lato'; font-weight: 400; font-style: italic; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-Italic.woff') format('woff'); }
+@font-face { font-family: 'Lato'; font-weight: 600; font-style: normal; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-Semibold.woff') format('woff'); }
+@font-face { font-family: 'Lato'; font-weight: 600; font-style: italic; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-SemiboldItalic.woff') format('woff'); }
+@font-face { font-family: 'Lato'; font-weight: 700; font-style: normal; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-Bold.woff') format('woff'); }
+@font-face { font-family: 'Lato'; font-weight: 700; font-style: italic; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-BoldItalic.woff') format('woff'); }
+@font-face { font-family: 'Lato'; font-weight: 900; font-style: normal; font-display: block; ascent-override: 98.7%; descent-override: 16.5%; line-gap-override: 0%; src: url('/fonts/Lato-Black.woff') format('woff'); }

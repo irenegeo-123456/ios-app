@@ -1,0 +1,366 @@
+/* Attachments: SKThumbnailAttachment, SKCompactAttachment, SKCompactOverflow, SKExpandedAttachment, SKAttachmentBar
+   and the badges they overlay. Spec: slackkit-components.md › SKThumbnailAttachment … SKAttachmentBar. */
+
+/* ------------------------------------------------------------------------------------------------ badges */
+.sk-video-badge,
+.sk-alt-badge {
+  /* sk_black @70 %, insets 2 / 4 (VideoDurationBadge.swift:42-54, AltTextHelper.swift:16-24) */
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 2px 4px;
+  background: rgb(from var(--sk_black) r g b / 0.7);
+  color: var(--dt_color_constants_white);
+  white-space: nowrap;
+}
+.sk-video-badge {
+  gap: 2px;
+  border-radius: 8px; /* largerCornerRadius */
+}
+.sk-video-badge > .ios-icon {
+  flex: none;
+}
+.sk-video-badge__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-video-badge--small .sk-video-badge__label {
+  font: var(--sk-caption-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-video-badge--medium .sk-video-badge__label {
+  font: var(--sk-small-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-alt-badge {
+  justify-content: center;
+  /* the badge measures 24 pt tall with or without the plus: the SKIcon's 20 pt still sets the row height
+     (SKThumbnailAttachmentSnapshotTests/testAttachmentImageMediumWithAltText: 52 × 24) */
+  min-height: 24px;
+  border-radius: 6px;
+}
+.sk-alt-badge > .ios-icon {
+  flex: none;
+}
+.sk-alt-badge__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--sk-caption-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-edit-badge {
+  /* EditIconBadge.swift:14-55: the icon 4 pt from every edge, sk_black @70 %, radius 8 */
+  display: inline-flex;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: 8px;
+  background: rgb(from var(--sk_black) r g b / 0.7);
+}
+.sk-alt-badge.is-interactive {
+  cursor: pointer;
+}
+.sk-multiselect-badge {
+  /* 20 pt; unselected sk_black @70 % inside a 2 pt white border, selected white (MultiSelectBadge.swift:18-95) */
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--dt_color_constants_white);
+  background: rgb(from var(--sk_black) r g b / 0.7);
+  color: var(--sk_black);
+  /* smallBodyBold capped at 14 pt (maximumPointSize) */
+  font: 700 14px/1 Lato;
+}
+.sk-multiselect-badge.is-selected {
+  border-width: 0;
+  background: var(--dt_color_constants_white);
+}
+
+/* ----------------------------------------------------------------------------------- SKThumbnailAttachment */
+.sk-thumbnail {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  isolation: isolate;
+  vertical-align: top;
+  background: var(--dt_color_base_primary);
+  -webkit-tap-highlight-color: transparent;
+}
+.sk-thumbnail::after {
+  /* the layer border, composited over the content: 1 pt outlineTertiary; 3 pt sk_secondary_highlight selected */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.sk-thumbnail.is-selected::after {
+  box-shadow: inset 0 0 0 3px var(--sk_secondary_highlight);
+}
+.sk-thumbnail.is-plain::after {
+  content: none;
+}
+.sk-thumbnail.is-interactive {
+  cursor: pointer;
+}
+.sk-thumbnail.is-interactive.is-pressed {
+  opacity: 0.6; /* highlightedAlpha */
+}
+.sk-thumbnail__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.sk-thumbnail__icon {
+  grid-area: 1 / 1;
+}
+.sk-thumbnail__overflow {
+  grid-area: 1 / 1;
+  font: var(--sk-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sk-thumbnail__dim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--sk_black_high_contrast);
+}
+.sk-thumbnail__select,
+.sk-thumbnail__video,
+.sk-thumbnail__heart,
+.sk-thumbnail__edit,
+.sk-thumbnail__alt {
+  position: absolute;
+  z-index: 2;
+}
+.sk-thumbnail__heart {
+  /* a 7 pt sk_black_high_contrast shadow (:196-201) */
+  filter: drop-shadow(0 0 7px var(--sk_black_high_contrast));
+}
+.sk-thumbnail__alt {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ------------------------------------------------------------------------------------- AttachmentOrnament */
+.sk-attachment-ornament {
+  /* an SKEntityOrnamentView .large image: 36 pt, radius 6 (imageViewCornerRadius, SKEntityOrnamentView.swift:367-378);
+     the view masks to its bounds, so a video's centered "Video" badge is clipped */
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--dt_color_base_tertiary);
+}
+.sk-attachment-ornament > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sk-attachment-ornament__video {
+  /* pinned to the center, wider than the tile */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ------------------------------------------------------------------------------------- SKCompactAttachment */
+.sk-compact-attachment {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 100%;
+  overflow: hidden;
+  vertical-align: top;
+  border-radius: 15px; /* moreRoundedCornerRadius */
+  background: var(--dt_color_base_primary);
+  -webkit-tap-highlight-color: transparent;
+}
+.sk-compact-attachment::after {
+  /* the 1 pt outlineTertiary layer border, over the content */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.sk-compact-attachment.is-interactive {
+  cursor: pointer;
+}
+.sk-compact-attachment.is-interactive.is-pressed {
+  opacity: 0.6;
+}
+.sk-compact-attachment__row {
+  /* outerStackViewInsets 12, spacing 8, centered (:79-81, :255-257) */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  min-width: 0;
+}
+.sk-compact-attachment__labels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px; /* innerStackViewSpacing */
+  min-width: 0;
+}
+.sk-compact-attachment__primary {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* primaryContentStackViewSpacing */
+  max-width: 100%;
+  min-width: 0;
+}
+.sk-compact-attachment__title,
+.sk-compact-attachment__detail,
+.sk-compact-attachment__subtitle {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sk-compact-attachment__title {
+  flex: 0 1 auto;
+  font: var(--sk-small-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+}
+.sk-compact-attachment__detail {
+  /* compresses before the title */
+  flex: 0 100 auto;
+  font: var(--sk-caption);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sk-compact-attachment__accessory {
+  display: flex;
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+.sk-compact-attachment__subtitle {
+  max-width: 100%;
+  font: var(--sk-caption);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_tertiary);
+}
+.sk-compact-attachment__divider {
+  /* onePixel: one device pixel of layout, drawn on top of a 1 pt box (src/styles/hairline.css) */
+  flex: none;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.sk-compact-attachment__preview {
+  display: block;
+  width: 100%;
+  /* the image doesn't widen the card: its width comes from the row above (size(for:) :381-470) */
+  contain: inline-size;
+  max-height: 300px; /* maxAbsoluteHeight */
+  overflow: hidden;
+}
+.sk-compact-attachment__preview > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sk-compact-attachment__progress {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* --------------------------------------------------------------------------------------- SKCompactOverflow */
+.sk-compact-overflow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.sk-compact-overflow__card {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------------------------ SKExpandedAttachment */
+.sk-expanded-attachment {
+  position: relative;
+  box-sizing: border-box;
+  display: block;
+  overflow: hidden;
+  background: var(--dt_color_base_secondary);
+  -webkit-tap-highlight-color: transparent;
+}
+.sk-expanded-attachment::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--ea-border, var(--dt_color_outline_tertiary));
+  pointer-events: none;
+}
+.sk-expanded-attachment > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.sk-expanded-attachment.is-interactive {
+  cursor: pointer;
+}
+.sk-expanded-attachment.is-interactive.is-pressed {
+  opacity: 0.6;
+}
+.sk-expanded-attachment__badge {
+  position: absolute;
+  z-index: 1;
+}
+
+/* ----------------------------------------------------------------------------------------- SKAttachmentBar */
+.sk-attachment-bar {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.sk-attachment-bar__thumbnails {
+  position: relative;
+}
+.sk-attachment-bar__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px; /* rowSpacing */
+}
+.sk-attachment-bar__full,
+.sk-attachment-bar__stack > .sk-compact-overflow {
+  width: 100%;
+}
+.sk-attachment-bar__full.sk-compact-attachment {
+  display: flex;
+}

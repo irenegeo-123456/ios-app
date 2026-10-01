@@ -1,0 +1,52 @@
+Slack for iOS prototyping kit: NOTICE
+
+INTERNAL TO SLACK. This repository contains Slack's proprietary code, design tokens and design assets. Use it
+for prototypes, demos and design reviews inside Slack and Salesforce. Don't publish it, mirror it publicly,
+host it on the open internet, publish it as a claude.ai Artifact or ship it in a product. Its GitHub Pages
+site must stay on an access-controlled internal host (docs/publishing.md).
+
+
+SLACK PROPRIETARY MATERIAL (internal use only)
+
+- Values, copy and structure taken from Slack's iOS app (slack-objc): layout constants, strings and behavior
+  described in reference/ios/specs/ and cited in the code, the icons (src/icons/generated/, from
+  Modules/Data/Icon/ResourceBundle/Icons.xcassets), the app icon and launch images (public/ios/) and the
+  notification sounds (public/sounds/, from App/Resource/Sounds).
+- Slack's design tokens: slack/design-tokens at df1f228, the commit the iOS app pins (output/ios/Colors.swift and
+  Presets.swift, vendored in reference/ios/vendor/, generated into src/tokens/generated/).
+- Code and data shared with the web prototyping kit (slack-remix): the Northstar demo workspace (src/data/), the
+  message formatter ported from slack/webapp (src/lib/vendor/), Slack's emoji data (src/emoji/*.json) and built-in
+  emoji images (public/emoji-builtin/), the App Kit and Block Kit types (src/apps/, src/blocks/).
+- Design assets from Slack's internal kits: company logos, file icons, previews and thumbnails in public/kit/
+  (public/kit/README.md says where each came from).
+
+
+FONTS (public/fonts/)
+
+- Lato 2.007, the faces Slack's iOS app bundles: Copyright (c) 2010-2014 Lukasz Dziedzic (tyPoland), with Reserved
+  Font Name "Lato". SIL Open Font License 1.1. Converted losslessly from TrueType to WOFF.
+
+
+EMOJI
+
+- Apple emoji images (the 64 px set, served from the emoji-datasource-apple package). The package's README says:
+  "Apple images, Copyright © Apple Inc., are not licensed for commercial usage." They're used here only for
+  internal prototyping.
+- emoji-datasource data: MIT License, Copyright (c) 2013 Cal Henderson.
+
+
+PEOPLE
+
+- Illustrated avatars (public/avatars/demo/, public/kit/illustrated/) are generated with DiceBear's "Notionists"
+  style, by Zoish, CC0 1.0.
+- Persona names and photos (public/kit/personas/, src/data/personas.ts): Slack's legal-approved persona roster, for
+  internal use as Slack's persona guide describes.
+
+
+THIRD-PARTY MARKS
+
+- App icons and logos of other companies (in public/kit/apps/, public/apps/, public/demo/icons/) are trademarks of
+  their owners. The simulator's device frame and status bar are drawings of Apple hardware and iOS for context.
+
+
+npm dependencies keep their own licenses; see each package in node_modules/.

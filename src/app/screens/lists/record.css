@@ -1,0 +1,388 @@
+/* A list item and the editors its fields open (ListRecordSheet.tsx, ListFieldEditors.tsx; spec canvas-lists-creation.md
+   §3.3). The item is laid out as ListRecordFeatureSnapshotTests' iOS 26 renders measure (testSelectField_singleSelect,
+   testWithCheckboxRow(Completed), testDateField_*, testUserField_*, testTextField_*, testPrimaryTextField_empty @3x),
+   from the top of the content: the safe area's there (59 pt), the sheet's 60 pt bar here. */
+
+.lr {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.lr__bar .sheet-bar__title {
+  /* the title view between the two 44 pt circles */
+  left: 76px;
+  right: 76px;
+}
+.lr__navtitle .sk-nav-title__subtitle {
+  /* the list's name: caption, highlight1.content (ListRecordPresenter.swift:2037-2039) */
+  font: var(--sk-caption);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_highlight_1);
+}
+.lr__more {
+  right: 16px;
+  width: 44px;
+  display: grid;
+  place-items: center;
+}
+/* the list under the bar, the "View only" banner over its bottom */
+.lr__body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.lr__scroll {
+  flex: 1;
+  min-height: 0;
+  padding-top: 60px;
+  /* the list's bottom inset leaves room for the "View only" banner (banner + 2 × 16, ListRecordViewController.swift:452-459) */
+  padding-bottom: 16px;
+}
+.lr.is-view-only .lr__scroll {
+  /* the banner (48 pt) and 16 pt either side of it */
+  padding-bottom: 80px;
+}
+.lr.is-new .lr__scroll {
+  padding-bottom: calc(16px + var(--sheet-safe-bottom, var(--safe-bottom, 0px)));
+}
+
+/* the primary field's section: its text's caps 17 pt below the top (76.0 − 59) — a 3 pt blank header over the
+   SKGenericEntity row (10 / 16 insets) */
+.lr__section--primary {
+  padding-top: 3px;
+}
+.lr__primary {
+  /* bodyBold, contentPrimary; empty "Untitled Item" in contentTertiary (testPrimaryTextField_empty: #5E5D60) */
+  font: var(--sk-body-bold);
+  line-height: inherit;
+  color: var(--dt_color_content_primary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.lr__primary.is-empty {
+  color: var(--dt_color_content_tertiary);
+}
+
+/* the actions row (Complete · Add a comment): 40 pt buttons 8 pt apart, 16 pt from the sides, 59.7 pt below the top
+   (15.7 below the primary row), 4 pt above the section's 8 pt hairline footer (whose 1 px line sits at 111.3) */
+.lr__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15.7px;
+  padding: 0 16px 4px;
+}
+.lr__action {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* a field's SKHeaderEntity (.medium): the name in smallBodyBold contentPrimary, 20 pt below the section's top, 12 pt
+   above its row (50 pt in all: "Select" caps at 194.0, its row at 220.7) */
+.lr__header {
+  padding: 20px 16px 12px;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+
+/* text: body contentSecondary (#454447), any number of lines */
+.lr__text {
+  color: var(--dt_color_content_secondary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.lr__text-icon,
+.lr__date-icon,
+.lr__placeholder-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.lr__text-icon {
+  color: var(--dt_color_content_secondary);
+}
+
+/* a date and svgCaretDown in contentPrimary; empty "Date ⌄" lighter than contentTertiary: #8D8D8D measured
+   (contentTertiary at 70 %). The icon font's calendar glyph is 18 pt wide: the SVG at 24 pt. */
+.lr__date {
+  display: inline-flex;
+  align-items: center;
+  color: var(--dt_color_content_primary);
+}
+.lr__date-icon {
+  color: var(--dt_color_content_primary);
+}
+.lr__date-icon .ios-icon {
+  width: 24px;
+  height: 24px;
+}
+.lr__date.is-empty,
+.lr__date-icon.is-empty {
+  color: rgb(from var(--dt_color_content_tertiary) r g b / 0.7);
+}
+
+/* select and person: a token bar row, 10 / 16 insets around the 32.67 pt tokens */
+.lr__tokens {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: calc(32.67px + 20px);
+  padding: 10px 16px;
+  box-sizing: border-box;
+}
+/* the empty token: the icon in a 24 pt box, 12 pt, the word, contentTertiary (#5E5D60); "Select" draws bold
+   (testSelectField_empty), "Person" regular (testUserField_empty) */
+.lr__placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 32.67px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+}
+.lr__placeholder.is-select {
+  font: var(--sk-body-bold);
+}
+/* the pull-down menu's choice circles: 20 pt, a 1 pt _70 ring, _20 fill (SKMenu.swift:66, 149-166) */
+.lr__choice-circle {
+  display: block;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border: 1px solid;
+  border-radius: 50%;
+}
+
+/* a checkbox field: no header; SKCheckbox in a 24 pt box at x 16, the name in body at x 52, 44 pt (182.3 − 203.3) */
+.lr__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+}
+.lr__checkbox-box {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.lr__checkbox-label {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+
+/* "Add field": the list's footer button, 10 pt below the last row */
+.lr__add-field {
+  padding: 10px 16px 0;
+}
+
+/* the update toast: 16 pt from the sides, 8 pt above the bottom, fading 0.2 s (ListRecordViewController.swift:21, 280-282) */
+.lr__toast {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 8px;
+  z-index: 6;
+  animation: lr-toast-in 0.2s linear;
+}
+@keyframes lr-toast-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* "View only": SKBanner 12 pt from the sides, 16 pt above the bottom */
+.lr__banner {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 16px;
+  z-index: 5;
+}
+
+/* previous / next and "N of M" (ListRecordBottomBarNavigationView.swift:28-33, 125-162): basePrimary, a 1 pt
+   outlineTertiary divider at the top, 10 pt above the 40 pt buttons, 16 pt margins and spacing, then the safe area */
+.lr__bottom {
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px var(--sheet-safe-bottom, var(--safe-bottom, 0px));
+  background: var(--dt_color_base_primary);
+  border-top: 1px solid var(--dt_color_outline_tertiary);
+}
+.lr__count {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lr__count-position {
+  /* captionBold contentPrimary */
+  font: var(--sk-caption-bold);
+  color: var(--dt_color_content_primary);
+}
+.lr__count-title {
+  /* the item's title, micro contentSecondary, once it has scrolled away */
+  max-width: 100%;
+  font: var(--sk-micro);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------------------------------------ the text editor */
+/* RichTextInputViewController.swift:57-73, 112-200, 236-238, 355-363: cross-dissolved over everything, black 40 % */
+.lr-input {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.ios-overlay.is-open .lr-input {
+  opacity: 1;
+}
+/* the Liquid Glass card: radius 24, 16 pt from the sides, 12 pt above the keyboard; 16 pt margins, 8 pt apart */
+.lr-input__card {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(var(--kb-height, 0px) + 12px);
+  max-height: calc(100% - var(--safe-top, 0px) - var(--kb-height, 0px) - 12px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: 24px;
+  transition: bottom 0.25s cubic-bezier(0.17, 0.59, 0.4, 0.77);
+}
+.lr-input__title {
+  flex: none;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+.ios-app .lr-input__text {
+  flex: 0 1 auto;
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  resize: none;
+  outline: none;
+  background: transparent;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+  caret-color: var(--dt_color_content_highlight_1);
+  overflow-y: auto;
+}
+.lr-input__text::placeholder {
+  color: var(--dt_color_content_tertiary);
+}
+.lr-input__toolbar {
+  flex: none;
+  margin: 0 -4px;
+}
+.lr-input__buttons {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  /* 16 pt below the toolbar (:150) */
+  margin-top: 8px;
+}
+.ios-app .lr-input__button {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_highlight_1);
+}
+.lr-input__button.is-pressed {
+  opacity: 0.5;
+}
+
+/* ------------------------------------------------------------------------------------------------ Select User */
+.lr-pick {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dt_color_base_primary);
+}
+.lr-pick__search {
+  /* SKSearchView: 16 / 12 pt insets under the 60 pt bar (SKSearchView.swift:24-33) */
+  flex: none;
+  padding: calc(60px + 12px) 16px 12px;
+}
+.lr-pick__rule {
+  /* a 1 px (UIUtilities.onePixel) outlineTertiary rule under the search view (UserConversationPickerViewController.swift:195,
+     211): one device pixel of layout, its line on top (docs/conventions.md, "Hairlines") */
+  flex: none;
+  height: 1px;
+  margin-bottom: calc(var(--hairline) - 1px);
+  box-shadow: inset 0 var(--hairline) 0 var(--dt_color_outline_tertiary);
+}
+.lr-pick__list {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: calc(var(--kb-height, 0px) + var(--sheet-safe-bottom, var(--safe-bottom, 0px)));
+}
+
+/* ------------------------------------------------------------------------------------------------ Select a date */
+/* The Block Kit date sheet's classes (src/blocks/sheets/sheets.css), placed as testScreenshotDate@3x.png measures from
+   the picker's top (12 pt under the title row): the month row centered at 35.2, its label 12.35 pt left of the first
+   column's center, the arrows 45.65 apart, the right one centered 39.35 pt in from the content's right edge; weekday
+   symbols centered at 77.6; weeks centered from 109.3, 45.67 apart, in 45 pt columns centered on the sheet; 25.5 pt
+   under the last week. "Clear" follows the picker directly (the outer stack has no spacing there). */
+/* a native sheet now: the margins 20 / 16 / 12 / 16 from its own edge, then the safe area */
+.lr-date.bk-datetime {
+  padding: 20px 16px calc(12px + var(--sheet-safe-bottom, 0px));
+}
+.lr-date .bk-calendar {
+  padding: 0 0 25.5px;
+}
+.lr-date .bk-calendar__head {
+  margin-top: 13.15px;
+  padding-left: 37px;
+}
+.lr-date .bk-calendar__nav {
+  padding-right: 25.4px;
+}
+.lr-date .bk-calendar__weekdays,
+.lr-date .bk-calendar__grid {
+  grid-template-columns: repeat(7, 45px);
+}
+.lr-date .bk-calendar__weekdays {
+  margin-top: 12.45px;
+  height: 16px;
+  line-height: 16px;
+}
+.lr-date .bk-calendar__grid {
+  margin-top: 0.87px;
+  grid-auto-rows: 45.67px;
+}
+.lr-date .bk-datetime__clear {
+  margin-top: -12px;
+}
+/* UIKit draws today, when it's the picked day, white on the tint */
+.ios-app .lr-date .bk-calendar__day.is-today.is-selected {
+  background: var(--cal-tint);
+  color: var(--dt_color_base_primary);
+}

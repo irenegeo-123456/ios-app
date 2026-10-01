@@ -1,0 +1,334 @@
+/* You, Pause Notifications and their sheet bar (spec shell-navigation.md §4.3-§4.5; values cited in the .tsx files).
+   Colors are the CoreColorSet tokens the September 2026 source moved these views to (slack-objc 14b3cbaf). */
+
+.you {
+  /* YouViewController: view.backgroundColor = basePrimary (YouViewController.swift:21) */
+  background: var(--dt_color_base_primary);
+}
+.you--sheet,
+.you-pause {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  /* basePrimary (YouViewController.swift:21; NotificationsPauseViewController.swift:25) */
+  background: var(--dt_color_base_primary);
+}
+.you-list {
+  background: var(--dt_color_base_primary);
+}
+.you-list__bottom {
+  /* pushed on a tab: clear of the floating tab bar (21 + 62 pt, measurements.md); in a sheet: the home indicator */
+  height: calc(21px + 62px + 16px);
+}
+.you--sheet .you-list__bottom,
+.you-pause .you-list__bottom {
+  height: calc(var(--safe-bottom) + 16px);
+}
+/* SKNavigationBar's title (UINavigationBar+SlackStyles.swift:84): Lato Bold 17, contentPrimary */
+.you-title {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------------------------------ profile row */
+.you-profile {
+  /* YouInfoView.swift:32-41: insets 4/16/12/16, 16 pt from the avatar to the text, centered */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 16px 12px;
+  /* basePrimary (YouInfoView.swift:51) */
+  background: var(--dt_color_base_primary);
+  transition: background-color 0.2s;
+}
+.you-profile.is-pressed {
+  /* setHighlighted: baseSecondary (YouInfoView.swift:117-119) */
+  background: var(--dt_color_base_secondary);
+}
+.you-profile__text {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.you-profile__name {
+  /* .subtitle (Lato Black 20), contentPrimary (YouInfoView.swift:90-92) */
+  font: var(--sk-subtitle);
+  color: var(--dt_color_content_primary);
+  overflow-wrap: anywhere;
+}
+.you-profile__presence {
+  /* .body, contentSecondary (YouInfoView.swift:94-96) */
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+}
+
+/* ------------------------------------------------------------------------------------ add-photo banner */
+.you-banner-row {
+  /* SKBannerEntity margins 12/16/12/16 (SKBannerEntity.swift:23) */
+  padding: 12px 16px;
+}
+
+/* ---------------------------------------------------------------------------------------- status pill */
+.you-status-row {
+  /* YouStatusView.swift: insets 4/16/8/16 */
+  padding: 4px 16px 8px;
+}
+.you-status {
+  /* UserStatusView.swift:25-52: insets 8/16/8/16, radius 14 continuous, a 1 pt outlineTertiary border on basePrimary
+     (:37, :43), 12 pt spacing; height max(20, text, the 40 pt clear button) + 16 = 56 */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  border-radius: 14px;
+  background: var(--dt_color_base_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  /* bounce mode: back up over 0.4 s (smooth/medium), down over 0.2 s (UIView+BounceMode.swift:14-35) */
+  transition:
+    transform 0.4s var(--sk-spring-smooth),
+    background-color 0.4s var(--sk-spring-smooth);
+}
+.you-status.is-pressed {
+  /* setHighlighted: baseTertiary (:46), scale 0.99 (:25, :141-148) */
+  background: var(--dt_color_base_tertiary);
+  transform: scale(0.99);
+  transition-duration: 0.2s;
+}
+.you-status__emoji {
+  flex: none;
+  display: block;
+}
+.you-status__placeholder {
+  /* svgEmoji (svgEmojiFilled pressed) in contentSecondary (UserStatusView.swift:59, :165) */
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--dt_color_content_secondary);
+}
+.you-status__placeholder .is-pressed,
+.you-status.is-pressed .you-status__placeholder .is-normal {
+  display: none;
+}
+.you-status.is-pressed .you-status__placeholder .is-pressed {
+  display: block;
+}
+.you-status__text {
+  flex: 1;
+  min-width: 0;
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+.you-status__text.is-placeholder {
+  /* Text(R.strings.whats_your_status, textColor: contentSecondary) (YouPresenter.swift:256-261) */
+  color: var(--dt_color_content_secondary);
+}
+.you-status__clear {
+  flex: none;
+  /* the button's 40 pt frame ends at the pill's 16 pt inset; its 20 pt glyph sits 10 pt inside it */
+  margin: -2px -10px -2px 0;
+}
+
+/* SKGenericEntity accessoryText: .body contentSecondary (SKEntityContentView.swift:61-62) */
+.you-accessory-text {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------------------- the sheet bar */
+.you-sheet-bar {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60px;
+  pointer-events: none;
+}
+.you-sheet-bar > button {
+  pointer-events: auto;
+}
+.you-sheet-bar__edge {
+  /* iOS 26's soft scroll edge under a bar, once content scrolls beneath it (as .ios-navbar__edge) */
+  position: absolute;
+  inset: 0 0 -16px;
+  background: linear-gradient(to bottom, var(--dt_color_base_primary) 55%, color-mix(in srgb, var(--dt_color_base_primary) 70%, transparent) 78%, transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.you-sheet-bar.is-scrolled .you-sheet-bar__edge {
+  opacity: 1;
+}
+.you-sheet-glass {
+  /* the render's glass over a sheet reads as UIKit's systemFill: rgba(120,120,128,.16) light, .3 dark (measured) */
+  border: 0;
+  padding: 0;
+  background: var(--ios-fill, rgba(120, 120, 128, 0.16));
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  backdrop-filter: blur(14px) saturate(1.6);
+  color: var(--dt_color_content_primary);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+[data-appearance='dark'] .you-sheet-glass {
+  background: var(--ios-fill, rgba(120, 120, 128, 0.3));
+}
+.you-sheet-glass.is-pressed {
+  transform: scale(0.94);
+}
+.you-sheet-bar__close {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+}
+.you-sheet-bar__title {
+  position: absolute;
+  left: 76px;
+  right: 76px;
+  top: 16px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.you-sheet-bar__title.is-narrow {
+  /* room for a title button on either side ("Cancel": 16 + 87 + 9), as SheetBar */
+  left: 112px;
+  right: 112px;
+}
+.you-sheet-bar__text-button {
+  /* a title bar button item: UIKit's glass capsule, 44 pt tall, the title 12 pt in from its ends (measurements.md,
+     iOS 26 bars: SKBarButtonItemTests testTitleButtons 12.3, system Edit / Save / Cancel 11–12.3; SKBarButtonItem
+     turns on the custom view's layout margins under Liquid Glass, SKBarButtonItem.swift:170-172); UIKit's system font
+     at 17 pt unless Slack styles it */
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0 12px;
+  border-radius: 22px;
+  font: 400 17px/1 var(--sf);
+}
+.you-sheet-bar__text-button.is-leading {
+  left: 16px;
+  right: auto;
+}
+.ios-app .you-sheet-bar__text-button {
+  font: 400 17px/1 var(--sf);
+  color: var(--dt_color_content_primary);
+}
+.ios-app .you-sheet-bar__text-button.is-bold {
+  font: 700 17px/1 Lato;
+}
+.ios-app .you-sheet-bar__text-button.is-regular {
+  font: 400 17px/1 Lato;
+}
+.you-sheet-bar__text-button:disabled,
+.you-sheet-bar__icon-button:disabled {
+  color: var(--dt_color_content_tertiary);
+  opacity: 0.6;
+}
+.ios-app .you-sheet-bar__text-button.is-bold:disabled {
+  /* Slack's title items while disabled (.inactive): contentSecondary (SKButton+Types.swift:200-234;
+     SNAP/SKBarButtonItemTests/testSystemSaveButton) */
+  color: var(--dt_color_content_secondary);
+  opacity: 1;
+}
+.you-sheet-bar__icon-button {
+  /* an icon bar button item: the same 44 pt glass circle as the close button */
+  position: absolute;
+  top: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+}
+.you-sheet-bar__icon-button.is-trailing {
+  right: 16px;
+}
+.you-sheet-bar__icon-button.is-leading {
+  left: 16px;
+}
+
+/* ----------------------------------------------------------------------------------- pause notifications */
+.you-pause__list {
+  padding-top: 60px;
+  /* basePrimary (NotificationsPausePresenter.swift:48) */
+  background: var(--dt_color_base_primary);
+}
+
+/* UIDatePicker .wheels (UIKit's 216 pt picker, approximated): four wheels over a rounded selection band */
+.you-wheels {
+  position: relative;
+  height: 216px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+  font-family: var(--sf);
+  user-select: none;
+}
+.you-wheels__band {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 92px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--ios-fill, rgba(120, 120, 128, 0.16));
+  pointer-events: none;
+}
+.you-wheel {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  touch-action: none;
+  cursor: default;
+}
+.you-wheel.is-day {
+  width: 132px;
+}
+.you-wheel.is-hour,
+.you-wheel.is-minute {
+  width: 44px;
+}
+.you-wheel.is-meridiem {
+  width: 52px;
+}
+.you-wheel.is-single {
+  flex: 1;
+  margin: 0 16px;
+}
+.you-wheel__rows {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.you-wheel__rows.is-dragging {
+  transition: none;
+}
+.you-wheel__row {
+  height: 32px;
+  line-height: 32px;
+  padding: 0 6px;
+  font-size: 20px;
+  color: var(--ios-label, var(--dt_color_content_primary));
+  white-space: nowrap;
+  transform-origin: 50% 50%;
+}

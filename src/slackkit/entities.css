@@ -1,0 +1,292 @@
+/* Entity rows and their accessories (SKEntityBaseView anatomy, SKGenericEntity, SKMemberEntity, SKChannelEntity…,
+   SKHeaderEntity, SKList accessories and swipe actions). Spec: slackkit-components.md › List rows, Lists. */
+
+/* --------------------------------------------------------------------------------------- row accessories */
+.sk-accessories {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* SKListRowAccessoryStackView.swift:679 */
+  flex: none;
+}
+.sk-accessories__control {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------------------------------------- SKGenericEntity */
+.sk-entity {
+  position: relative;
+  background: var(--entity-bg);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.sk-entity[role='button'] {
+  cursor: pointer;
+}
+.sk-entity__body {
+  position: relative;
+  background: var(--entity-bg);
+}
+.sk-entity.has-bounce .sk-entity__body {
+  /* the cell shrinks by 8 pt in its longest dimension, (L − 8) / L, with the bounce timing: 0.2 s smooth down,
+     0.4 s smooth up (SKListCollectionViewCell.swift:214-240, UIView+BounceMode.swift:14-35) */
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.sk-entity.has-bounce.is-pressed .sk-entity__body {
+  transform: scale(calc((var(--screen-w, 393px) - 8px) / var(--screen-w, 393px)));
+  transition-duration: 0.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-entity.has-bounce .sk-entity__body,
+  .sk-entity.has-bounce.is-pressed .sk-entity__body {
+    transition: none;
+    transform: none;
+  }
+}
+.sk-entity__highlight {
+  /* SKEntityBackgroundView: rounded = 4 pt in from the sides, radius 12, continuous */
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 12px;
+  transition: background-color 0.4s var(--sk-spring-smooth);
+}
+.sk-entity.is-pressed .sk-entity__highlight {
+  background: var(--entity-highlight);
+  transition-duration: 0.2s;
+}
+.sk-entity.is-focused .sk-entity__highlight {
+  /* highlight3.surface since September 2026 (SKEntityBackgroundView.swift:111-114; June sk_pale_yellow) */
+  background: var(--dt_color_surface_highlight_3);
+}
+.sk-entity__row {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  min-width: 0;
+}
+.sk-entity__ornament {
+  display: inline-flex;
+  flex: none;
+}
+.sk-entity__ornament.is-disabled,
+.sk-entity.is-disabled .sk-entity__inline {
+  opacity: 0.6; /* disabledViewAlpha */
+}
+.sk-entity__image {
+  display: block;
+  object-fit: cover;
+  background: var(--dt_color_base_tertiary);
+}
+.sk-entity__content {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sk-entity__texts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sk-entity__texts.is-centered {
+  align-items: center;
+  text-align: center;
+}
+.sk-entity__primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  min-width: 0;
+}
+.sk-entity__title,
+.sk-entity__trailing,
+.sk-entity__workspace,
+.sk-entity__secondary,
+.sk-entity__accessory-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-entity__title {
+  flex: 0 1 auto;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_primary);
+}
+.sk-entity__title.is-bold {
+  font: var(--sk-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-entity__title.is-black {
+  font: var(--sk-body-black);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-entity__trailing,
+.sk-entity__workspace {
+  /* compress before the title (priorities defaultHigh − 1 / − 2) */
+  flex: 0 100 auto;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sk-entity__workspace {
+  flex-shrink: 200;
+}
+.sk-entity__inline {
+  flex: none;
+}
+.sk-entity__inline-icon {
+  /* the inline icon is nudged by (−1.5, 1.5) (SKEntityPrimaryContentView.swift:47) */
+  transform: translate(-1.5px, 1.5px);
+}
+.sk-entity__adjacent {
+  /* microBold, insets 2 / 4, radius 4 (:57-61) */
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font: var(--sk-micro-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  white-space: nowrap;
+}
+.sk-entity__secondary {
+  max-width: 100%;
+  font: var(--sk-caption);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sk-entity__secondary.is-large {
+  font: var(--sk-small-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-entity__accessory-text {
+  flex: 0 0 auto;
+  max-width: 50%;
+  font: var(--sk-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sk-entity.is-disabled .sk-entity__title,
+.sk-entity.is-disabled .sk-entity__trailing,
+.sk-entity.is-disabled .sk-entity__workspace,
+.sk-entity.is-disabled .sk-entity__secondary,
+.sk-entity.is-disabled .sk-entity__accessory-text {
+  color: var(--dt_color_content_tertiary);
+}
+.sk-entity__footer {
+  /* the footer button sits 15 pt below the row content (verticalSpacing) */
+  position: relative;
+  margin-top: 5px;
+}
+/* Swipe actions: the revealed background, and the medium default-style SKButton in it */
+.sk-entity__swipe {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.sk-entity__swipe-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: left 0.368s var(--sk-spring-snappy), right 0.368s var(--sk-spring-snappy);
+}
+.sk-entity__swipe-button.is-left {
+  left: 0;
+}
+.sk-entity__swipe-button.is-right {
+  right: 0;
+}
+.sk-entity.is-swiping .sk-entity__body {
+  /* while swiping the row gets a 12 pt radius and a shadow: black, opacity 0.4, radius 4 (:76-90, :473-480) */
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgb(0 0 0 / 0.4);
+}
+
+/* -------------------------------------------------------------------------------------------- SKHeaderEntity */
+.sk-header-entity {
+  background: var(--dt_color_base_primary);
+}
+.sk-header-entity__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+.sk-header-entity__ornament {
+  display: inline-flex;
+  flex: none;
+}
+.sk-header-entity__image {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.sk-header-entity__texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* verticalStackViewSpacing */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sk-header-entity__texts.is-tappable {
+  cursor: pointer;
+}
+.sk-header-entity__title,
+.sk-header-entity__secondary {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sk-header-entity__title {
+  font: var(--sk-small-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-header-entity__secondary {
+  font: var(--sk-small-body);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_secondary);
+}
+.sk-header-entity__secondary.is-small {
+  font: var(--sk-micro);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-header-entity__button {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  max-width: 50%;
+  padding: 0 4px; /* rightButtonHorizontalPadding */
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.sk-header-entity__button-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--sk-small-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  color: var(--dt_color_content_highlight_1);
+}
+.sk-header-entity__button-text.is-small {
+  font: var(--sk-micro-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+}
+.sk-header-entity__caret {
+  display: inline-flex;
+  flex: none;
+  cursor: pointer;
+}
+.sk-header-entity__caret > .ios-icon {
+  transition: transform 0.25s;
+}
+.sk-header-entity__texts.is-pressed,
+.sk-header-entity__button.is-pressed,
+.sk-header-entity__caret.is-pressed {
+  opacity: 0.4; /* ContainerControl highlighted alpha */
+}

@@ -1,0 +1,1140 @@
+/* The composer (reference/ios/specs/composer.md): the iOS 26 Liquid Glass card, its toolbar and buttons, the rich text
+   view, the autocomplete card, the "+" sheet and the link alert. Values cite the spec section or Swift file:line
+   (paths in the spec's file index). */
+
+/* -------------------------------------------------------------------------------------------- placement */
+.cmp {
+  /* the host view's bottom (§2.1, §15.1): the floating tab bar's top while it shows (21 pt margin + 62 pt capsule,
+     measurements.md), else the safe-area bottom; the keyboard's top while it's up */
+  --cmp-dock: calc(21px + 62px);
+  --cmp-kb-curve: cubic-bezier(0.17, 0.59, 0.4, 0.77); /* the keyboard's own slide (app.css .ios-kb), 0.25 s */
+  /* the sides while collapsed: the tab bar's own inset, 21 pt on every iPhone here (Sept: ComposerViewController.swift:
+     282-292, :344-348 read it from the tab bar's first and last items, CustomConstraintHelpers.swift:42-70; June the same,
+     :137-212), 16 pt without a tab bar (the fallback); 8 pt focused (:349) */
+  --cmp-side: 21px;
+  /* the gap: 8 pt (Sept: ComposerViewController.swift:417-425, :455; ComposerViewConstants.swift:50); June flag off: 12
+     (liquidGlassBottomPadding, ComposerViewController.swift:305) */
+  --cmp-gap: 8px;
+  position: absolute;
+  z-index: 25;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--cmp-dock) + var(--cmp-gap));
+  pointer-events: none;
+  transition: bottom 0.25s var(--cmp-kb-curve);
+}
+.cmp--legacy {
+  --cmp-gap: 12px;
+}
+.ios-screen[data-device='iphone-se'] .cmp {
+  --cmp-dock: calc(8px + 62px);
+}
+.ios-tab:has(> .ios-tabbar-host.is-hidden) .cmp {
+  --cmp-dock: var(--safe-bottom);
+  --cmp-side: 16px;
+}
+.cmp.is-focused,
+.ios-tab:has(> .ios-tabbar-host.is-hidden) .cmp.is-focused {
+  --cmp-side: 8px;
+}
+.ios-app.has-keyboard .cmp {
+  bottom: calc(var(--kb-height) + var(--cmp-gap));
+}
+
+/* ---------------------------------------------------------------------------------------------- the card */
+.cmp-card {
+  position: relative;
+  margin: 0 var(--cmp-side);
+  /* 36 / 2 + 4 = 22, collapsed and focused (Sept: ComposerGlassGeometry.swift:21, :35-37; ComposerViewController.swift:
+     133-136); June flag off: liquidGlassCornerRadius 26 = 8 + 18 (ComposerViewConstants.swift:38) */
+  border-radius: 22px;
+  overflow: hidden;
+  pointer-events: auto;
+  transition:
+    margin 0.25s var(--cmp-kb-curve),
+    height 0.25s var(--cmp-kb-curve),
+    top 0.4s var(--sk-spring-smooth, ease-out),
+    background-color 0.4s;
+}
+.cmp--legacy .cmp-card {
+  border-radius: 26px;
+}
+/* The composer's glass reads darker than the bars' in dark mode: (25,26,29) over the list's (25,28,32), its rim
+   (56,61,69) → (47,51,58) → (40,42,48) from the edge in (reference/device/IMG_2247–2248, measured) */
+.ios-screen[data-appearance='dark'] .cmp-card.glass {
+  --glass-fill: rgba(24, 24, 26, 0.6);
+  /* three one-device-pixel rings, drawn with --hairline so they stay one device pixel each at every DPR (src/styles/hairline.css) */
+  --glass-edge: inset 0 0 0 var(--hairline) rgba(122, 140, 168, 0.104), inset 0 0 0 calc(2 * var(--hairline)) rgba(122, 140, 168, 0.083),
+    inset 0 0 0 calc(3 * var(--hairline)) rgba(122, 140, 168, 0.16);
+}
+/* the full-screen composer: its top pins to the safe-area top, the glass turns opaque basePrimary
+   (ComposerLongformContainerView.swift:317-380; ComposerViewController.swift:61-81); spring 0.4 s, damping 1 */
+.cmp.is-longform {
+  z-index: 35;
+}
+.cmp.is-longform .cmp-card {
+  background: var(--dt_color_base_primary);
+  transition-duration: 0.4s;
+  transition-timing-function: var(--sk-spring-smooth, ease-out);
+}
+.cmp.is-longform .cmp-stack {
+  top: 0;
+}
+.cmp.is-longform .cmp-contents {
+  flex: 1;
+  min-height: 0;
+}
+.cmp.is-longform .cmp-input {
+  flex: 1;
+  min-height: 0;
+}
+.cmp.is-longform .cmp-editor {
+  max-height: none;
+  height: 100%;
+}
+
+/* the vertical stack (ComposerView.swift:132-145), bottom-anchored: the card grows upward */
+.cmp-stack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* inner insets (§2.2): collapsed 0 / 0, focused 0 / 4 (Sept: ComposerView.swift:193-207; ComposerViewConstants.swift:28);
+   June flag off: collapsed 8 / 8, with a banner 8 / 4 (ComposerView.swift:284-299) */
+.cmp-contents {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.cmp.is-focused .cmp-contents {
+  padding: 0 0 4px;
+}
+.cmp--legacy .cmp-contents {
+  padding: 8px 0;
+}
+.cmp--legacy.has-banner .cmp-contents {
+  padding-bottom: 4px;
+}
+.cmp--legacy.is-focused .cmp-contents {
+  padding: 0 0 4px;
+}
+
+/* the 20 pt handlebar tap area, focused only; its 48 × 4 pill is clear in glass (ComposerHandlebarView.swift:34-57) */
+.cmp-handle {
+  display: none;
+  flex: none;
+  height: 20px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.cmp.is-focused .cmp-handle {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------------------- the context bar */
+/* Sept: SKContextBar, its own cell above the composer in the bottom drawer: centered with 6 pt above and below
+   (ContextBarBottomDrawer.swift:77-79, :107-112), the composer's side margins (:115-130), an interactive glass capsule
+   at least 36 tall, 6 / 12 padding for one line, caption 13 contentPrimary (SKContextBar.swift:38-41, :66-77, :136-152,
+   :468-474, :682-689), sliding in without a fade (ContextBarContentPlugin.swift:85-93) */
+.cmp-context {
+  padding: 6px var(--cmp-side) 6px;
+  display: flex;
+  transition: padding 0.25s var(--cmp-kb-curve);
+}
+.cmp-context .cmp-banner--bar {
+  pointer-events: auto;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  min-height: 36px;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 18px;
+  color: var(--dt_color_content_primary);
+  animation: cmp-bar-in 0.25s var(--sk-spring-smooth, ease-out);
+}
+/* Sept: the label is Lato 13 on up to 2 lines, its <bold> spans Lato Bold 13 (SKContextBar.swift:339-341, :618-629;
+   ContextBarRowView.swift:18-23; June's in-card banner used Lato Black) */
+.cmp-context .cmp-banner--bar b {
+  font: var(--sk-caption-bold);
+}
+.cmp-context .cmp-banner--bar .cmp-banner__text {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+/* it leaves with a fade and a slide, the drawer's bouncy medium spring (ContextBarContentPlugin.swift:85-94;
+   ListDrawerAppearanceAnimation.swift:49-52) */
+.cmp-context.is-leaving .cmp-banner--bar {
+  animation: cmp-bar-out 0.43s var(--sk-spring-bouncy, ease-out) both;
+  pointer-events: none;
+}
+@keyframes cmp-bar-out {
+  to {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+@keyframes cmp-bar-in {
+  from {
+    transform: translateY(12px);
+  }
+}
+/* June: ContextBarView in the card (§14): 8 pt from the card's sides and top, radius 16, 13/16/13/16 padding
+   (updatedBannerViewInsets, ComposerViewConstants.swift:18), sk_foreground_soft_solid (Sept's ContextBarView:
+   base_tertiary), Lato 13. The standalone bar is .glass and keeps the glass fill. */
+.cmp-banner {
+  flex: none;
+  margin: 8px 8px 0;
+  padding: 13px 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--sk-caption);
+  color: var(--sk_primary_foreground);
+  animation: cmp-fade-in 0.15s ease-out;
+}
+.cmp-banner:not(.glass) {
+  background: var(--sk_foreground_soft_solid);
+}
+.cmp-banner b {
+  font: var(--sk-caption-black);
+}
+.cmp-banner__pile {
+  flex: none;
+}
+.cmp-banner__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes cmp-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------- "Also send to #channel" (§10) */
+.cmp-stc {
+  flex: none;
+  /* 12 pt after the row (sendToChannelViewSpacing, ComposerViewConstants.swift:25) */
+  margin-bottom: 12px;
+  /* checkbox 12 pt from the leading edge, 2 pt above and below (ComposerSendToChannelView.swift:26-33, :152-164) */
+  padding: 2px 12px;
+  display: flex;
+}
+.cmp-stc__button {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: flex;
+  align-items: center;
+  /* 8 pt image padding (checkBoxButtonTitleHorizontalOffset) */
+  gap: 8px;
+  min-width: 0;
+  text-align: left;
+}
+.cmp-stc__button::before {
+  /* the tap area grows 12 pt all round (:146-148) */
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+/* 16 × 16: unchecked contentSecondary, checked highlight1.content (ComposerSendToChannelView.swift:174-180 [Sept]; June
+   sk_foreground_max_solid / sk_highlight; the latest testDefaultComposerSendToChannelView PNG shows #454447) */
+.cmp-stc__box {
+  flex: none;
+  display: block;
+  color: var(--dt_color_content_secondary);
+}
+.cmp-stc__button.is-checked .cmp-stc__box {
+  color: var(--dt_color_content_highlight_1);
+}
+/* UIFont.caption (Lato 13) contentPrimary, the channel in captionBold (:188-212 [Sept]; June sk_primary_foreground) */
+.cmp-stc__label {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmp-stc__name {
+  font: var(--sk-caption-bold);
+}
+.cmp-stc__lock {
+  display: inline-block;
+  vertical-align: -2px;
+}
+/* pressed: label and checkbox tinted contentPrimary at 30 % (:137-145 [Sept]) */
+.cmp-stc__button.is-pressed .cmp-stc__box,
+.cmp-stc__button.is-pressed .cmp-stc__label {
+  color: rgb(from var(--dt_color_content_primary) r g b / 0.3);
+}
+
+/* --------------------------------------------------------------------------------------- the text view */
+.cmp-input {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+}
+/* collapsed: the text view is hidden (ComposerView.swift:187-191) but stays focusable */
+.cmp--collapsed .cmp-input {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.cmp-editor {
+  /* padding 4 / 12 / 12 / 12 (ComposerInputDataTypes.swift:16-18, SKTextInput.swift:278); line fragment padding 0 */
+  padding: 4px 12px 12px;
+  /* Lato Regular 17, contentPrimary (WysiwygTextProcessor+Config.swift:69-74, :106); a 20.4 pt line */
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+  /* grows with its content, scrolls after 134 pt (maximumStandardHeight, ComposerViewConstants.swift:43-44) */
+  max-height: 134px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  /* the caret isn't tinted by Slack (no tintColor in the composer or on the window): UIKit's iOS 26 systemBlue
+     (src/app/sheets/ui/ios.css) */
+  caret-color: var(--ios-blue, #0088ff);
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+.cmp-editor::-webkit-scrollbar {
+  display: none;
+}
+/* the placeholder: the same string, Lato 17 contentTertiary, one line, at the 4 / 12 inset (SKTextInput.swift:284-300) */
+.cmp-input__placeholder {
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  right: 12px;
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+/* a DM's status emoji in the placeholder: grayscale, still (PlaceholderTextPublisher.swift:234-238) */
+.cmp-ph-emoji {
+  display: inline-block;
+  vertical-align: -3px;
+  filter: grayscale(1);
+}
+
+/* ---------------------------------------------------------------------------- rich text while typing (§8) */
+.cmp-l {
+  position: relative;
+  min-height: 1.2em;
+}
+.cmp-editor b,
+.cmp-editor strong {
+  font-weight: 700;
+}
+.cmp-editor i,
+.cmp-editor em {
+  font-style: italic;
+}
+.cmp-editor u {
+  text-decoration: underline;
+}
+.cmp-editor s,
+.cmp-editor strike,
+.cmp-editor del {
+  text-decoration: line-through;
+}
+/* inline code: Menlo 16 (base size − 1), message_rendering_code, on a surfacePrimary rect with a 1 pt outlineTertiary
+   stroke, radius 3, square where it wraps (WysiwygTextProcessor+Config.swift:107; SKFont.swift:320-343;
+   LayoutManager.swift:18, :130-160; LayoutManagerRoundedRectanglePlugin.swift:15) */
+.cmp-editor code,
+.cmp-label code {
+  font-family: Menlo, 'SF Mono', ui-monospace, monospace;
+  font-size: 16px;
+  color: var(--sk_code);
+  background: var(--dt_color_surface_primary);
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  border-radius: 3px;
+  padding: 1px 0;
+}
+/* links: highlight1.content, no underline (WysiwygTextProcessor+Config.swift:65-67, :109) */
+.cmp-link,
+.cmp-editor a {
+  color: var(--dt_color_content_highlight_1);
+  text-decoration: none;
+}
+/* mentions: message_rendering_mention_text on surface_highlight_1, radius 3; yours and broadcasts on
+   surface_highlight_3 (WysiwygTextProcessor+SKMapping.swift:389-396, :564-589; Text+Display.swift:1776-1783) */
+.cmp-mention {
+  color: var(--sk_mention_text);
+  background: var(--dt_color_surface_highlight_1);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.cmp-mention--self {
+  background: var(--dt_color_surface_highlight_3);
+}
+.cmp-emoji {
+  width: 20px;
+  height: 20px;
+  vertical-align: -4px;
+}
+/* lists: "•" "◦" "▪" and "1." "a." "i." for levels 0/1/2 (then again), the marker at 29 pt × level and the text 28 pt
+   after it (BulletedListPrefixGenerator.swift:11-25; OrderedListPrefixGenerator.swift:11-25; RichTextTheming.swift:72-83) */
+.cmp-l[data-k='ul'],
+.cmp-l[data-k='ol'] {
+  padding-left: 28px;
+}
+.cmp-l[data-k='ul']::before,
+.cmp-l[data-k='ol']::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+.cmp-l[data-i='1'] {
+  padding-left: calc(29px + 28px);
+}
+.cmp-l[data-i='1']::before {
+  left: 29px;
+}
+.cmp-l[data-i='2'] {
+  padding-left: calc(58px + 28px);
+}
+.cmp-l[data-i='2']::before {
+  left: 58px;
+}
+.cmp-l[data-i='3'] {
+  padding-left: calc(87px + 28px);
+}
+.cmp-l[data-i='3']::before {
+  left: 87px;
+}
+.cmp-l[data-i='4'] {
+  padding-left: calc(116px + 28px);
+}
+.cmp-l[data-i='4']::before {
+  left: 116px;
+}
+.cmp-l[data-i='5'] {
+  padding-left: calc(145px + 28px);
+}
+.cmp-l[data-i='5']::before {
+  left: 145px;
+}
+.cmp-l[data-k='ul']::before,
+.cmp-l[data-k='ul'][data-i='3']::before {
+  content: '•';
+}
+.cmp-l[data-k='ul'][data-i='1']::before,
+.cmp-l[data-k='ul'][data-i='4']::before {
+  content: '◦';
+}
+.cmp-l[data-k='ul'][data-i='2']::before,
+.cmp-l[data-k='ul'][data-i='5']::before {
+  content: '▪';
+}
+/* the numbers come from renumber() (editor.ts): "1." "a." "i.", restarting where the list is interrupted */
+.cmp-l[data-k='ol']::before {
+  content: attr(data-n);
+}
+/* quote: a 4 pt bar, radius 2, outlineTertiary, spanning the quoted lines and starting 2 pt below the first line's top;
+   the text indented 15 pt left and right (Text+Display.swift:1627-1631; LayoutManager.swift:97-128;
+   RichTextTheming.swift:21-37) */
+.cmp-l[data-k='q'] {
+  padding: 0 15px;
+}
+.cmp-l[data-k='q']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--dt_color_outline_tertiary);
+}
+.cmp-l[data-k='q'] + .cmp-l[data-k='q']::before {
+  top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.cmp-l[data-k='q']:has(+ .cmp-l[data-k='q'])::before {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+/* code block: Menlo 16 contentPrimary in one rounded rect around the block, code_block fill and 1 pt stroke, radius 3,
+   text 10 pt in from the sides and 2 pt from the top and bottom (WysiwygStyles+Rendering.swift:95-109;
+   Text+Display.swift:1767-1774; LayoutManager.swift:162-173) */
+.cmp-l[data-k='pre'] {
+  font-family: Menlo, 'SF Mono', ui-monospace, monospace;
+  font-size: 16px;
+  line-height: 20.4px;
+  color: var(--dt_color_content_primary);
+  padding: 2px 10px;
+  background: var(--sk_code_block_fill);
+  border: 1px solid var(--sk_code_block_stroke);
+  border-radius: 3px;
+}
+.cmp-l[data-k='pre'] + .cmp-l[data-k='pre'] {
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  padding-top: 0;
+}
+.cmp-l[data-k='pre']:has(+ .cmp-l[data-k='pre']) {
+  border-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding-bottom: 0;
+}
+
+/* ------------------------------------------------------------------------------------------- the toolbar */
+/* 44 pt = a 36 pt button + 8 (ComposerToolbarView.swift:25-29, :371) */
+.cmp-toolbar {
+  position: relative;
+  flex: none;
+  height: 44px;
+}
+.cmp-row {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+}
+/* Collapsed ↔ focused: 0.35 s keyframes; the outgoing row fades in the first 10 %, the incoming one over the rest; on
+   iOS 26 a pure crossfade (ComposerToolbarAnimator.swift:27-35, :58-95). Focused ↔ formatting: a 0.35 s spring
+   crossfade (:97-104, :155-176). */
+.cmp-row {
+  transition: opacity 0.035s linear;
+}
+.cmp--collapsed .cmp-row--collapsed,
+.cmp.is-focused:not(.is-formatting) .cmp-row--expanded,
+.cmp.is-formatting .cmp-row--format {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.315s linear 0.035s;
+}
+.cmp-row__first {
+  position: absolute;
+  /* 8 pt from the card's edge (liquidGlassExpandedStyleInset, ComposerViewConstants.swift:53); 4 in the collapsed
+     capsule (Sept: ComposerGlassGeometry.swift:56-64; ComposerToolbarView.swift:157-180) */
+  left: 8px;
+}
+.cmp--collapsed:not(.cmp--legacy) .cmp-row__first {
+  left: 4px;
+}
+/* the scrollable button row: 5 pt apart, no indicators (ComposerToolbarView.swift:23, :34-55); focused it ends
+   36 + 12 pt before the card's right plus its own 8 (ComposerToolbarContainerView.swift:30-32, :118-120) */
+.cmp-scroll {
+  position: absolute;
+  left: 8px;
+  right: 56px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.cmp-scroll::-webkit-scrollbar {
+  display: none;
+}
+/* formatting: after the close button (8 + 36 + 8 = 52), ending 52 pt from the right (ComposerToolbarView.swift:150-185;
+   ComposerToolbarContainerView.swift:297-314) */
+.cmp-scroll--format {
+  left: 52px;
+  right: 52px;
+}
+.cmp.is-editing .cmp-scroll--format {
+  right: calc(52px + 44px);
+}
+/* the right side: its buttons 8 pt from the card's edge, 8 apart (ComposerToolbarContainerView.swift:328-399); 4 from
+   the collapsed capsule's (Sept: ComposerToolbarView.swift:321, :334-340; ComposerToolbarContainerView.swift:340, :355) */
+.cmp-right {
+  position: absolute;
+  right: 8px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cmp--collapsed:not(.cmp--legacy) .cmp-right {
+  right: 4px;
+}
+.cmp-right .sk-button {
+  /* the attachment chip sits 12 pt left of send (collapsed toolbar trailing −48, its own −8) */
+  margin-right: 4px;
+}
+
+/* the collapsed row's label: 4 + 36 + 8 = 48 pt in (Sept: ComposerToolbarView.swift:184-185; June's card 52), one line;
+   its hit area the toolbar's full 44 pt (ComposerToolbarView.swift:610-617; ComposerPlaceholderView.swift:93-100) */
+.cmp-label {
+  position: absolute;
+  left: 48px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  cursor: text;
+}
+.cmp--legacy .cmp-label {
+  left: 52px;
+}
+.cmp-label__text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* the placeholder: Lato 17 contentTertiary (PlaceholderTextPublisher.swift:60, :175, :218-219) */
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+}
+/* a draft: its text, falling back to contentSecondary (ComposerToolbarView.swift:621-638) */
+.cmp-label.is-draft .cmp-label__text {
+  color: var(--dt_color_content_secondary);
+}
+.cmp-label .cmp-emoji {
+  width: 20px;
+  height: 20px;
+}
+
+/* -------------------------------------------------------------------------------------- toolbar buttons */
+/* 36 × 36, the circle fills it (radius 18), a 20 pt icon (SKIconButton.swift:461-463, :712-720). Defaults
+   (ButtonPresentationObject.init, Sept ComposerToolbarPluginType.swift:67): icon contentSecondary (June
+   sk_foreground_max_solid), selected icon sk_sky_blue, background and selected background clear. The colors are
+   variables the variants below set; the rule that uses them is scoped under .cmp to beat app.css's
+   `.ios-app button { color: inherit }`. */
+.cmp-btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--dt_color_content_secondary);
+  --btn-bg-on: transparent;
+  --btn-fg-on: var(--sk_sky_blue);
+}
+.cmp .cmp-btn {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  padding: 0;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  /* the pressed bounce: 0.9 with the smooth spring, 0.2 s down and 0.4 s back (SKIconButton.swift:29, :213-248;
+     UIView+BounceMode.swift:14-35) */
+  transition:
+    transform 0.4s var(--sk-spring-smooth, ease-out),
+    background-color 0.2s,
+    color 0.2s;
+}
+.cmp .cmp-btn.is-pressed {
+  transform: scale(0.9);
+  transition-duration: 0.2s;
+}
+.cmp .cmp-btn.is-pressed,
+.cmp .cmp-btn.is-selected {
+  background: var(--btn-bg-on);
+  color: var(--btn-fg-on);
+}
+.cmp-btn__icon {
+  grid-area: 1 / 1;
+}
+.cmp-btn__icon--selected,
+.cmp-btn.is-pressed .cmp-btn__icon--normal,
+.cmp-btn.is-selected .cmp-btn__icon--normal {
+  visibility: hidden;
+}
+.cmp-btn.is-pressed .cmp-btn__icon--selected,
+.cmp-btn.is-selected .cmp-btn__icon--selected {
+  visibility: visible;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmp .cmp-btn.is-pressed {
+    transform: none;
+  }
+}
+/* "+": defaultPluginButton, a contentSecondary icon on surfacePrimary, pressed surfaceSecondary (Sept:
+   ComposerOmnipickerPlugin.swift:224, ComposerToolbarPluginType.swift:88-104; June: baseTertiary,
+   ComposerOmnipickerPlugin.swift:208-217); measured (36,39,41) on the dark capsule, reference/device/IMG_2247 */
+.cmp-btn--plus {
+  --btn-bg: var(--dt_color_surface_primary);
+  --btn-bg-on: var(--dt_color_surface_secondary);
+  --btn-fg-on: var(--dt_color_content_secondary);
+}
+/* send (and save): highlight2.baseInverse #007a5a / #177e56, white icon; pressed at 80 % (ComposerSendPlugin.swift:124-138,
+   :161-194 [Sept]; June sk_lilypad_green #007a5a in both appearances) */
+.cmp-btn--send {
+  --btn-bg: var(--dt_color_base_inverse_highlight_2);
+  --btn-fg: var(--dt_color_constants_white);
+  --btn-bg-on: rgb(from var(--dt_color_base_inverse_highlight_2) r g b / 0.8);
+  --btn-fg-on: var(--dt_color_constants_white);
+}
+/* send, disabled: no circle, outlineSecondary icon, untappable (interactionState .disabled); SKIconButton's 0.35 dim is
+   undone by `rightButton.alpha = 1.0` right after configure, so it stays at full opacity
+   (ComposerToolbarContainerView.swift:488-502 [Sept]) */
+.cmp-btn--send-disabled {
+  --btn-fg: var(--dt_color_outline_secondary);
+  --btn-fg-on: var(--dt_color_outline_secondary);
+}
+.cmp .cmp-btn--send-disabled.is-pressed {
+  /* a no-circle SKIconButton dims to 0.75 instead of bouncing (SKIconButton.swift:219-220) */
+  transform: none;
+  opacity: 0.75;
+}
+/* cancel edit: white on sk_raspberry_red; pressed takes the default selected colors (ComposerCancelEditingPlugin.swift:27-40) */
+.cmp-btn--cancel {
+  --btn-bg: var(--sk_raspberry_red);
+  --btn-fg: var(--dt_color_constants_white);
+}
+/* the formatting toolbar's close: white on highlight1.baseInverse #1264a3 / #0a77a7; pressed the style buttons' selected
+   colors, sk_frosty_blue / sk_sky_blue (ComposerTextFormattingPlugin.swift:29; ComposerWysiwygPlugin.swift:68-78 [Sept];
+   June sk_primary_background on sk_highlight) */
+.cmp-btn--close-format {
+  --btn-bg: var(--dt_color_base_inverse_highlight_1);
+  --btn-fg: var(--dt_color_constants_white);
+  --btn-bg-on: var(--sk_frosty_blue);
+}
+/* style buttons: contentSecondary; active = sk_sky_blue on an sk_frosty_blue circle (ComposerWysiwygPlugin.swift:68-78 [Sept]) */
+.cmp-btn--format {
+  --btn-bg-on: var(--sk_frosty_blue);
+}
+/* a disabled icon button (the plugin's `enabled` is false): alpha 0.35, no taps. Sept reads it for every toolbar icon
+   button (ComposerToolbarView.swift:501-502; SKIconButton.swift:236-241): "/" while there's text, Link without a link
+   opportunity (ComposerToolbarInteractor.swift:446-456, :522-550). June showed no change. */
+.cmp .cmp-btn.is-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+/* stop (an AI reply streaming): white on highlight1.baseInverse #1264a3 / #0a77a7 (ComposerStopStreamingPlugin.swift:31-45
+   [Sept]; June sk_highlight); pressed takes the default selected colors */
+.cmp-btn--stop {
+  --btn-bg: var(--dt_color_base_inverse_highlight_1);
+  --btn-fg: var(--dt_color_constants_white);
+}
+/* mic: contentSecondary; selected white on highlight1.baseInverse, svgMicrophoneFilled (Sept ComposerAudioPlugin.swift:
+   53-55; June sk_highlight) */
+.cmp-btn--mic {
+  --btn-bg-on: var(--dt_color_base_inverse_highlight_1);
+  --btn-fg-on: var(--dt_color_constants_white);
+}
+
+/* --------------------------------------------------------------------------------------- attachments (§9) */
+/* 76 pt: 72 pt items with 2 above and below, 10 pt side padding, items 4 pt apart (12 − 8), 16 pt to the toolbar
+   (ComposerAttachmentsView.swift:71-91, :121-125, :294-296; attachmentsViewSpacing, ComposerViewConstants.swift:26) */
+.cmp-tray {
+  flex: none;
+  height: 76px;
+  margin-bottom: 16px;
+  padding: 2px 10px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.cmp-tray::-webkit-scrollbar {
+  display: none;
+}
+/* each item: the 64 pt card with 8 pt spare on the top and right for the remove button (removeButtonOverflow = 8) */
+.cmp-tray__item {
+  position: relative;
+  flex: none;
+  height: 72px;
+  padding: 8px 8px 0 0;
+}
+.cmp-tray__card {
+  position: relative;
+  height: 64px;
+  overflow: hidden;
+  background: var(--dt_color_base_primary);
+  transition:
+    transform 0.25s var(--sk-spring-smooth, ease-out),
+    opacity 0.25s;
+}
+/* a 1 pt outlineTertiary border over the content, on basePrimary (the layer border: SKThumbnailAttachment.swift:88-113;
+   SKCompactAttachment.swift:71-93) */
+.cmp-tray__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+/* card press: 0.94, content at 60 % (ComposerThumbnailAttachmentCell.swift:152-167) */
+.cmp-tray__card.is-pressed {
+  transform: scale(0.94);
+  opacity: 0.6;
+}
+/* thumbnails: 64 × 64, radius min(20, 0.225 × 64) = 14.4 (UIUtilities.swift:94-99; PNG testAttachmentImageSmall) */
+.cmp-tray__item.is-thumb .cmp-tray__card {
+  width: 64px;
+  border-radius: 14.4px;
+}
+.cmp-tray__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+}
+/* compact file card: ≤ 220 wide, radius 15, 12 pt padding, a 36 pt file tile, 8 pt gap, Lato Bold 15 title and Lato 13
+   subtitle (ComposerCompactAttachmentCell.swift:35-39, :80-89; SKCompactAttachment.swift:578-579, :628-632; PNG
+   testAttachmentFile) */
+.cmp-tray__item.is-file .cmp-tray__card {
+  max-width: 220px;
+  border-radius: 15px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cmp-tray__tile {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  /* the ornament box's proportional radius: 0.25 × 36 = 9 (SKOrnamentBox.swift:637-638) */
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_constants_white);
+}
+.cmp-tray__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.cmp-tray__title {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmp-tray__type {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+}
+/* remove: close_circle_filled 20 pt in contentPrimary on a basePrimary circle with a 2 pt ring of the same, centred on the
+   card's corner pulled in 2 pt; tap area +8 (ComposerAttachmentRemoveButton.swift:37, :47-87 [Sept]; June
+   sk_primary_foreground / sk_primary_background; ComposerThumbnailAttachmentCell.swift:35-39, :80-87) */
+.cmp .cmp-tray__remove {
+  position: absolute;
+  top: calc(8px - 10px + 2px);
+  right: calc(8px - 10px + 2px);
+  width: 20px;
+  height: 20px;
+  border: 0;
+  padding: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_primary);
+  background: var(--dt_color_base_primary);
+  box-shadow: 0 0 0 2px var(--dt_color_base_primary);
+}
+.cmp-tray__remove::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+.cmp-tray__remove.is-pressed svg {
+  opacity: 0.6;
+}
+
+/* ---------------------------------------------------------------------------------- autocomplete (§18.2) */
+.cmp-ac {
+  position: absolute;
+  z-index: 2;
+  /* between the layout margins (UIKit's: 16 pt, 20 on Max; ARPC:500-507) */
+  left: 16px;
+  right: 16px;
+  pointer-events: auto;
+  /* UIGlassEffect() without a tint, radius 8, a 1 px outlineTertiary border, shadow black 10 % radius 4 offset 0
+     (ARV:25-34, :90-96, :114-144) */
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  backdrop-filter: blur(14px) saturate(1.6);
+  /* the border: a CALayer border sits over the rows and takes no room, so a one-device-pixel ring on ::after
+     (src/styles/hairline.css) */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  /* appear: fade in 0.075 s, slide 6 pt over 0.15 s ease-out; height changes: 0.17 s spring, damping 0.85
+     (ARPC:49-50, :376-408, :523-533) */
+  animation:
+    cmp-ac-fade 0.075s linear,
+    cmp-ac-slide 0.15s ease-out;
+  transition: height 0.17s var(--sk-spring-snappy, ease-out);
+}
+.cmp-ac::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--hairline) var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.ios-screen[data-device='iphone-17-pro-max'] .cmp-ac {
+  left: 20px;
+  right: 20px;
+}
+@keyframes cmp-ac-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cmp-ac-slide {
+  from {
+    transform: translateY(6px);
+  }
+}
+.cmp-ac__scroll {
+  height: 100%;
+}
+/* rows are clear (ARVM:472-477); pressed or keyboard-highlighted: baseTertiary, inset 4, radius 12 (§18.3) */
+.cmp-ac-row.is-highlighted .sk-row__bg {
+  background: var(--dt_color_base_tertiary);
+}
+.cmp-ac-row__name {
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+/* the other name, the trailing text and "Not in channel": Lato 17 contentSecondary (SKX-Member:120-145, :244-254) */
+.cmp-ac-row__secondary {
+  font: var(--sk-body);
+  color: var(--dt_color_content_secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.cmp-ac-row .sk-row__inline {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+/* the name keeps its room; the trailing text truncates first */
+.cmp-ac-row .sk-row__title {
+  flex-shrink: 0.001;
+}
+.cmp-ac-row.is-disabled .sk-row__title,
+.cmp-ac-row.is-disabled .cmp-ac-row__secondary {
+  color: var(--dt_color_content_tertiary);
+}
+.cmp-ac-row.is-muted .sk-row__ornament {
+  color: var(--dt_color_content_tertiary);
+}
+.cmp-ac-row__app {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+}
+.cmp-ac-row__lines {
+  display: flex;
+  flex-direction: column;
+}
+.cmp-ac-row__cmd {
+  font: var(--sk-body);
+  color: var(--dt_color_content_primary);
+}
+/* the command's caption: Lato 13 contentSecondary (SKX-SlashCommand:23-52) */
+.cmp-ac-row__caption {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------------------------------- "+" sheet (§16) */
+.cmp-plus {
+  position: relative;
+  background: var(--dt_color_base_primary); /* SKListBottomSheetViewController.swift:165 [Sept]; June sk_primary_background, same hex */
+}
+/* 96 × 96 tiles, radius 20, 8 apart, the strip padded 4 / 16 / 4 / 16 (PhotoGalleryCell.swift:11-13, :39-45;
+   PhotoGalleryHorizontalScrollerCell.swift:25-29, :177-187) */
+.cmp-plus__strip {
+  display: flex;
+  gap: 8px;
+  padding: 4px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.cmp-plus__strip::-webkit-scrollbar {
+  display: none;
+}
+.cmp-plus__tile {
+  position: relative;
+  flex: none;
+  width: 96px;
+  height: 96px;
+  border: 0;
+  padding: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--dt_color_base_primary);
+}
+/* 1 pt outlineTertiary, over the photo (SKThumbnailAttachment.swift:92) */
+.cmp-plus__tile::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  pointer-events: none;
+}
+.cmp-plus__tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* the camera tile: svgCamera in contentSecondary (PhotoGalleryHorizontalScrollerCell.swift:252-257 [Sept]; June
+   sk_foreground_max #1d1c1d@70% / #d1d2d3@70%) */
+.cmp-plus .cmp-plus__tile--camera {
+  display: grid;
+  place-items: center;
+  color: var(--dt_color_content_secondary);
+}
+.cmp-plus__tile.is-pressed {
+  opacity: 0.6;
+}
+/* selected: a 3 pt sk_secondary_highlight border over a sk_black_high_contrast shade (SKThumbnailAttachment.swift:77-79,
+   :181, :539-556) */
+.cmp-plus__tile.is-selected::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sk_black_high_contrast);
+  box-shadow: inset 0 0 0 3px var(--sk_secondary_highlight);
+}
+/* the 20 pt selection badge 6 pt in from the top right: a 2 pt white ring on sk_black @70 %; selected, white with the
+   number in Lato Bold capped at 14 pt, sk_black (MultiSelectBadge.swift:19-29, :72-96) */
+.cmp-plus__badge {
+  position: absolute;
+  z-index: 2;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid #fff;
+  background: rgb(from var(--sk_black) r g b / 0.7);
+  display: grid;
+  place-items: center;
+  font: 700 14px/1 Lato;
+  color: var(--sk_black);
+}
+.cmp-plus__tile.is-selected .cmp-plus__badge {
+  border: 0;
+  background: #fff;
+}
+.cmp-plus__tile--camera .cmp-plus__badge {
+  display: none;
+}
+/* a blank divider header (SKListFooterView.Constants.topMargin) */
+.cmp-plus__gap {
+  height: 8px;
+}
+/* the green "Attach" button 16 pt from the sides and 30 pt from the bottom over a 180 pt fade of
+   sk_foreground_min_solid, 20 % → 80 % → 100 % (SKListBottomSheetViewController.swift:23-29, :187-224, :283-302) */
+.cmp-plus__attach {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * var(--safe-bottom));
+  height: 180px;
+  padding: 0 16px calc(30px);
+  display: flex;
+  align-items: flex-end;
+  /* the 180 pt fade: baseSecondary #f8f8f8 / #1a1d21 at 20 % → 80 % → 100 % (SKListBottomSheetFeatureDeprecated.swift:156-176
+     [Sept]; June sk_foreground_min_solid, dark #212428) */
+  background: linear-gradient(
+    to bottom,
+    rgb(from var(--dt_color_base_secondary) r g b / 0.2),
+    rgb(from var(--dt_color_base_secondary) r g b / 0.8) 50%,
+    var(--dt_color_base_secondary)
+  );
+  animation: cmp-fade-in 0.3s ease-out;
+}
+
+/* ----------------------------------------------------------------------------------------- the link alert */
+/* the alert itself is the app's iOS 26 UIAlertController (src/app/sheets/ui/ios.css); UIKit's text fields in it:
+   17 pt system text on the system fill, 22 pt in like the title */
+.cmp-link-alert__url {
+  word-break: break-all;
+}
+.cmp-link-alert__fields {
+  padding: 16px 22px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cmp-link-alert__field {
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--ios-fill);
+  font: 400 17px/22px var(--sf);
+  color: var(--ios-label);
+  caret-color: var(--ios-blue);
+  outline: none;
+}
+.cmp-link-alert__field::placeholder {
+  color: var(--ios-tertiary-label);
+}
+
+/* ------------------------------------------------------------------------------ SlackKit buttons in here */
+/* app.css's `.ios-app button { font: inherit; color: inherit }` outranks SlackKit's own button fonts and colors (app.css
+   restates them only inside sheets): restated for the ones the composer uses */
+.cmp .sk-button {
+  font: var(--btn-font);
+  color: var(--btn-title);
+}
+.cmp .sk-button.is-pressed {
+  color: var(--btn-title-pressed);
+}
+/* the "+" sheet's "View Library": SKHeaderEntity .medium's text button, smallBodyBold highlight1.content
+   (SKHeaderEntity.swift:488-494) */
+.cmp-plus .sk-list-header__text-button {
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_highlight_1);
+}

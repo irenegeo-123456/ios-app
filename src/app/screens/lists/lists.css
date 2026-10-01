@@ -1,0 +1,219 @@
+/* A Slack List on a phone (ListScreen.tsx; spec search-slackbot-huddles.md §4.5). Positions are measured in
+   ListsFeatureTests.ListKanbanFeatureSnapshotTests/testTodosGroupedBySelect@3x.png (393 pt wide, pixels ÷ 3): header
+   centers 30 pt below the previous divider (38 for the first group, 8 pt of top inset), cards from 4 pt under the
+   34 pt header, x 16–377, a 1 pt full-width divider 17.3 pt under the last card. */
+
+.lists {
+  background: var(--dt_color_base_primary);
+}
+.lists__content {
+  padding: calc(var(--navbar-bottom) + 8px) 16px calc(21px + 62px + 16px);
+}
+.lists__header {
+  /* ListKanbanSectionHeaderView: an 8 pt inset stack, title → badge 8, badge → caret 8; the caret flush with the
+     header's trailing edge less 8 (measured title x 24.3, caret 350.7–367.3) */
+  width: 100%;
+  height: 34px;
+  margin-top: 13px;
+  border: 0;
+  padding: 0 8px;
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  transition: opacity 0.2s;
+}
+.lists__header.is-pressed {
+  opacity: 0.6;
+}
+.lists__header-title {
+  /* sectionHeaderTextForSelects: smallBodyBold, contentPrimary for to-do lists, 1 line (ListItemPresentationObjectMapper.swift:1186-1217) */
+  min-width: 0;
+  font: var(--sk-small-body-bold);
+  color: var(--dt_color_content_primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lists__header-title.is-empty {
+  color: var(--dt_color_content_tertiary);
+}
+.lists__header-spacer {
+  flex: 1;
+}
+.lists__caret {
+  /* svgCaretDownFull in the section foreground color (ListItemPresentationObjectMapper.swift:417, 569) */
+  flex: none;
+  color: var(--dt_color_content_primary);
+  transition: transform 0.25s;
+}
+.lists__caret.is-collapsed {
+  transform: rotate(-90deg);
+}
+.lists__card {
+  /* ListKanbanRecordCell: radius 12 (Spacing.large), 1 pt border (outlineTertiary for to-do groups, measured #EAEAEA);
+     16 pt padding; cards 8 pt apart (ListKanbanCollectionViewLayout.swift:71); the title then the fields, 5.67 pt
+     apart as measured (card y 59–143.3) */
+  margin-top: 4px;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--dt_color_outline_tertiary);
+  background: var(--dt_color_base_primary);
+  transition: transform 0.4s var(--sk-spring-smooth);
+}
+.lists__card + .lists__card {
+  margin-top: 8px;
+}
+.lists__card.is-pressed {
+  transform: scale(0.98);
+  transition-duration: 0.2s;
+}
+.lists__card-head {
+  /* the title row: horizontal, top-aligned, 8 pt apart — the completed checkbox, the title (ListKanbanRecordView.swift:95-105) */
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.lists__card-head > .lists__card-title {
+  flex: 1;
+  min-width: 0;
+}
+/* the fields under a checkbox card start 16 + 20 + 8 = 44 pt in (ListKanbanRecordView.swift:44-55) */
+.lists__card.has-checkbox .lists__fields {
+  margin-left: 28px;
+}
+/* a checked card: baseSecondary, its title contentTertiary and plain titles in .body; no strikethrough
+   (ListKanbanRecordView.swift:385-387, 501; ListItemPresentationObjectMapper.swift:339, 1084-1098) */
+.lists__card.is-completed {
+  background: var(--dt_color_base_secondary);
+}
+.lists__card.is-completed .lists__card-title {
+  font: var(--sk-body);
+  color: var(--dt_color_content_tertiary);
+}
+.lists__check {
+  /* ListKanbanCheckbox: 20 × 20, a circle, 1.5 pt outlinePrimary border; checked: contentTertiary fill, no border; the
+     tap area 12 pt beyond it (ListKanbanCheckbox.swift:20, 36-62, 85-101 in the Sept 2026 source; ListKanbanRecordView.swift:70) */
+  position: relative;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--dt_color_outline_primary);
+  transition:
+    background-color 0.4s var(--sk-spring-smooth),
+    box-shadow 0.4s var(--sk-spring-smooth);
+}
+.lists__check::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+.lists__check.is-on {
+  background: var(--dt_color_content_tertiary);
+  box-shadow: none;
+}
+.lists__check svg {
+  position: absolute;
+  inset: 0;
+}
+.lists__check-mark {
+  /* stroked basePrimary, 2 pt in the 24-unit box (so ×20/24 here), round caps and joins; drawn in on strokeEnd with a
+     0.25 s spring, bounce 0.15; unchecking resets at once */
+  fill: none;
+  stroke: var(--dt_color_base_primary);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.lists__check.is-on .lists__check-mark {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.25s cubic-bezier(0.25, 1.15, 0.5, 1);
+}
+.lists__card-title {
+  /* the primary column: bodyBlack 17, contentPrimary, 2 lines (ListItemPresentationObjectMapper.swift:1066-1100;
+     ListKanbanRecordCellView.defaultPrimaryTextTitleLines) */
+  font: var(--sk-body-black);
+  /* a wrapping UILabel advances 1.2 em a line and rounds only its whole box to the pixel grid (docs/conventions.md,
+     "Text baselines"): the 1.2 line height, the box padded once (a per-line round(up) added 0.27 pt a line) */
+  padding-bottom: calc(round(up, 1lh - 0.001px, 1px / 3) - 1lh);
+  color: var(--dt_color_content_primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.lists__fields {
+  margin-top: 5.67px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.lists__fields::-webkit-scrollbar {
+  display: none;
+}
+.lists__field {
+  /* an inline SKTokenView on a clear fill: a 16 pt icon then the value 6 pt later, caption contentTertiary
+     (measured: the tag centered at x 41.8, text from 56, #5E5D60) */
+  flex: none;
+  height: 26px;
+  padding-left: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--sk-caption);
+  color: var(--dt_color_content_tertiary);
+  white-space: nowrap;
+}
+.lists__divider {
+  /* a full-width 1 pt divider 17.3 pt under the last card (measured y 160.7, #EAEAEA) */
+  height: 1px;
+  margin: 17.33px -16px 0;
+  background: var(--dt_color_outline_tertiary);
+}
+.lists__missing {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 28px;
+  text-align: center;
+}
+.lists__missing-title {
+  margin-top: 5px;
+  font: var(--sk-body-bold);
+  color: var(--dt_color_content_primary);
+}
+.lists__missing-body {
+  font: var(--sk-caption);
+  color: var(--dt_color_content_primary);
+}
+
+/* "Add Item": 16 pt from the trailing safe edge and 16 pt above the bottom safe area — here, above the floating tab bar
+   (ListViewViewController.swift:21-28, 290-291) */
+.lists__add {
+  position: absolute;
+  z-index: 30;
+  right: 16px;
+  bottom: calc(21px + 62px + 16px);
+}
+/* the "View only" banner, 12 pt from the sides, 16 pt above the bottom safe area (ListViewViewController.swift:247-248, 275) */
+.lists__banner {
+  position: absolute;
+  z-index: 30;
+  left: 12px;
+  right: 12px;
+  bottom: calc(21px + 62px + 16px);
+}
