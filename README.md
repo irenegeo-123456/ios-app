@@ -5,6 +5,8 @@ from Slack's iOS source (SlackKit, MessageKit, Block Kit, the iOS 26 Liquid Glas
 tokens, icons, Lato and sounds harvested from the app, and the Northstar demo workspace, personas and App Kit shared
 with the web kit (slack-remix). Prototypes are small files in `prototypes/`, and the same files run in the web kit.
 
+**Live** (Slack sign-in): https://pages.slack-github.com/colson-rice/design-pages/slack-mobile/ · code: https://slack-github.com/colson-rice/slack-mobile-clone
+
 **Internal only**: it ships Slack's fonts, icons, sounds and design tokens (see `NOTICE`). Never publish it
 publicly; `docs/publishing.md` lists the internal hosts.
 

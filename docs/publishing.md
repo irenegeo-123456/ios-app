@@ -29,8 +29,8 @@ node tools/publish.mjs ../design-pages/slack-mobile /colson-rice/design-pages/sl
 cd ../design-pages && git add slack-mobile && git commit -m "Slack mobile kit: build of $(git -C ../slack-mobile-clone rev-parse --short HEAD)" && git push
 ```
 
-The kit is then at https://pages.slack-github.com/colson-rice/design-pages/slack-mobile/ and a prototype at
-`…/slack-mobile/?proto=<name>`.
+The kit is live there: https://pages.slack-github.com/colson-rice/design-pages/slack-mobile/ (first published
+2026-10-01), and a prototype at `…/slack-mobile/?proto=<name>`. Republish after merging changes to `main`.
 
 ## Salesforce: private GitHub Pages
 
