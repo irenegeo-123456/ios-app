@@ -126,6 +126,26 @@ describe('definePrototype checks', () => {
     expect(p.problems.find((x) => x.startsWith('start.view'))).toContain("Did you mean 'activity'?")
   })
 
+  it("checks a person's dnd: true, or { until: '17:00' | ISO date-time }, and not on me", () => {
+    const ok = definePrototype({ ...base, people: { zoe: { name: 'Zoe', dnd: true }, sam: { name: 'Sam', dnd: { until: '17:00' } }, kim: { name: 'Kim', dnd: { until: '2026-10-02T09:00' } }, al: { name: 'Al', dnd: false } } })
+    expect(ok.problems).toEqual([])
+    const bad = definePrototype({ ...base, me: { dnd: true }, people: { zoe: { name: 'Zoe', dnd: { until: '5pm' } }, sam: { name: 'Sam', dnd: 'yes' as never }, kim: { name: 'Kim', dnd: { untill: '17:00' } as never } } })
+    const msg = "should be true, or { until: '17:00' } (a 24-hour time) or { until: '2026-10-02T09:00' }"
+    expect(bad.problems).toEqual(
+      expect.arrayContaining([`people.zoe.dnd ${msg}`, `people.sam.dnd ${msg}`, `people.kim.dnd ${msg}`, 'me.dnd: paused notifications show in a DM with that person, so set dnd on people, not on me']),
+    )
+  })
+
+  it("resolves dnd's until: 'HH:MM' is the next such time, ISO is that moment", async () => {
+    const { parseUntil } = await import('./prototype')
+    const now = new Date(2026, 9, 1, 14, 30)
+    expect(parseUntil('17:00', now)).toBe(new Date(2026, 9, 1, 17, 0).getTime())
+    expect(parseUntil('09:00', now)).toBe(new Date(2026, 9, 2, 9, 0).getTime())
+    expect(parseUntil('2026-10-05T08:15', now)).toBe(new Date(2026, 9, 5, 8, 15).getTime())
+    expect(parseUntil('soon', now)).toBeNull()
+    expect(parseUntil('25:00', now)).toBeNull()
+  })
+
   it('checks the phone: device, appearance and theme', () => {
     expect(definePrototype({ ...base, device: 'iphone-se', appearance: 'dark', theme: 'jade' }).problems).toEqual([])
     const p = definePrototype({ ...base, device: 'pixel-9', appearance: 'dim' as never, theme: 'jaed' })
@@ -188,6 +208,25 @@ describe('applying a prototype', () => {
     expect(fx.sections.flatMap((s) => s.conversationIds).sort()).toEqual([channel, dm].sort())
     // Messages without a time end just before now, in order.
     expect(parseFloat(msg.ts) * 1000).toBeLessThan(Date.now())
+  })
+
+  it("applies people's dnd: until resolved against the prototype's clock, none for people without it", async () => {
+    const m = await fresh()
+    const { definePrototype, personId } = await import('./prototype')
+    const fx = structuredClone(m.demo)
+    const now = new Date(2026, 9, 1, 14, 30)
+    const proto = definePrototype({
+      title: 'T',
+      description: 'D',
+      author: 'A',
+      updated: '2026-09-25',
+      people: { zoe: { name: 'Zoe', dnd: true }, sam: { name: 'Sam', dnd: { until: '17:00' } }, kim: { name: 'Kim', dnd: false }, al: { name: 'Al' } },
+    })
+    expect(m.applyPrototype(fx, proto, {}, now).problems).toEqual([])
+    expect(fx.users[personId('zoe')].dnd).toEqual({})
+    expect(fx.users[personId('sam')].dnd).toEqual({ until: new Date(2026, 9, 1, 17, 0).getTime() })
+    expect(fx.users[personId('kim')].dnd).toBeUndefined()
+    expect(fx.users[personId('al')].dnd).toBeUndefined()
   })
 
   it('reports references that go nowhere, with suggestions', async () => {

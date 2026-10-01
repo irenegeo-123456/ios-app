@@ -3,7 +3,7 @@ import type { KitBlock } from '../apps/kit'
 import { DEMO_IDS } from '../data/demo'
 import { makeTs } from '../lib/time'
 import { defaultAvatar } from './assets'
-import { channelId, didYouMean, dmId, personId, type MessageInput, type Prototype, type ScenePost, type StartInput, type StartTab, type StartView } from './prototype'
+import { channelId, didYouMean, dmId, parseUntil, personId, type MessageInput, type Prototype, type ScenePost, type StartInput, type StartTab, type StartView } from './prototype'
 
 // Turns a prototype into workspace data: patches a fixture (a copy of the Northstar demo) with the prototype's
 // workspace, people, channels, messages, unreads and sidebar, and resolves where it starts. Pure: no store, no
@@ -109,6 +109,8 @@ export function applyPrototype(fx: Fixture, proto: Prototype, apps: Record<strin
       timezone: p.timezone ?? base.timezone ?? 'America/Los_Angeles',
       email: p.email ?? (p.name ? `${name.split(/\s+/)[0].normalize('NFD').replace(/[^A-Za-z]/g, '').toLowerCase()}@${domain}.com` : base.email),
       ...(p.role ? { role: p.role } : {}),
+      // paused notifications from now: `until` resolved against the prototype's clock (types.ts User.dnd)
+      ...(p.dnd ? { dnd: typeof p.dnd === 'object' && p.dnd.until !== undefined ? { until: parseUntil(p.dnd.until, now) ?? undefined } : {} } : {}),
     }
   }
   if (proto.me) fx.users[fx.me] = toUser(fx.users[fx.me], proto.me, 'me')

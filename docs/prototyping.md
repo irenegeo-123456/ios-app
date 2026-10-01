@@ -123,8 +123,14 @@ people: {
   zoe: persona('zoe-maxwell', { illustrated: true }),
   harry: { ...persona('harry-boone', { illustrated: true }), title: 'Design Lead' }, //   change one detail
   sam: { name: 'Sam Rivera', title: 'Office Manager', presence: 'away', status: { emoji: 'palm_tree', text: 'Out until Monday' } },
+  lena: { name: 'Lena Ortiz', dnd: { until: '17:00' } }, //   paused notifications (or dnd: true, until they turn it off)
 },
 ```
+
+`dnd` is do not disturb: your DM with that person shows "Lena Ortiz has **paused their notifications**" above the
+composer, as the iPhone app does. `until` is a 24-hour time (the next time it's that time) or a date and time like
+`'2026-10-02T09:00'`; after it, the bar goes away. It's for other people: your own pause is the You tab's Pause
+notifications.
 
 The word on the left (`zoe`) is how you refer to that person everywhere else. `persona()` fills in one of Slack's
 approved personas (browse them at `/?kit=assets`). Slack's persona guide asks for **illustrated personas on screens
@@ -281,7 +287,7 @@ definePrototype({
   device?, appearance?, theme?, slackbotTab?,
   workspace?: { name?, icon?, initials?, domain?, plan? },
   me?: { name?, title?, avatar?, presence?, status?, … },
-  people?: { key: { name, title?, avatar?, presence?, status?, pronouns?, timezone?, email?, role? } },
+  people?: { key: { name, title?, avatar?, presence?, status?, pronouns?, timezone?, email?, role?, dnd?: true | { until? } } },
   channels?: { name: { topic?, description?, private?, members?, starred?, created?, createdBy? } },
   messages?: { '#channel' | '@person' | '@app': [{ from, text?, blocks?, minutesAgo? | daysAgo + at?, reactions?, replies?, files?, attachments?, edited?, pinned?, id? }] },
   unreads?: { target: number | { count, mentions? } },

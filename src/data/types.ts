@@ -45,6 +45,13 @@ export interface User {
   isExternal?: boolean
   /** an app that's an agent (with isApp): a channel's Agents list, the "AGENT" tag (channels-people.md §8) */
   isAgent?: boolean
+  /**
+   * Do not disturb: they've paused their notifications. Slack keeps one window per person (SLKDNDInfo's start and end,
+   * from next_dnd_start_ts / next_dnd_end_ts: DNDInfoManager.swift:21-29, :189-203) and they're in DND while now is in it
+   * (:166-179). Here the window has started; `until` is its end (ms since 1970, like statusExpiration), missing: until
+   * they turn it off. A DM with them shows "Jane has paused their notifications" above the composer (composer.md §14).
+   */
+  dnd?: { until?: number }
 }
 
 export type ConversationType = 'channel' | 'private' | 'im' | 'mpim' | 'app'

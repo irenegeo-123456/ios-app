@@ -17,6 +17,33 @@
 .convo-bar-button {
   color: var(--dt_color_content_primary);
 }
+/* A live huddle's bar button (ConversationNavBar.tsx ActiveHuddleButton): UIKit's `.prominent` capsule filled with the
+   core highlight2.baseInverse (#007A5A / #177E56; SKBarButtonItem.swift:232-238; HeaderHelperService.swift:533), 44 tall
+   like every glass item and at least 44 wide; inside, the clear SKButton pill: 8 pt padding a side, the 16 pt headphones,
+   5 pt, the count in Lato Bold 15, all sk_off_white (SKButton+Types.swift:253-254, :338-339, :372-373;
+   SKButton+PresentationObject.swift:208-209; HeaderHelperService.swift:27). */
+.convo-huddle-live {
+  flex: none;
+  height: 44px;
+  min-width: 44px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: var(--dt_color_base_inverse_highlight_2);
+  box-shadow: var(--glass-shadow);
+  color: var(--sk_off_white);
+  font: var(--sk-small-body-bold);
+  line-height: round(up, calc(1.2em - 0.01px), calc(1px / 3));
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.convo-huddle-live.is-pressed {
+  transform: scale(0.94);
+}
 
 /* The title pill (ConversationNavigationTitleView.swift:128-140, 254-258, 451-541): interactive glass, 44 tall, as wide
    as the bar allows, left-aligned; [ornament][name / subtitle] with 6 pt (2 + 4) to the trailing edge. */

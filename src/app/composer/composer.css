@@ -207,7 +207,8 @@
 .cmp-banner b {
   font: var(--sk-caption-black);
 }
-.cmp-banner__pile {
+.cmp-banner__pile,
+.cmp-banner__icon {
   flex: none;
 }
 .cmp-banner__text {

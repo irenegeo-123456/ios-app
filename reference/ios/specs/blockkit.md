@@ -285,7 +285,10 @@ PNGs: `BKHeaderBlockSnapshotTests/testHeaderBlock` (Sept 2 × 2; Black 22, 3 lin
 
 `Blocks/Divider/BKDividerBlockView.swift:18-21,75-82`: a line 2 device pixels tall (0.67 pt at @3x, 1 pt at @2x),
 `dt_color_outline_tertiary`, full content width; 10 pt above and 10 pt below. PNG:
-`BKDividerBlockSnapshotTests/testDividerBlock`.
+`BKDividerBlockSnapshotTests/testDividerBlock` (each 62 px cell: the line on rows 30–31, `#5E5D60@13%` / `#797C81@30%`).
+The clone drew it with a `calc(2px / 3)` border, which Chrome snaps to 3 device pixels; it's now an inset shadow two
+hairlines deep (`blocks.css` `.bk-divider`, docs/conventions.md "Hairlines"). A `rich_text_divider` is a different
+drawing (§3.8): 8 pt, not 10, and the text color.
 
 ### 3.4 context: `BKContextBlockView`
 
@@ -380,6 +383,8 @@ paragraph metrics in `Modules/UIInfra/TextDisplay/Implementation/RichTextTheming
 | date | text formatted from the token (below), body style; Sept keeps the date as a model attribute | `Text+Display.swift:788-795` |
 | emoji | inline at text size; ×2 when the message is emoji-only (messages enable jumbomoji) | `Text+Display.swift:46,87-119`; `Modules/Features/MessageTranscript/Implementation/Pipeline/State/MessageTransformationMapper.swift:177` |
 | color | "#RRGGBB " followed by a color swatch | `Text+Display.swift:797-816` |
+| `rich_text_header` | **production: a plain paragraph** in the block's base style (`.default(spans:)`, its inline styles kept), so "(edited)" joins it. Only with `markdownInComposer` **or** `opaqueBlocksInComposer` on (both `"defaultValue": false`, `Modules/Data/Toggles/Definitions/ios_markdown_in_composer.json`, `ios_opaque_blocks_in_composer.json`; clone flags of the same names, `src/app/flags.ts`) a `.header` text block: level 1 (the default) `headline` Black 28, 2 `title` Black 22, 3 `subtitleBold` Bold 20, in the text color, no extra spacing; "(edited)" then takes a line of its own (`.header` doesn't merge, `Text+Adding.swift:97-113`) | `Modules/Data/TextExtensions/Implementation/TextWithRichBlocksResolvableBlocks+Init.swift:25-33, 104-109`; `ToggleMigrationPlugin+Dependencies.swift:116-121`; `Text+Display.swift:49-62, 224-242` |
+| `rich_text_divider` | **production: dropped** (no text block). With either toggle on: a `DividerAttachment` paragraph, a full-width line 2 device pixels thick centered in 8 pt above and below (not the divider block's 10), in the block's text color: `content_primary` on a message, because `withFallbackTextAttributes` gives the divider block the base text color (`RichTextBlock+BKContainerBlockConvertible.swift:27-32` → `TextBlock.swift:75-76`) and `Text+Display.swift:278-281` tints the line with it; `outline_tertiary` is only the attachment's fallback. Unmeasured: the line fragment around the attachment (no snapshot draws one) | `TextWithRichBlocksResolvableBlocks+Init.swift:111-112`; `Modules/UIInfra/SlackKit/Implementation/CoreComponents/Label/Attachments/DividerAttachment.swift:20-31, 40-60` |
 
 Date tokens (`Modules/Data/I18n/Implementation/DateFormattingUtilities.swift:36,56-66`): `date_num` 2015-01-26,
 `date` / `date_long_full` "February 26th, 2015", `date_long` "Thursday, February 26th, 2015", `date_short`

@@ -32,6 +32,11 @@ export interface PersonInput {
   email?: string
   /** the "Workspace Owner" / "Workspace Admin" label on their profile */
   role?: 'owner' | 'admin'
+  /**
+   * paused notifications (do not disturb): `true` until they turn it off, or `{ until: '17:00' }` (24h, the next time
+   * it's that time) or `{ until: '2026-10-02T09:00' }`. Your DM with them shows "Zoe has paused their notifications".
+   */
+  dnd?: boolean | { until?: string }
 }
 
 /** A channel. Its key in `channels` is its name: lowercase, hyphens, no spaces ('project-acme'). */
@@ -285,7 +290,7 @@ const FIELDS: (keyof PrototypeDefinition)[] = [
   'scenes',
   'extend',
 ]
-const PERSON_FIELDS: (keyof PersonInput)[] = ['name', 'title', 'avatar', 'presence', 'status', 'pronouns', 'timezone', 'email', 'role']
+const PERSON_FIELDS: (keyof PersonInput)[] = ['name', 'title', 'avatar', 'presence', 'status', 'pronouns', 'timezone', 'email', 'role', 'dnd']
 const CHANNEL_FIELDS: (keyof ChannelInput)[] = ['topic', 'description', 'private', 'members', 'starred', 'created', 'createdBy']
 const MESSAGE_FIELDS: (keyof MessageInput)[] = ['from', 'text', 'blocks', 'minutesAgo', 'daysAgo', 'at', 'reactions', 'replies', 'files', 'attachments', 'edited', 'pinned', 'id']
 const START_FIELDS = ['tab', 'open', 'appTab', 'thread', 'profile', 'view', 'screen', 'props', 'sheet', 'sheetProps']
@@ -552,6 +557,28 @@ function checkPerson(p: Record<string, unknown>, where: string, out: string[], n
   if (p.presence !== undefined && p.presence !== 'active' && p.presence !== 'away') out.push(`${where}.presence should be 'active' or 'away'`)
   if (p.role !== undefined && p.role !== 'owner' && p.role !== 'admin') out.push(`${where}.role should be 'owner' or 'admin'`)
   if (p.status !== undefined && !isObj(p.status)) out.push(`${where}.status should look like { emoji: 'palm_tree', text: 'Out until Monday' }`)
+  if (p.dnd !== undefined) {
+    const ok = typeof p.dnd === 'boolean' || (isObj(p.dnd) && Object.keys(p.dnd).every((k) => k === 'until') && (p.dnd.until === undefined || parseUntil(p.dnd.until) !== null))
+    if (!ok) out.push(`${where}.dnd should be true, or { until: '17:00' } (a 24-hour time) or { until: '2026-10-02T09:00' }`)
+    else if (!needsName && p.dnd) out.push(`${where}.dnd: paused notifications show in a DM with that person, so set dnd on people, not on me`)
+  }
+}
+
+/**
+ * When a person's `dnd` ends: 'HH:MM' is the next time it's that time (today, or tomorrow once it's past), an ISO
+ * date-time is that moment; null when it's neither.
+ */
+export function parseUntil(until: unknown, now = new Date()): number | null {
+  if (typeof until !== 'string') return null
+  const hm = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(until)
+  if (hm) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), Number(hm[1]), Number(hm[2]))
+    if (d.getTime() <= now.getTime()) d.setDate(d.getDate() + 1)
+    return d.getTime()
+  }
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(until)) return null
+  const t = new Date(until).getTime()
+  return Number.isNaN(t) ? null : t
 }
 
 function checkMessage(m: unknown, where: string, out: string[], ids: Set<string>) {

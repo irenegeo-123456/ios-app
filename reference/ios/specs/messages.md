@@ -404,10 +404,11 @@ Shown for Slackbot's generated replies in the Slackbot DM once streaming ends (`
   `Modules/UIInfra/BlockKitComponents/Implementation/Blocks/Header/BKHeaderBlockView.swift:77-92`).
   **The clone:** `src/app/text` draws mrkdwn, and TSF has no header or divider syntax (`TSF2NativeTokenizer.swift:105-123`),
   so headings reach a message only as Block Kit header blocks or `rich_text_header` elements, drawn by `src/blocks`
-  (`blocks.css` `.bk-header--1/2/3` = headline / title / subtitleBold). Open there: `src/blocks/blocks/RichText.tsx` draws
-  `rich_text_header` / `rich_text_divider` natively always, which is production only with `markdownInComposer` /
-  `opaqueBlocksInComposer` on (off: a plain paragraph, no divider), and its divider is 10 pt above and below where
-  `DividerAttachment` has 8.
+  (`blocks.css` `.bk-header--1/2/3` = headline / title / subtitleBold). `src/blocks/blocks/RichText.tsx` gates
+  `rich_text_header` / `rich_text_divider` on the clone flags `markdownInComposer` / `opaqueBlocksInComposer` (off, as in
+  production: a plain paragraph, no divider; on: the heading scale and `DividerAttachment`'s 8 pt line in the text color,
+  blockkit.md §3.8). Note the divider's color: the spec line above says `outline_tertiary`, but on a message the block's
+  base text color tints it (`Text+Display.swift:278-281`; `TextBlock.swift:75-76`).
 - Not the message path (legacy/composer; don't copy their colors): `Modules/Integration/TextRendering/Interface/RichText/*`,
   `Modules/Data/TSFKit/Implementation/TextRenderer/TSF2TextRenderer.swift` ("hardly used / soon to be completely removed", `:187`) with
   `Modules/UIInfra/TSFTheme/Implementation/TSF2Theme+Default.swift:22-43`, and `App/Source/RichText/*`.

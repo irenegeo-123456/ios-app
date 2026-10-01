@@ -6,6 +6,7 @@ import { Icon } from '../../../icons/Icon'
 import { Emoji } from '../../../emoji/Emoji'
 import { SKMemberAvatar } from '../../../slackkit/SKMemberAvatar'
 import { conversationTitle, displayName, plural } from '../../../messagekit/format'
+import { openCallSheet, useLiveHuddle } from '../../huddle'
 import { conversationTabs } from './tabs'
 
 // The conversation's navigation bar on iOS 26 (spec shell-navigation.md §3, messages.md §10.2): a clear bar with the
@@ -32,10 +33,44 @@ export function BackButton({ onClick }: { onClick?: () => void }) {
  */
 export function HuddleButton({ conversationId }: { conversationId: string }) {
   const presentSheet = useApp((s) => s.presentSheet)
+  const live = useLiveHuddle(conversationId)
+  if (live.live) return <ActiveHuddleButton conversationId={conversationId} {...live} />
   return (
     <GlassButton label="Start Huddle" onClick={() => presentSheet('huddle', { conversationId })} className="convo-bar-button">
       <Icon name="headphones" size={20} />
     </GlassButton>
+  )
+}
+
+/**
+ * The huddle button while a huddle is live in the conversation (HuddleStateResolvable.swift:69-99: the channel's active
+ * huddle, its activeMembers.count). SKHuddleBarButtonView's active state (SKHuddleBarButtonView.swift:151-188): an SKButton
+ * `.huddleBarButton(isLiquidGlass: true)` with `svgHeadphones` 16 pt, 5 pt, then the member count in Lato Bold 15
+ * (`smallBodyBold`), padding 8 × 6 (SKButton+Types.swift:253-254, :284-285, :338-339, :372-373; SKButton+PresentationObject
+ * .swift:208-209), title and icon `sk_off_white` (HeaderHelperService.swift:27, :532-541); the count is blank at 0. On glass the
+ * button is clear and the item takes UIKit's `.prominent` style tinted `highlight2.baseInverse` (core, not the theme:
+ * HeaderHelperService.swift:533; SKBarButtonItem.swift:232-238, :546-553): the filled capsule is the pill, its own capsule
+ * rather than a slot in the Slackbot item's (UIKit's, unmeasured: no snapshot draws it, the iOS_26 / iOS_27
+ * HeaderHelperBarButtonItemTests testActive* PNGs are blank). No animation (the pulse is the coachmark's, :73-90), no
+ * bounce (disableAnimations, :176). VoiceOver "Join huddle, 3 members" (`join_huddle` yaml:10336, `one_member` /
+ * `other_members`). Tap: the same `.huddleButtonTapped` → HuddlesStartService.initiateHuddle (AnyConversationInteractor
+ * .swift:347-356; HuddlesStartService.swift:61-104): already in it, the huddle sheet comes up; otherwise the join preview.
+ */
+function ActiveHuddleButton({ conversationId, participantIds, joined }: { conversationId: string; participantIds: string[]; joined: boolean }) {
+  const presentSheet = useApp((s) => s.presentSheet)
+  const count = participantIds.length
+  const label = `Join huddle, ${plural(count, '1 member', '%@ members')}`
+  return (
+    <button
+      type="button"
+      className="convo-huddle-live"
+      aria-label={label}
+      onClick={() => (joined ? openCallSheet() : presentSheet('huddle', { conversationId }))}
+      data-tap
+    >
+      <Icon name="headphones" size={16} />
+      {count > 0 && <span className="convo-huddle-live__count">{count.toLocaleString('en-US')}</span>}
+    </button>
   )
 }
 
@@ -58,7 +93,20 @@ export function ConversationBarTrailing({ conversationId, huddle = true }: { con
   const conv = useApp((s) => s.fx.conversations[conversationId])
   const hasSlackbot = useApp((s) => !!s.fx.users.USLACKBOT)
   const entry = useFlag('slackbotConversationHeaderEntry') && hasSlackbot && conv?.userId !== 'USLACKBOT'
+  const live = useLiveHuddle(conversationId)
   if (!entry) return huddle ? <HuddleButton conversationId={conversationId} /> : null
+  // a live huddle's prominent capsule stands apart, leaving Slackbot's item alone in its glass (ActiveHuddleButton)
+  if (huddle && live.live)
+    return (
+      <>
+        <GlassGroup className="convo-bar-group">
+          <GlassGroupItem label="Slackbot" width={47} onClick={() => useApp.getState().presentSheet('slackbot-dm')} className="convo-bar-slackbot">
+            <Icon name="slackbot_color" size={25} />
+          </GlassGroupItem>
+        </GlassGroup>
+        <ActiveHuddleButton conversationId={conversationId} {...live} />
+      </>
+    )
   return (
     <GlassGroup className="convo-bar-group">
       <GlassGroupItem label="Slackbot" width={47} onClick={() => useApp.getState().presentSheet('slackbot-dm')} className="convo-bar-slackbot">

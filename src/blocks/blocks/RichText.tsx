@@ -1,5 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { RichText, renderInlines } from '../../app/text/RichText'
+import { useFlags } from '../../app/flags'
 import { registerBlock } from '../surface'
 import { toInlines, type RtElement, type RtInline, type RtList } from '../rich-text'
 import type { RichTextBlockKit } from '../types'
@@ -8,6 +9,10 @@ import type { RichTextBlockKit } from '../types'
 // content_primary (Sept; June sk_primary_foreground: BlockKitPresentationServiceInterface.swift:108-112), styled like message text (Text+Display.swift, the classes in src/app/text/text.css).
 // Sections are paragraphs a line break apart; lists put bullets •, ◦, ▪ (numbers 1. a. i.) at indent × 29 with the
 // text 28 further (RichTextTheming.swift:71-80); quotes indent 15 behind a 4 pt bar; code blocks are the full-width box.
+// rich_text_header and rich_text_divider draw natively only with the markdownInComposer or opaqueBlocksInComposer toggle
+// on (TextResolvableBlocks.shouldRenderHeadersAndDividers, TextWithRichBlocksResolvableBlocks+Init.swift:29-33; both off in
+// production, src/app/flags.ts): off, a header is a plain paragraph (`.default(spans:)`, :104-108) and a divider is
+// dropped (:111-112).
 
 /** "  (edited)" goes after the last rich_text block of a message whose blocks are all rich_text (TextMapper.swift:36-62). */
 export const EditedContext = createContext<string | null>(null)
@@ -69,7 +74,7 @@ function ListView({ el }: { el: RtList }) {
   )
 }
 
-function ElementView({ el, edited }: { el: RtElement; edited?: ReactNode }) {
+function ElementView({ el, edited, native }: { el: RtElement; edited?: ReactNode; native: boolean }) {
   switch (el.type) {
     case 'rich_text_section':
       return (
@@ -99,6 +104,15 @@ function ElementView({ el, edited }: { el: RtElement; edited?: ReactNode }) {
       )
     }
     case 'rich_text_header':
+      // flags off: the header's spans as a paragraph in the block's base style, like a section (.default(spans:),
+      // TextWithRichBlocksResolvableBlocks+Init.swift:104-108)
+      if (!native)
+        return (
+          <div className="rt-p">
+            <Inlines els={el.elements ?? []} />
+            {edited}
+          </div>
+        )
       // level 1 when unset (RichTextHeader.swift:21,34); ≤ 1 headline, 2 title, ≥ 3 subtitleBold (Text+Display.swift:49-61)
       return (
         <div className={`bk-rt-header bk-header--${Math.max(1, Math.min(el.level ?? 1, 3))}`}>
@@ -106,24 +120,30 @@ function ElementView({ el, edited }: { el: RtElement; edited?: ReactNode }) {
         </div>
       )
     case 'rich_text_divider':
-      return <div className="bk-divider bk-rt-divider" role="separator" />
+      // DividerAttachment (Text+Display.swift:278-292): blocks.css .bk-rt-divider. Flags off it never gets here (dropped).
+      return <div className="bk-rt-divider" role="separator" />
     default:
       return null
   }
 }
 
+/** "(edited)" joins the last paragraph: a `.default` text block merges with the label's (Text+Adding.swift:48-70, :97-113). */
+const joinsEdited = (el: RtElement | undefined, native: boolean) => el?.type === 'rich_text_section' || (el?.type === 'rich_text_header' && !native)
+
 export function RichTextBlockView({ block, blockId }: { block: RichTextBlockKit; blockId?: string }) {
   const editedFor = useContext(EditedContext)
+  const native = useFlags((s) => s.markdownInComposer || s.opaqueBlocksInComposer)
   const edited = editedFor !== null && editedFor === blockId ? <span className="rt-edited">{'  (edited)'}</span> : undefined
   if (!block.elements && typeof block.text === 'string') return <RichText text={block.text} jumbomoji={false} edited={!!edited} className="bk-rich-text" />
-  const els = block.elements ?? []
+  // flags off, a divider is no text block at all (TextWithRichBlocksResolvableBlocks+Init.swift:111-112)
+  const els = (block.elements ?? []).filter((el) => native || el.type !== 'rich_text_divider')
   const last = els.length - 1
   return (
     <div className="rt bk-rich-text">
       {els.map((el, i) => (
-        <ElementView key={i} el={el} edited={i === last && el.type === 'rich_text_section' ? edited : undefined} />
+        <ElementView key={i} el={el} native={native} edited={i === last && joinsEdited(el, native) ? edited : undefined} />
       ))}
-      {edited && els[last]?.type !== 'rich_text_section' && <div className="rt-p">{edited}</div>}
+      {edited && !joinsEdited(els[last], native) && <div className="rt-p">{edited}</div>}
     </div>
   )
 }

@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 
-// Feature flags that change how the shell and the tab roots look, with production's values as the defaults: what a
+// Feature flags that change how the shell, the tab roots and messages look, with production's values as the defaults: what a
 // real iPhone showed in September 2026 (reference/device/IMG_2246…2250, iOS 26, measured; specs: "Production (device
-// screenshots, Sept 2026)"). A flag is kept only where Slack's current source (slack-objc main @ 14b3cbaf, 2026-09-30)
+// screenshots, Sept 2026)"), else the toggle's own default. A flag is kept only where Slack's current source (slack-objc main @ 14b3cbaf, 2026-09-30)
 // still decides it at runtime: a server toggle in `Modules/Data/Toggles/Definitions/*.json` (all `"defaultValue": false`,
 // rolled out server-side) or an entitlement. June's `ios_ia_next_home_tab_v3`, `ios_ia_next_dms_filters`,
 // `ios_activity_views` and `ios_activity_row_redesign` are gone in 14b3cbaf, their code the only path, so the clone
@@ -53,6 +53,24 @@ export const FLAGS = {
     source:
       'Sept: shown when Slackbot AI is enabled and the conversation isn\'t the Slackbot DM (NewConversationHeaderHelperService.swift:1093-1108 → ConversationHeaderPresentationObject.swift:763, HeaderBarButtonPresentable.swift:281-283); not a toggle: an entitlement',
     effect: 'Conversation and thread bars: the full-color Slackbot button left of the headphones, one glass capsule (off: the headphones alone)',
+  },
+  // Block Kit rich_text: either of the next two draws rich_text_header / rich_text_divider elements natively
+  // (TextResolvableBlocks.shouldRenderHeadersAndDividers = shouldRenderHeaderBlocks() || shouldRenderOpaqueBlocks(),
+  // TextWithRichBlocksResolvableBlocks+Init.swift:25-33, :104-112). Both are composer projects still off by default, and
+  // no device screenshot shows a heading in a message, so production draws the fallback (blockkit.md §3.8).
+  markdownInComposer: {
+    value: false,
+    source:
+      'Sept: Modules/Data/Toggles/Definitions/ios_markdown_in_composer.json (markdownInComposer, "Render markdown in the composer", default false, added 2026-06-25) → TextResolvableBlocks.shouldRenderHeaderBlocks (ToggleMigrationPlugin+Dependencies.swift:116-118)',
+    effect:
+      'Block Kit rich_text, with opaqueBlocksInComposer (either one): rich_text_header in the heading scale (level 1 Black 28, 2 Black 22, 3+ Bold 20, Text+Display.swift:49-62, :224-237) and rich_text_divider as a 2-device-pixel line in the text color, 8 pt above and below (DividerAttachment.swift:20-24) (both off: a header is a plain paragraph in the body style, a divider is dropped, TextWithRichBlocksResolvableBlocks+Init.swift:106-112)',
+  },
+  opaqueBlocksInComposer: {
+    value: false,
+    source:
+      'Sept: Modules/Data/Toggles/Definitions/ios_opaque_blocks_in_composer.json (opaqueBlocksInComposer, "Render non-editable blocks as chips in the composer", default false, added 2026-08-13) → TextResolvableBlocks.shouldRenderOpaqueBlocks (ToggleMigrationPlugin+Dependencies.swift:119-121)',
+    effect:
+      'Block Kit rich_text: the same native rich_text_header / rich_text_divider rendering as markdownInComposer (TextWithRichBlocksResolvableBlocks+Init.swift:29-33); its composer chips for non-editable blocks (:532-545) aren\'t in the clone',
   },
 } satisfies Record<string, FlagDef>
 

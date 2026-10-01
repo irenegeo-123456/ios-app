@@ -450,7 +450,7 @@ iOS 26 / device column; iOS-27-only looks are not adopted.
 | Concentric avatars: round, the unread / presence dot on the edge at 45° (`shouldMakeConcentric`, `:635-638`, `:675-680`) | iOS 26 | — | **agrees**: the round 28 pt workspace avatar carries the other-workspaces unread dot, Ø 7.33 centered at (51.67, 74.0) = (23.67, 4.0) in the avatar's box, in a round cutout (IMG_2246) | round (`SKWorkspaceAvatar round`, the concentric dot in `skws-concentric-*`); the demo has one workspace, so Home shows no dot |
 | `axisBehavior` (`SKBarButtonItem.swift:66-70`) | `#if canImport(UIKit, _version: 9127.0.85)` + iOS 27.1 | — | — | n/a (no visual on iOS 26) |
 | `.prominent` icon style, tinted glass (`SKBarButtonItem.swift:281-283`, `:321-333`) | iOS 26; the only caller is the Share extension's send button (`ShareExtension/Implementation/SharePresenter.swift:883`) | — | not in any bar on the device | n/a |
-| Huddle button `SKHuddleBarButtonView`, `.prominent` capsule while a huddle is active or its coachmark shows (§3.5) | iOS 26 | — | inactive: the bare headphones in the Slackbot capsule (IMG_2247–2248) | inactive as on the device (`ConversationNavBar.tsx`); no active-huddle state in the bar yet |
+| Huddle button `SKHuddleBarButtonView`, `.prominent` capsule while a huddle is active or its coachmark shows (§3.5) | iOS 26 | — | inactive: the bare headphones in the Slackbot capsule (IMG_2247–2248) | inactive as on the device (`ConversationNavBar.tsx`); live huddle: the prominent capsule (below) |
 | Back button: SKNavigationController's `SKBarButtonItem .back` on every push, `svgCaretLeftFull` 20 pt contentPrimary (§3.3) | unchanged since June | `testBackButtons` / `testAllTogether` draw the caret | the caret, ink x 37.5–46.3, y 75.5–92.2 in the circle x 20–64 (IMG_2248), (248,248,248) | the caret on every pushed bar (`NavBar.tsx` `BackChevron`; the clone's generic bar drew UIKit's chevron before) |
 
 The iOS_27 `SKBarButtonItemTests` PNGs render the glass as a flat mid-gray fill ((130–134) gray) with the items flush
@@ -891,7 +891,20 @@ Snapshots (iOS 18, 1179×132 each, June baselines; iOS 26 baselines are blank be
 | active, 0 count | 32×28 green pill, icon only | `testActiveWithoutMembers@3x.png` |
 
 Copy: a11y "Start Huddle" (`start_huddle` 20629), "Join huddle, %@" (`join_huddle` 10336, e.g. "15 members"). Tap →
-huddle preview (`Modules/Features/AnyConversation/Implementation/AnyConversationFeature.swift:495-497`). Button styles:
+`HuddlesPreviewRoute(.channelHeaderBadge)` (`Modules/Features/AnyConversation/Implementation/AnyConversationFeature.swift:494-495`)
+→ `HuddlesStartService.initiateHuddle` (`Modules/Features/Handlers/Huddles/Implementation/HuddlesStartService.swift:61-104`):
+with a huddle live in the channel, the huddle sheet if you're in it, else the join preview; with none, the start preview.
+"Live" is the channel's active huddle, keyed by channel, so a thread's bar shows it too, and the count is its
+`activeMembers` (`HuddleStateResolvable.swift:69-99`).
+
+**The clone** (`ConversationNavBar.tsx` `ActiveHuddleButton`, `conversation.css` `.convo-huddle-live`): while
+`useLiveHuddle(conversationId)` reports the conversation's huddle, a 44 pt capsule filled `base_inverse_highlight_2`
+(the core token, not the theme's: `HeaderHelperService.swift:533`), at least 44 wide, 8 pt in from its ends, the 16 pt
+headphones, 5 pt, the count in Lato Bold 15, all `sk_off_white`; no count at 0, no animation. Tap: `openCallSheet()` when
+you're in it, else the preview. Next to the Slackbot entry it's its own capsule, 12 pt from Slackbot's, now alone in its
+glass: UIKit's treatment of a `.prominent` item, which nothing measures (the iOS_26 / iOS_27 `testActiveWithMembers` /
+`testActiveWithoutMembers` PNGs are fully transparent, the Huddles and NavigationController snapshots don't draw the bar,
+and no device screenshot shows a live huddle): a gap. The tint over the glass is drawn as a flat fill. Button styles:
 `Modules/UIInfra/SlackKit/Implementation/DesignerComponents/Button/SKButton+Types.swift:253-254`, `284-285`, `315-316`,
 `338-339`, `372-373`.
 

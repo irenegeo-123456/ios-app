@@ -115,11 +115,14 @@
 }
 
 /* ------------------------------------------------------------------------------------------------ divider */
-/* 2 device pixels of outline_tertiary, full width, 10 above (the row) and 10 below (BKDividerBlockView.swift:18-21,75-82) */
+/* 2 device pixels of outline_tertiary (UIUtilities.onePixel() × 2), full width, 10 above (the row) and 10 below
+   (BKDividerBlockView.swift:19-21, :64-66, :74-82). Drawn as an inset shadow 2 hairlines deep on a 1 px box that takes
+   2 hairlines of layout: a `calc(2px / 3)` border snaps to 1 CSS px, 3 device pixels at @3x (docs/conventions.md,
+   "Hairlines"). BKDividerBlockSnapshotTests/testDividerBlock: rows 30–31 of each 62 px cell. */
 .bk-divider {
-  height: 0;
-  border-top: calc(2px / 3) solid var(--dt_color_outline_tertiary);
-  margin-bottom: 10px;
+  height: 1px;
+  margin-bottom: calc(10px + 2 * var(--hairline) - 1px);
+  box-shadow: inset 0 calc(2 * var(--hairline)) 0 var(--dt_color_outline_tertiary);
 }
 
 /* ------------------------------------------------------------------------------------------------ context */
@@ -886,8 +889,16 @@
   border-radius: 2px;
   background: var(--dt_color_outline_tertiary);
 }
+/* rich_text_divider, drawn only with markdownInComposer or opaqueBlocksInComposer on (RichText.tsx): DividerAttachment,
+   one attachment paragraph 2 device pixels + 2 × 8 pt tall with the line centered in it, full width
+   (DividerAttachment.swift:20-24, :40-60): 8 pt above and below, not the divider block's 10. Its color is the block's
+   text color, content_primary on a message (Text+Display.swift:278-281 tints it with attributesOverride.textColor, which
+   RichTextBlock+BKContainerBlockConvertible.swift:27-32 sets to the base text color through withFallbackTextAttributes,
+   TextBlock.swift:75-76); outline_tertiary is only DividerAttachment's fallback when no color is set (:24, :30-31). */
 .bk-rt-divider {
-  margin: 10px 0;
+  height: 1px;
+  margin: 8px 0 calc(8px + 2 * var(--hairline) - 1px);
+  box-shadow: inset 0 calc(2 * var(--hairline)) 0 currentColor;
 }
 .bk-rt-header {
   color: var(--dt_color_content_primary);

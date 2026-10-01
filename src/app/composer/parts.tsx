@@ -3,6 +3,7 @@ import { Icon } from '../../icons/Icon'
 import { LONG_PRESS_MS } from '../gestures'
 import { SKButton } from '../../slackkit/SKButton'
 import { SKAvatarPile } from '../../slackkit/SKAvatarPile'
+import { SKOrnamentBox } from '../../slackkit/SKOrnamentBox'
 import type { Conversation, FileAttachment, User } from '../../data/types'
 import { SKThumbnailAttachment } from '../../slackkit/SKThumbnailAttachment'
 import type { ContextBarState } from './contextBar'
@@ -160,8 +161,20 @@ function typingLabel(users: User[]): ReactNode {
  */
 export function ContextBar({ state }: { state: ContextBarState }) {
   let avatars: string[] = []
+  let icon: string | undefined
   let label: ReactNode
-  if (state.kind === 'typing') {
+  if (state.kind === 'dnd') {
+    // `user_has_paused_notifications` "%@ has <bold>paused their notifications</bold>" (yaml:22952), the name plain
+    // (ContextBarConfiguration.swift:76-79); left the `.snoozeFilled` icon with no fill, so in the text color, a 16 pt
+    // .tiny SKOrnamentBox (SKContextBarAdapter.swift:291-299; SKContextBar.swift:318-331), drawn as svgNotificationsDnd
+    // (SKIcon.swift:131; SKIconManifest+SVGMapping.swift:191). Not tappable (only .channelContextbar has a link, :460-464).
+    icon = 'notifications_dnd'
+    label = (
+      <>
+        {state.name} has <b>paused their notifications</b>
+      </>
+    )
+  } else if (state.kind === 'typing') {
     avatars = state.users.map((u) => u.avatar)
     label = typingLabel(state.users)
   } else if (state.kind === 'aiAppProcessing') {
@@ -181,6 +194,7 @@ export function ContextBar({ state }: { state: ContextBarState }) {
     <div className="cmp-banner cmp-banner--bar glass" role="status">
       {/* SKAvatarPile .extraSmall, overlapping (SKContextBar.swift:37, :331-335); none when there's no avatar */}
       {avatars.length > 0 && <SKAvatarPile avatars={avatars} size="extraSmall" shouldOverlap maxAvatarCount={5} className="cmp-banner__pile" />}
+      {icon && <SKOrnamentBox ornament={{ icon, color: 'currentColor' }} size="tiny" className="cmp-banner__icon" />}
       <span className="cmp-banner__text">{label}</span>
     </div>
   )
