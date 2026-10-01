@@ -18,7 +18,8 @@ use the same fields as the web kit (slack-remix), so an idea can move between de
 
 You'll type a few commands in **Terminal** (Applications › Utilities › Terminal). Paste each line and press Return.
 
-1. Get the kit: `git clone https://slack-github.com/colson-rice/slack-mobile-clone.git` then `cd slack-mobile-clone`. If your Mac asks to install the
+1. Get the kit: `git clone https://slack-github.com/colson-rice/slack-mobile-clone.git` (at Salesforce,
+   `https://github.com/salesforce-ux-emu/slack-mobile-clone.git`) then `cd slack-mobile-clone`. If your Mac asks to install the
    command line developer tools, click Install, then run the line again.
 2. Use the right version of Node (the program that runs the kit): `nvm install` then `nvm use`. If Terminal says
    `nvm: command not found`, install Node 22 from [nodejs.org](https://nodejs.org), then open a new Terminal window.
@@ -254,7 +255,7 @@ export default definePrototype({
 - **Present it**, offline: `npm run demo`, then open http://localhost:4190/?proto=expense-approvals. Before a demo,
   run `npm run selftest -- --proto expense-approvals`: it opens every screen and reports anything broken.
 - **Share a link.** The kit is live at https://pages.slack-github.com/colson-rice/design-pages/slack-mobile/ (Slack
-  sign-in). Once your prototype is in the kit and published (`docs/publishing.md`), it's at
+  sign-in) and https://laughing-adventure-8g6g51z.pages.github.io/ (Salesforce sign-in). Once your prototype is in the kit and published (`docs/publishing.md`), it's at
   `https://pages.slack-github.com/colson-rice/design-pages/slack-mobile/?proto=<name>`. Add `&chrome=device` for just the phone, or `&chrome=screen` for the screen
   alone (good in a slide or an iframe), `&device=iphone-16` and `&appearance=dark` to pick the phone.
 - **Add it to the kit** so everyone sees it in the gallery: run `npm run check` (it type-checks, tests every

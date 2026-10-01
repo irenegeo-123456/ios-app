@@ -34,8 +34,10 @@ The kit is live there: https://pages.slack-github.com/colson-rice/design-pages/s
 
 ## Salesforce: private GitHub Pages
 
-A `salesforce-ux-emu` repository serves its `gh-pages` branch at its private Pages address (set Pages visibility
-to Private in the repository settings first). Check the branch out into `site/` (ignored by Git) once per clone,
+github.com/salesforce-ux-emu/slack-mobile-clone (internal) serves its `gh-pages` branch, privately, at
+https://laughing-adventure-8g6g51z.pages.github.io/ (Pages visibility: private; first published 2026-10-01). Pushing to
+salesforce-ux-emu needs your Salesforce EMU account (`colson-rice_sfemu` in `gh auth status`); Salesforce's admin bot
+may add commits there (CODEOWNERS), so pull before you push. Check the branch out into `site/` (ignored by Git) once per clone,
 then publish, commit and push:
 
 ```sh
