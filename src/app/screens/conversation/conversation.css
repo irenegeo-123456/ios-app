@@ -12,12 +12,10 @@
   opacity: 1;
   background: var(--dt_color_base_primary);
 }
-/* bar buttons: 20 pt icons in content_primary (SKBarButtonItem.swift:277-288) */
+/* bar buttons: 20 pt icons in content_primary in both appearances (SKBarButtonItem.swift:277-288; the device's dark back
+   caret is (248,248,248) = content_primary, reference/device/srgb/IMG_2247–2248) */
 .convo-bar-button {
   color: var(--dt_color_content_primary);
-}
-[data-appearance='dark'] .convo-bar-button {
-  color: var(--glass-ink);
 }
 
 /* The title pill (ConversationNavigationTitleView.swift:128-140, 254-258, 451-541): interactive glass, 44 tall, as wide

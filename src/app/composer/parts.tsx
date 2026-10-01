@@ -139,7 +139,7 @@ export function SendToChannel({ conv, checked, onToggle }: { conv: Conversation 
 
 /** "Jane is **typing…**" / "Jane and Sam are **typing…**" / "Several people are **typing…**" (user_is_typing yaml:22968,
  *  two_users_are_typing :22438, several_people_are_typing :17733; ContextBarTypingConfiguration.swift:31-42). Names are
- *  `user.name`, display or real (TypingUsersService.swift:56-70). */
+ *  `user.name`, display or real, and the avatars the users' own (ContextBarService.swift:411-430). */
 function typingLabel(users: User[]): ReactNode {
   const names = users.map((u) => u.name || u.realName)
   const lead = names.length === 1 ? `${names[0]} is ` : names.length === 2 ? `${names[0]} and ${names[1]} are ` : 'Several people are '

@@ -78,13 +78,18 @@ export function HomeScreen() {
         titleOpacity={titleOpacity}
         title={fx.workspace.name}
         leading={
+          // The workspace button: SKWorkspaceAvatar .smallPlus 28 pt, concentric (round, its unread dot on the edge at
+          // 45°) in a 44 pt glass circle (PrimaryNavigationHeaderService.swift:629-671 [Sept]; device IMG_2246, iOS 26.7:
+          // avatar x 28–56 in the circle x 20–64). The 32 pt .toolbarItem is the edge-to-edge avatar, only when built
+          // with the iOS 27 SDK and run on iOS 27 (`#if compiler(>=6.4)` + `#available(iOS 27.0, *)`, :548-559,
+          // :592-598, :643-653): production differs from that path (shell-navigation.md §2.2).
           <GlassButton label="Open Workspace Panel" dark={onDark && gradientVisible} onClick={() => presentSheet('workspaces')}>
             <SKWorkspaceAvatar name={fx.workspace.name} initials={fx.workspace.initials} src={fx.workspace.iconUrl} size="smallPlus" round />
           </GlassButton>
         }
         trailing={
-          // rightButtons = [user, filter] (HomeInteractor.swift:235-247) go to setRightBarButtonItems, which UIKit lays
-          // out from the trailing edge inward: the profile avatar is rightmost, the filter to its left.
+          // rightButtons = [filter, user], leading to trailing (Sept, HomeInteractor.swift:258-268; June's [user, filter]
+          // was trailing-first): the filter, then the profile avatar rightmost, sharing one capsule.
           <GlassGroup dark={onDark && gradientVisible}>
             <GlassGroupItem label="Sort and Filter Home" onClick={() => presentSheet('home-filter')}>
               <Icon name="refine" size={20} />

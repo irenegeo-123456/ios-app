@@ -99,7 +99,10 @@
    September ones draw no glass), SKBarButtonItemTests @3x: testIconButtons (three icons in 16.0–163.0 pt, centers 52
    apart), testTitleButtons and testSystemEditButton (titles 12.3 pt in from the capsule's edges, 32 apart),
    testAllTogether ([spinner][Hello][user] from rightItems [user, title, spinner]); and on devices: two icons in 96 × 44
-   (measurements.md A), Home's [filter][avatar] at x 324.0–420.3 (D). */
+   (measurements.md A), Home's [filter][avatar] at x 324.0–420.3 (D, iOS 26.7). Secondary (iOS 27, not production): the
+   iOS_27 SKNavigationToolbarSnapshotTests draw the same geometry, a 44 pt circle at x 16–60, a 96 × 44 [clock][person]
+   capsule at x 278–374 of 390, the title from 72. Sept's edge-to-edge avatars and 32 pt toolbar avatar need the iOS 27
+   SDK on iOS 27 (shell-navigation.md §2.2), so avatars stay 28 pt with padding. */
 .glass-group {
   height: 44px;
   flex: none;
@@ -207,8 +210,10 @@
   align-items: center;
   gap: 4px;
 }
+/* the back caret is contentPrimary in both appearances, not the bar's label color (SKBarButtonItem.swift:48, :277-288
+   [Sept]; measured (248,248,248) on the device, IMG_2247–2248), centered in its circle (NavBar.tsx BackChevron) */
 .glass-button--back {
-  color: var(--glass-ink);
+  color: var(--dt_color_content_primary);
 }
 /* The profile item with a status emoji (SKBarButtonAvatarItem.swift:24-28, 160-166): the 22 pt emoji and the 28 pt
    (smallPlus) avatar 8 pt apart, Spacing.large (12) before, (36 − 28) / 2 = 4 after: 74 × 44. Without a status the
@@ -220,9 +225,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-.glass-button--back svg {
-  margin-left: -2px;
 }
 
 /* A tab root's bar: leading title in SKFont.title (Lato Black 22), theme.contentInversePrimary over the gradient */

@@ -596,6 +596,18 @@ Shown under the text view once there's at least one attachment (focused styles o
 | File / canvas / list / unfurl (compact card) | 64pt tall, ≤ **220pt** wide | radius **15**, 1pt border `outlineTertiary`, bg `basePrimary`, 12pt padding, 36×36 file-type tile, 8pt gap, title **Lato Bold 15** `contentPrimary` 1 line, subtitle **Lato 13** `contentTertiary` (file type in caps, e.g. "PDF"; canvases/lists show last-edited time) | `ComposerCompactAttachmentCell.swift:35-39`, `:80-89`; `SKCompactAttachment.swift:71-93`, `:578-579`, `:628-632`; `.../Helpers/AttachmentOrnament/AttachmentOrnament.swift:24-25`; `ComposerAttachmentsPresenter.swift:185-214`; PNG `testAttachmentFile@3x.png` |
 | Audio clip | 200×64 | radius 8, 1pt border `outlineTertiary` (*June:* `sk_foreground_low_solid` #DDDDDD / #323538) | `ComposerAudioAttachmentCell.swift:36-47` |
 
+**ALT badge** (Sept): an image thumbnail is an `SKThumbnailAttachment` with `altTextBadgeVisibility` **`.visibleAlways`**
+("ALT", or the "+ ALT" reminder when the image has none) when the user's or the team's alt-text-reminder pref is on, else
+**`.visibleIfPresent`** ("ALT" only when the image has alt text) (`ComposerAttachmentsPresenter.swift:253-261`; prefs
+`altTextReminders` / `teamAltTextReminders`, `?? false`, `ComposerFeature+Dependencies.swift:225-226`, `:243`;
+`Modules/UIInfra/SlackKit/Implementation/Helpers/AltText/AltTextBadgeVisibility.swift:6-26`). With image markup on (flag off)
+the edit icon takes the badge's place (`SKThumbnailAttachment.swift:366`), and with `.visibleAlways` a tap opens File
+Details, where alt text is edited (`ComposerAttachmentsView.swift:519-522`). June passed `allowAltTextReminder` instead.
+The message attachment bar is different: its thumbnails never show a badge (`.hidden`, the default; "thumbnail
+attachments always hide badges in attachments bar", `SKAttachmentBar.swift:874-879`), only an expanded image does
+(`.visibleAlways` with the reminder, else `.visibleIfPresent`). The clone (`parts.tsx` `AttachmentsTray`) uses
+`.visibleIfPresent`: it has neither pref, and its files carry no alt text, so no badge shows.
+
 **Remove "×"** (`ComposerAttachmentRemoveButton.swift`): `svgCloseCircleFilled` (`close_circle_filled.svg`), 20×20,
 color `contentPrimary` **#1D1C1D / #F8F8F8**, on a circle of `basePrimary` with a 2pt ring of the same color (`:34-38`,
 `:59-62`, `:70-73`, `:87-89`). *June:* `sk_primary_foreground` (#D1D2D3 dark) on `sk_primary_background`. Centred on the
@@ -796,6 +808,24 @@ declared at `ComposerViewConstants.swift:29`); `sk_foreground_soft_solid` #F3F3F
 `ContextBarView.swift:30`, `:63-65`, `:734-737`); Lato 13 with Lato Black 13 emphasis (`:54-62`); 22pt icon
 `sk_foreground_max_solid` (now `contentSecondary`, `:34-35`); shown/hidden with a 0.15s ease-out. `ContextBarView` is
 no longer used by the composer (only the conversation bottom drawer, Canvas and Share Message use it).
+
+**Which bar production draws for the states the clone has** (`src/app/composer/contextBar.ts`, `parts.tsx` `ContextBar`;
+one bar, the first that applies in `ContextBarPriorities` order, `ContextBarData.swift:39-58`):
+
+| State | Production (Sept, flags at their defaults) | Source |
+|---|---|---|
+| People typing (conversation level; the clone has no per-thread typers) | their avatars (16 pt pile) + "Jane is **typing…**" / "Jane and Sam are **typing…**" / "Several people are **typing…**" | `ContextBarTypingConfiguration.swift:31-42`; `SKContextBarAdapter.swift:153-161` |
+| An AI app working (its `assistant.threads.setStatus`) | in a **thread of the app's DM** only: "Beacon is looking into it…", the app's name + " " + the status, plain caption, **no avatar, no bold**; nothing in a channel or at the DM's top level (the plugin needs a thread source and the DM's user) | `Modules/Features/MessageTranscript/Implementation/Plugins/AiAppProcessingIndicatorPlugin.swift:181-229`; `ContextBarAiAppProcessingConfiguration.swift:22`; `SKContextBarAdapter.swift:282-289` |
+| Slackbot answering in its DM | Slackbot's avatar + "Slackbot is **typing...**" (three periods, `slackbot_is_typing` yaml:20148) | `ContextBarSlackbotAIProcessingConfiguration.swift:31-40`; `SKContextBarAdapter.swift:410-418` |
+| Agents working, with stop buttons and an expandable list of agent rows | **not drawn**: `ios_agent_sessions_context_bar` / `ios_channel_sessions_context_bar` are both `"defaultValue": false` | `ContextBarActiveParticipantsConfiguration.swift:21-26` |
+| The other person's DND ("Jane has **paused their notifications**", `snoozeFilled`) | drawn by production in a DM with a person who has paused notifications; the clone has no DND state for other people (`src/data/types.ts` `User`), so it can't show it | `ContextBarDNDConfiguration.swift:14-25`; `ContextBarConfiguration.swift:76-90` (yaml:22952) |
+
+The app kit mirrors an agent's status into the typing state (`src/apps/agent.ts` `mirrorTyping`); the bar never draws
+that as "is typing". Measured against `Modules/UIInfra/ContextBarUI/Snapshots/iOS_26/ContextBarUITests.SKContextBarSnapshotTests/`
+(the `iOS_27` PNGs are pixel-identical; glass isn't rendered, light only), the clone's bar copied without its glass into
+a 393 pt `base_primary` host with the fixtures' labels: `testTypingIndicator_ShortText` 1.35 % (avatar at 12, 16 pt;
+label from 36; 36 tall), `…_MultipleAvatars` 2.89 % (three avatars 12–52, label from 60), `…_LongText` 1.47 % (two
+lines, 43 vs 43.33 tall); what differs is the avatar image (the fixture uses Slackbot's) and antialiasing.
 
 ---
 
@@ -1325,13 +1355,16 @@ named in the README; `SKListCellPresentationObject+X.swift` stands for the per-t
 | `ComposerWysiwygPlugin.swift` | `Modules/Features/ComposerCorePlugins/Implementation/Plugins/ComposerWysiwygPlugin.swift` |
 | `ContentOffsetAccounting.swift` | `Modules/UIInfra/SlackKit/Implementation/CoreComponents/List/Accounting/ContentOffsetAccounting.swift` |
 | `ContextBarActiveParticipantsConfiguration.swift` | `Modules/Integration/ContextBar/Implementation/Configurations/ContextBarActiveParticipantsConfiguration.swift` |
+| `ContextBarAiAppProcessingConfiguration.swift` | `Modules/Integration/ContextBar/Implementation/Configurations/ContextBarAiAppProcessingConfiguration.swift` |
 | `ContextBarBottomDrawer.swift` | `Modules/Features/AnyConversation/Implementation/Plugins/ContextBarBottomDrawer.swift` |
 | `ContextBarConfiguration.swift` | `Modules/UIInfra/ContextBarUI/Implementation/ContextBarConfiguration.swift` |
 | `ContextBarContentPlugin.swift` | `Modules/Features/AnyConversation/Implementation/Plugins/ContextBarContentPlugin.swift` |
+| `ContextBarDNDConfiguration.swift` | `Modules/Integration/ContextBar/Implementation/Configurations/ContextBarDNDConfiguration.swift` |
 | `ContextBarData.swift` | `Modules/Integration/ContextBar/Implementation/ContextBarData.swift` |
 | `ContextBarDraftConfiguration.swift` | `Modules/Integration/ContextBar/Implementation/Configurations/ContextBarDraftConfiguration.swift` |
 | `ContextBarRowView.swift` | `Modules/UIInfra/ContextBarUI/Implementation/Views/ContextBarRowView.swift` |
 | `ContextBarScheduleMessageConfiguration.swift` | `Modules/Integration/ContextBar/Implementation/Configurations/ContextBarScheduleMessageConfiguration.swift` |
+| `ContextBarSlackbotAIProcessingConfiguration.swift` | `Modules/Integration/ContextBar/Implementation/Configurations/ContextBarSlackbotAIProcessingConfiguration.swift` |
 | `ContextBarTypingConfiguration.swift` | `Modules/Integration/ContextBar/Implementation/Configurations/ContextBarTypingConfiguration.swift` |
 | `ContextBarView.swift` | `Modules/Integration/ContextBar/Interface/ContextBarView.swift` |
 | `CustomConstraintHelpers.swift` | `Modules/UIInfra/SlackKit/Implementation/Helpers/LayoutConstraints/CustomConstraintHelpers.swift` |
@@ -1376,6 +1409,7 @@ named in the README; `SKListCellPresentationObject+X.swift` stands for the per-t
 | `SKBottomSheetDimmedView.swift` | `Modules/UIInfra/DeveloperComponents/Implementation/BottomSheet/View/SKBottomSheetDimmedView.swift` |
 | `SKBottomSheetPresentable+Defaults.swift` | `Modules/UIInfra/DeveloperComponents/Implementation/BottomSheet/Presentable/SKBottomSheetPresentable+Defaults.swift` |
 | `SKBottomSheetPresentationController.swift` | `Modules/UIInfra/DeveloperComponents/Implementation/BottomSheet/PresentationController/SKBottomSheetPresentationController.swift` |
+| `SKAttachmentBar.swift` | `Modules/UIInfra/SlackKit/Implementation/DesignerComponents/AttachmentBar/SKAttachmentBar.swift` |
 | `SKButton+PresentationObject.swift` | `Modules/UIInfra/SlackKit/Implementation/DesignerComponents/Button/SKButton+PresentationObject.swift` |
 | `SKButton+Types.swift` | `Modules/UIInfra/SlackKit/Implementation/DesignerComponents/Button/SKButton+Types.swift` |
 | `SKChannelEntity.swift` | `Modules/UIInfra/SlackKit/Implementation/DesignerComponents/Entities/ChannelEntity/SKChannelEntity.swift` |

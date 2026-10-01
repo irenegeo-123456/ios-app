@@ -51,12 +51,16 @@ export function GlassGroupItem({ children, label, onClick, width, className }: {
   )
 }
 
-/** SF Symbols chevron.left, as UIKit draws the back button glyph (17 pt, semibold). */
-export const BackChevron = () => (
-  <svg width="12" height="20" viewBox="0 0 12 20" fill="none" aria-hidden>
-    <path d="M10 2 2 10l8 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
+/**
+ * The back button's glyph: Slack's caret, not UIKit's chevron. SKNavigationController gives every pushed screen an
+ * SKBarButtonItem `.back` unless it sets its own back item (SKNavigationController.swift:68-81, :92-102, :112-117 [Sept];
+ * June the same): `svgCaretLeftFull` 20 pt, no side padding on iOS 26, in contentPrimary baked light / dark, tint ignored
+ * (SKBarButtonItem.swift:133-143, :258-275, :277-288). Production agrees: a real iPhone (iOS 26.7, Sept 2026,
+ * reference/device/IMG_2247–2248) draws the caret's ink at x 37.5–46.3, y 75.5–92.2 in the 44 pt circle at x 20–64,
+ * y 62–106 (caret_left_full's 5.5–14.8 × 1.7–18.3 of a centered 20 pt box) in (248,248,248) = contentPrimary. UIKit's
+ * own chevron only appears in the flagged `rootNavigationUpdates` stacks (shell-navigation.md §3.1, mode C).
+ */
+export const BackChevron = () => <Icon name="caret_left_full" size={20} />
 
 interface NavBarProps {
   title?: ReactNode

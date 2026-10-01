@@ -398,7 +398,16 @@ Shown for Slackbot's generated replies in the Slackbot DM once streaming ends (`
   `.subtitle` / `.bodyBlack` / `.bodyBold` with the flatter heading scale) and a divider a full-width 2-device-pixel
   `outline_tertiary` line with 8pt above and below (`Text+Display.swift:49-61, 224-292`;
   `Modules/UIInfra/SlackKit/Implementation/CoreComponents/Label/Attachments/DividerAttachment.swift:21-24`). Off (production
-  default): headers read as plain paragraphs and dividers are dropped.
+  default): headers read as plain paragraphs and dividers are dropped. The flatter scale is `ios_flat_message_heading_scale`
+  (default off, added 2026-07-14, "to match web PR #403398"), wired at `ToggleMigrationPlugin+Dependencies.swift:71-73`.
+  Block Kit `header` blocks use the same `.header` text blocks unconditionally (level 2 when unset,
+  `Modules/UIInfra/BlockKitComponents/Implementation/Blocks/Header/BKHeaderBlockView.swift:77-92`).
+  **The clone:** `src/app/text` draws mrkdwn, and TSF has no header or divider syntax (`TSF2NativeTokenizer.swift:105-123`),
+  so headings reach a message only as Block Kit header blocks or `rich_text_header` elements, drawn by `src/blocks`
+  (`blocks.css` `.bk-header--1/2/3` = headline / title / subtitleBold). Open there: `src/blocks/blocks/RichText.tsx` draws
+  `rich_text_header` / `rich_text_divider` natively always, which is production only with `markdownInComposer` /
+  `opaqueBlocksInComposer` on (off: a plain paragraph, no divider), and its divider is 10 pt above and below where
+  `DividerAttachment` has 8.
 - Not the message path (legacy/composer; don't copy their colors): `Modules/Integration/TextRendering/Interface/RichText/*`,
   `Modules/Data/TSFKit/Implementation/TextRenderer/TSF2TextRenderer.swift` ("hardly used / soon to be completely removed", `:187`) with
   `Modules/UIInfra/TSFTheme/Implementation/TSF2Theme+Default.swift:22-43`, and `App/Source/RichText/*`.
@@ -442,7 +451,10 @@ zero-inset test blocks and show 0).
 **Inline code** (`Text+Display.swift:774-786, 1743-1749`; `LayoutManager.swift:19, 159`;
 `LayoutManagerRoundedRectanglePlugin.swift:15-104`):
 - Font Menlo Regular **16** (base size − 1; Menlo Bold/Italic 16 when bold/italic) (`SKFont.swift:320-345`).
-- Text `message_rendering_code`: `#e01e5a` / `#e8912d` (`SKLegacyColors.swift:339`; measured).
+- Text `message_rendering_code`: `#e01e5a` / `#e8912d` (`SKLegacyColors.swift:339`; measured). **Unchanged in Sept**:
+  `Text+Display.swift:778` still tints it, and the Sept `testCodeText@3x.png` measures (224,30,90) / (232,145,45). (The
+  `content_primary` Menlo 13 in `TextAttributes+Display.swift:13-17`, "inline code in contentPrimary" in
+  slackkit-components.md › SKLabel, is `defaultCodeText`, the flagged-off rich code block's style, not inline code's.)
 - Background `surface_primary` `#1d1c1d@0.06` / `#f8f8f8@0.06`; border 1pt `outline_tertiary` `#5e5d60@0.13` /
   `#797c81@0.3`; corner radius 3.
 - The box is the glyph run's rect: **full line height, no horizontal padding** (measured: box = whole 20.67pt line;
@@ -459,6 +471,8 @@ Production uses the legacy style (the "rich" style is behind `ios_rich_code_bloc
 
 - Font Menlo Regular 16, text `content_primary` `#1d1c1d` / `#f8f8f8` (June `sk_primary_foreground`; the dark half of
   `testPreRenderedText` already measured `#f8f8f8`) (`Text+Display.swift:139-155`; `Modules/UIInfra/TextDisplay/Implementation/RichTextTheming.swift:48-57`).
+  The block sets that color itself (`:145-147`), so a code block in an ephemeral or system message (`content_secondary`
+  body) is still `content_primary`; the clone's `.rt-pre` does the same (`src/app/text/text.css`).
 - Box spans the **full column width** (`LayoutManager.swift:163-174`); fill `message_rendering_code_block_fill` =
   `#1d1c1d@0.04` / `#d1d2d3@0.13`; 1pt border `message_rendering_code_block_stroke` = `#1d1c1d@0.13` / `#d1d2d3@0.5`;
   radius 3 (`SKLegacyColors.swift:342-343`; `Text+Display.swift:1767-1774`).

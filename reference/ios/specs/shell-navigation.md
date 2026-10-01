@@ -28,7 +28,8 @@ a citation marked [June] refers to the June snapshot (cd22922) the spec was firs
   `RootViewControllerTabs` to `Modules/Features/Root/Implementation/LoggedIn/Compact/`; a SwiftUI "unified navigation"
   shell exists behind `ios_unified_nav_arch` (off; §0.1).
 - **Snapshots**: component PNGs are 2×2 grids (light / dark × normal / high contrast); the iOS 26 bar-button baselines no
-  longer draw glass; the pre-26 header baselines sit 26 pt higher; `Snapshots/iOS_27` folders exist (not pulled).
+  longer draw glass; the pre-26 header baselines sit 26 pt higher; `Snapshots/iOS_27` folders exist (pulled since:
+  §2.2 checks the Sept bar buttons against them and the device, which runs iOS 26.7).
 - **Design tokens** `f76ac0a` (pinned by 14b3cbaf): `flamingo_40` and `dt_color_base_inverse_important` dark became
   `#d3305d`.
 
@@ -435,6 +436,29 @@ Sept also defines `slackbotMenu` (`svgListView`, "Open Menu") and `newChat` (`sv
 (`:756-773`); no tab's header uses them. Workspace button a11y label `a11y_show_workspace_switcher_button` "Open Workspace
 Panel" (`localized_strings.yaml:270`).
 
+**Sept bar buttons: what's gated, and what production draws.** The Sept SlackKit refresh adds a glass "edge-to-edge"
+avatar, a 32 pt toolbar avatar, a `.prominent` style, an axis behavior and a new huddle view to `SKBarButtonItem`. Each
+was checked against its guard, the `Snapshots/iOS_27` PNGs (now pulled) and the device screenshots (D: iOS **26.7**,
+iPhone 17 Pro Max, Sept 2026, confirmed by the owner; production = the iOS 26 chrome they show). The clone draws the
+iOS 26 / device column; iOS-27-only looks are not adopted.
+
+| Sept code | Gate | iOS_27 PNGs | Device (iOS 26.7) | Clone |
+|---|---|---|---|---|
+| Glass config: `hidesSharedBackground = false`, `style = .plain`, adjacent items share a capsule (`SKBarButtonItem.swift:59-65`) | iOS 26, unchanged since June | `SKNavigationToolbarSnapshotTests` (390 wide): 44 pt circle x 16–60, `[clock][person]` capsule 96 × 44 at x 278–374, title from x 72 (12 after the circle) | circles and capsules as measured (§2.2, measurements.md D) | same geometry (`GlassButton`, `GlassGroup`) |
+| Edge-to-edge avatar: `isPaddingRemoved` (`SKBarButtonItem.swift:126-132`); the avatar fills the 44 pt container (`SKBarButtonAvatarItem.swift:123-136`) | `#if compiler(>=6.4)` **and** `#available(iOS 27.0, *)`: Xcode 27 SDK on iOS 27 (`PrimaryNavigationHeaderService.swift:548-559`), and only for an avatar alone in its capsule, not GovSlack, no status emoji (`:592-598`, `:643-647`, `:711-718`) | none of the tests render a header avatar (the toolbar tests' leading item is an icon) | **production differs**: Home's workspace avatar is 28 pt (x 28–56) in the 44 pt circle x 20–64; the profile avatar 28 pt (x 384–412) in the `[filter][avatar]` capsule x 324–420 | 28 pt `.smallPlus` with padding |
+| 32 pt `.toolbarItem` workspace avatar (`PrimaryNavigationHeaderService.swift:653`; `SKWorkspaceAvatar` sizes) | only when edge-to-edge (above) | — | **production differs**: 28 pt | 28 pt |
+| Concentric avatars: round, the unread / presence dot on the edge at 45° (`shouldMakeConcentric`, `:635-638`, `:675-680`) | iOS 26 | — | **agrees**: the round 28 pt workspace avatar carries the other-workspaces unread dot, Ø 7.33 centered at (51.67, 74.0) = (23.67, 4.0) in the avatar's box, in a round cutout (IMG_2246) | round (`SKWorkspaceAvatar round`, the concentric dot in `skws-concentric-*`); the demo has one workspace, so Home shows no dot |
+| `axisBehavior` (`SKBarButtonItem.swift:66-70`) | `#if canImport(UIKit, _version: 9127.0.85)` + iOS 27.1 | — | — | n/a (no visual on iOS 26) |
+| `.prominent` icon style, tinted glass (`SKBarButtonItem.swift:281-283`, `:321-333`) | iOS 26; the only caller is the Share extension's send button (`ShareExtension/Implementation/SharePresenter.swift:883`) | — | not in any bar on the device | n/a |
+| Huddle button `SKHuddleBarButtonView`, `.prominent` capsule while a huddle is active or its coachmark shows (§3.5) | iOS 26 | — | inactive: the bare headphones in the Slackbot capsule (IMG_2247–2248) | inactive as on the device (`ConversationNavBar.tsx`); no active-huddle state in the bar yet |
+| Back button: SKNavigationController's `SKBarButtonItem .back` on every push, `svgCaretLeftFull` 20 pt contentPrimary (§3.3) | unchanged since June | `testBackButtons` / `testAllTogether` draw the caret | the caret, ink x 37.5–46.3, y 75.5–92.2 in the circle x 20–64 (IMG_2248), (248,248,248) | the caret on every pushed bar (`NavBar.tsx` `BackChevron`; the clone's generic bar drew UIKit's chevron before) |
+
+The iOS_27 `SKBarButtonItemTests` PNGs render the glass as a flat mid-gray fill ((130–134) gray) with the items flush
+to the test bar's edges (`testAllTogether`: back circle x 0–44, capsule 226.7–393): the test harness, not production
+(the iOS_27 toolbar PNGs and the device both keep the layout margin). Their glass and the iOS_27 toolbar's near-white
+fill (249–252 over white, a 2-device-pixel (215 → 176) rim) are offscreen renders, so the clone's light glass stays as it
+was; only dark glass is measured (D).
+
 **Pull-to-smile** (Home, DMs, More; not Activity/Search) (`PrimaryNavigationHeaderEmbeddablePresenter.swift:19-24`,
 `99-127`; `…/PrimaryNavigationHeaderViewController.swift:28-32`, `53-75`, `102-114`): when the list is over-scrolled past
 **84 pt** a random message appears (soft haptic, intensity 0.5), centered, bottom 88 pt above the decoration's bottom;
@@ -746,6 +770,10 @@ The glass measurements in this spec are June's, confirmed on a device (§3.2).
   `Modules/Features/AnyConversation/Implementation/AnyConversationInteractor.swift:840`). Tap = pop; at the panel root
   this dismisses the panel (`CompactRootTabDoubleViewController.swift:208-211`). Mode C uses the system back button
   (title/color unverified).
+- Production (D, iOS 26.7): the caret, not UIKit's chevron, on pushed screens: a thread's back glyph ink x 37.5–46.3,
+  y 75.5–92.2 in the circle x 20–64 (caret_left_full's 5.5–14.8 × 1.7–18.3 of a centered 20 pt box), (248,248,248) =
+  `contentPrimary` (IMG_2248; the channel's, IMG_2247, the same). The clone draws it on every pushed bar (`NavBar.tsx`
+  `BackChevron`, measured x 37.67–46.67, y 75.67–92.33 on the Pro Max); its generic bar drew SF `chevron.left` before.
 
 ### 3.4 Conversation title pill (channel, DM, group DM; Messages tab)
 
@@ -1225,8 +1253,9 @@ resolved safe-area top is 54 pt. On iOS 26 the gradient decoration covers everyt
 - Device: must be `iPhone15,2` = "iPhone 14 Pro" or the test fails (`Modules/UIInfra/SnapshotTestFoundations/Implementation/SnapshotTestCase.swift:69-71`;
   `.bazelrc:51` `test --ios_simulator_device="iPhone 14 Pro"`). 393×852 pt, @3x → 1179×2556 px.
 - iOS version: the major version picks the folder `Snapshots/iOS_<major>` (`SnapshotTestCase.swift:39-60`, `85-87`).
-  Sept has `iOS_18`, `iOS_26` and (new) `iOS_27` baselines (1,889 `iOS_27` PNGs in 40 modules, Git LFS pointers in this
-  checkout: only `iOS_26` was pulled); the SDK guard now requires the iOS 27 SDK for iOS 27 runs (`:72-76`; June: iOS 26).
+  Sept has `iOS_18`, `iOS_26` and (new) `iOS_27` baselines (1,889 `iOS_27` PNGs in 40 modules, pulled in this checkout
+  since); the SDK guard now requires the iOS 27 SDK for iOS 27 runs (`:72-76`; June: iOS 26). iOS 27 renders glass
+  offscreen, so some `iOS_27` PNGs draw it; production is iOS 26 (the device, §2.2), so they're secondary evidence only.
 - Appearance: light unless a test overrides it. `ComponentSnapshotTestCase` now renders every case four times, a 2×2
   grid: rows light / dark, columns normal / high contrast (June: light over dark, two cells), each in a 393×852 window
   with **zero** safe-area insets (`Modules/UIInfra/SnapshotTestFoundations/Implementation/ComponentSnapshotTestCase.swift:11-24`,
