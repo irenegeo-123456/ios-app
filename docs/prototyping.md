@@ -16,15 +16,19 @@ use the same fields as the web kit (slack-remix), so an idea can move between de
 
 ## 1. Set up (once)
 
-You'll type a few commands in **Terminal** (Applications › Utilities › Terminal). Paste each line and press Return.
+The easy way is to let Claude do it: [Getting started](getting-started.md) has a prompt to paste into Claude Code
+that gets the kit, installs it and opens it in Chrome, plus the steps by hand and fixes for everything we've seen
+go wrong. In short, in **Terminal** (Applications › Utilities › Terminal), pasting each line and pressing Return:
 
-1. Get the kit: `git clone https://slack-github.com/colson-rice/slack-mobile-clone.git` (at Salesforce,
+1. Sign Git in to GitHub, once, with the GitHub CLI (`brew install gh`; Git doesn't take your password):
+   `gh auth login --hostname slack-github.com --git-protocol https --web`, then `gh auth setup-git`.
+2. Get the kit: `git clone https://slack-github.com/colson-rice/slack-mobile-clone.git` (at Salesforce,
    `https://github.com/salesforce-ux-emu/slack-mobile-clone.git`) then `cd slack-mobile-clone`. If your Mac asks to install the
    command line developer tools, click Install, then run the line again.
-2. Use the right version of Node (the program that runs the kit): `nvm install` then `nvm use`. If Terminal says
-   `nvm: command not found`, install Node 22 from [nodejs.org](https://nodejs.org), then open a new Terminal window.
-3. Install the kit's parts (a minute the first time): `npm install`
-4. Check everything is ready: `npm run doctor`. It lists anything missing and how to fix it.
+3. Use Node 22 (the program that runs the kit) **before you install**: `nvm install && nvm alias default 22`. If
+   Terminal says `nvm: command not found`, see [Getting started](getting-started.md#by-hand).
+4. Install the kit's parts (a minute the first time): `npm install`
+5. Check everything is ready: `npm run doctor`. It lists anything missing and how to fix it.
 
 ## 2. Run it
 
@@ -271,7 +275,8 @@ export default definePrototype({
 
 | What you see | What to do |
 |---|---|
-| `npm run dev` says Node is too old | `nvm use` (or install Node 22), then try again. `npm run doctor` checks everything |
+| `npm run dev` says Node can't run the kit | `nvm install 22 && nvm alias default 22`, then try again. `npm run doctor` checks everything |
+| Getting the kit or installing it fails | [Getting started](getting-started.md#troubleshooting) lists every setup error we've seen and its fix |
 | The page is blank or red | A typo in `index.ts` (usually a comma, quote or bracket). The red screen names the line; undo and save |
 | The panel lists "things to fix" | Each line says which field and why, often with a "did you mean". Fix and save |
 | "there's no prototype called …" | The folder name in `?proto=` doesn't match a folder in `prototypes/` |

@@ -61,9 +61,15 @@ lists the internal hosts.
 | `npm run harvest` | re-harvest tokens, icons, fonts and sounds from the iOS source |
 | `node tools/publish.mjs <folder> <base>` | static build for an internal Pages repo (`docs/publishing.md`) |
 
-- Node 22.12+ (`.nvmrc`). A folder that arrived by AirDrop or zip is quarantined by macOS: `xattr -dr com.apple.quarantine node_modules`.
+- Node 22.12+ (`.nvmrc`). Each command's shell starts on nvm's default Node, so `nvm use` doesn't carry over: start
+  commands with `nvm use >/dev/null &&`, or make 22 the default (`nvm alias default 22`, as the setup prompt in
+  `docs/getting-started.md` does). On an older Node npm leaves out Vite's native binding, so `.npmrc`
+  (engine-strict) refuses the install. A folder that arrived by AirDrop or zip is quarantined by macOS: `xattr -dr com.apple.quarantine node_modules`.
 - Headless Chrome can't start inside Claude Code's sandbox, so run `selftest`, `shot`, `compare` and `snapshots` outside it. A dev
   server started inside the sandbox never sees file changes, so start `npm run dev` outside it too.
+- Background tasks end with the session. When someone asks to see the kit and http://localhost:5190 doesn't answer,
+  start `npm run dev` (in the background, outside the sandbox) first, then open the page for them or give them the
+  link. Setup trouble (Git sign-in, Node, a broken install): `docs/getting-started.md`.
 - In the browser console: `slack.app.getState()` (the app store: `openConversation`, `push`, `presentSheet`,
   `receiveMessage`…), `slack.sim` (device, appearance), `slack.theme`.
 

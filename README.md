@@ -15,6 +15,9 @@ publicly; `docs/publishing.md` lists the internal hosts.
 
 ## Quick start
 
+New to this, or stuck? [docs/getting-started.md](docs/getting-started.md) has a prompt that has Claude Code set it
+all up, and fixes for every setup error we've seen.
+
 ```sh
 nvm use            # Node 22 (.nvmrc)
 npm install
@@ -37,6 +40,7 @@ URL options: `&device=iphone-16` (`iphone-17-pro`, `iphone-17-pro-max`, `iphone-
 
 | | |
 |---|---|
+| `docs/getting-started.md` | getting it running on a Mac: a prompt for Claude, the steps by hand, troubleshooting |
 | `docs/prototyping.md` | making prototypes (for designers; no coding needed) |
 | `docs/publishing.md` | building and hosting the site internally |
 | `docs/conventions.md` | how the clone is built (for contributors and Claude) |
