@@ -45,21 +45,23 @@ You're setting this up for a designer, not an engineer: do the work, ask only fo
 plain words, one step at a time.
 
 1. **The code.** If there's already a `slack-mobile-clone` folder (home, Desktop, Documents, Developer), use it and
-   `git pull`, keeping their work. Otherwise clone into `~/slack-mobile-clone`. "could not read Username", a
+   `git pull` (if it refuses, don't stash, reset or force: tell them). Otherwise clone into `~/slack-mobile-clone`. "could not read Username", a
    username prompt or "Repository not found" mean Git isn't signed in: get the GitHub CLI (`brew install gh`; with
    no Homebrew, the macOS zip from https://github.com/cli/cli/releases/latest in `~/.local/bin`), run
    `gh auth login --hostname slack-github.com --git-protocol https --web` in the background (github.com and their
    `_sfemu` account at Salesforce), show them the one-time code and the link, wait, then `gh auth setup-git` and
    clone again. Never ask for a password or token in the chat. If macOS offers the command line developer tools,
    ask them to click Install.
-2. **Node before packages.** The kit needs Node 22.12+ (24 and 26+ work too). Every command starts a fresh shell,
-   so `nvm use` doesn't last: `nvm install 22 && nvm alias default 22`. With no nvm, install it with its script
-   from https://github.com/nvm-sh/nvm (no admin password) and load it with `. ~/.nvm/nvm.sh` in the same command.
-   Don't `npm install` until `node -v` says v22 or later.
-3. **Install and check:** `npm install`, then `npm run doctor`, and fix what it lists.
+2. **Node before packages.** The kit needs Node 22.12+, 24 or 26+. Your shell may start on an older one, and
+   `nvm use` doesn't carry between commands, so `nvm install 22` if it's missing, then start every Node command in
+   the kit folder with `nvm use >/dev/null &&` (it reads `.nvmrc`). `nvm alias default 22` makes their Terminal use
+   it too. With no nvm, install it with its script from https://github.com/nvm-sh/nvm (no admin password) and load
+   it with `. ~/.nvm/nvm.sh` in the same command. Don't `npm install` until `node -v` says v22.12+, v24 or v26+.
+3. **Install and check:** `npm install`, then `npm run doctor`, and fix its ✗ lines (• lines are notes).
 4. **Start it:** `npm run dev` as a background task, outside the sandbox if you have one (inside it, the server
-   never sees file changes). When http://localhost:5190 answers, `open -a "Google Chrome" http://localhost:5190`,
-   or give them the link.
+   never sees file changes). If port 5190 is taken, find out what's using it and ask before stopping it. When
+   http://localhost:5190 answers, give them the link, and open it if you can
+   (`open -a "Google Chrome" http://localhost:5190`).
 5. **Hand over.** Read `CLAUDE.md`, `docs/prototyping.md` and `.claude/skills/`, and follow them from now on. Tell
    them in a few lines what they're looking at, with two or three example requests. Their changes are prototypes
    in `prototypes/<name>/` (never the Northstar demo): open `?proto=<name>` for them and look at a screenshot
@@ -67,8 +69,8 @@ plain words, one step at a time.
 6. Tell them the kit runs only while this session is open, and that next time they open Claude Code in the
    `slack-mobile-clone` folder and say "start the kit".
 
-Internal only: never publish the kit or push it anywhere public. No sudo. If a step fails twice the same way, stop
-and tell them exactly what it says.
+Internal only: never publish the kit or push it anywhere public. No sudo. If a step fails twice the same way, or
+hangs with no output, stop and tell them exactly what it says.
 
 ### Coming back to it
 
