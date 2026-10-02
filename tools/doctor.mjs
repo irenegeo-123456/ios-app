@@ -19,15 +19,30 @@ const [major, minor] = process.versions.node.split('.').map(Number)
 const nodeOk = (major === 22 && minor >= 12) || major === 24 || major >= 26
 if (!nodeOk) {
   const nvm = fs.existsSync(path.join(process.env.HOME || '', '.nvm'))
+  // `nvm use` lasts for one Terminal window; the default is what every new window (and Claude Code) starts with.
   problems.push(
-    `Node ${process.versions.node} is too old (need 22.12+).\n` +
-      (nvm ? '    Fix: nvm install 22 && nvm use   (this repo has an .nvmrc)' : '    Fix: install Node 22 LTS from https://nodejs.org, or via nvm / Homebrew (brew install node@22)'),
+    `Node ${process.versions.node} can't run the kit (it needs Node 22.12+, 24 or 26+).\n` +
+      (nvm
+        ? '    Fix: nvm install 22 && nvm alias default 22   (this repo has an .nvmrc)'
+        : '    Fix: install Node 24 LTS from https://nodejs.org (or nvm: https://github.com/nvm-sh/nvm), then open a new Terminal window'),
   )
 }
 
 // 2. Dependencies installed
 const hasModules = fs.existsSync('node_modules/vite/package.json')
 if (!hasModules) problems.push('Dependencies are not installed.\n    Fix: npm install')
+
+// 2b. Vite's native binding. npm skips an optional dependency that doesn't support the running Node without saying
+//     so, so a node_modules installed on an older Node has no binding and Vite stops with "Cannot find native
+//     binding". (.npmrc's engine-strict now refuses that install, but an older node_modules can still be missing it.)
+if (hasModules && fs.existsSync('node_modules/rolldown/package.json')) {
+  const bindings = fs.existsSync('node_modules/@rolldown') ? fs.readdirSync('node_modules/@rolldown').filter((d) => d.startsWith('binding-')) : []
+  if (!bindings.length)
+    problems.push(
+      "node_modules is missing Vite's native part: it was installed with an older Node.\n" +
+        '    Fix: rm -rf node_modules && npm install   (with Node 22 active; node -v says which)',
+    )
+}
 
 // 3. macOS quarantine: a folder copied via AirDrop / downloaded as a zip marks every file, and macOS then refuses to
 //    load the bundler's native binary.
